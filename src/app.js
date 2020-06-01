@@ -18,7 +18,9 @@ import {socket} from './start';
 import RestartGame from "./components/RestartGame";
 
 // TODO s
+// upload to Heroku
 // add round column to games table and add get and post request to set the round
+// immediately set timer to timeToExplain in frontend after click on 'start explaining'
 
 // TODO s bauernscharade
 // add status to game for setup

@@ -1,5 +1,5 @@
 const spicedPg = require('spiced-pg');
-const db = spicedPg('postgres:postgres:postgres@localhost:5433/scharade');
+const db = spicedPg(process.env.DATABASE_URL ||'postgres:postgres:postgres@localhost:5433/scharade');
 
 module.exports.getWords = function getWords() {
     return db.query('SELECT * FROM words');
