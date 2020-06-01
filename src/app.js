@@ -177,7 +177,7 @@ const App = () => {
         setGameStatus("playerExplaining");
         setPlayerExplaining("other");
         setWordToExplain({});
-        setWordToExplain({});
+        setWordsExplained([]);
         setWordsDiscarded([]);
         setScore(undefined);
     };
