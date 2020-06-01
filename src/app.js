@@ -253,7 +253,7 @@ const App = () => {
         }
     }
 
-    const showTimer = !!countdown && (gameStatus === "playerExplaining" || gameStatus === "timeOver" || gameStatus === "endOfRoundReached");
+    const showTimer = !!countdown && (gameStatus === "playerExplaining" || gameStatus === "endOfRoundReached") || gameStatus === "timeOver";
     const showStartExplaining = gameStatus === "start" || gameStatus === "timeOver" && playerExplaining !== "self";
     const showWordCard = gameStatus === "playerExplaining" && wordToExplain && playerExplaining === "self";
     const showOtherPlayerExplaining = gameStatus === "playerExplaining" && playerExplaining === "other";
