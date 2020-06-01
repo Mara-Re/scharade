@@ -200,7 +200,7 @@ const App = () => {
         try {
             await axios.post('/reset-words-status');
             setGameStatus("playerExplaining");
-            socket.emit("start-new-round");
+            socket.emit("start-new-round", {countdown});
             if (playerExplaining === "self") {
                 getRandomWord();
             }
