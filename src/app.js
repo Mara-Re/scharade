@@ -189,6 +189,8 @@ const App = () => {
             await getRandomWord();
             setCountdown(timeToExplain);
             setPlayerExplaining("self");
+            setWordsExplained([]);
+            setWordsDiscarded({});
             setGameStatus("playerExplaining");
             socket.emit("start-explaining");
         } catch(e) {
