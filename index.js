@@ -3,7 +3,7 @@ const app = express();
 const compression = require('compression');
 const db = require('./database/db');
 const server = require('http').Server(app);
-const io = require('socket.io')(server, { origins: 'ws://zettelchen.herokuapp.com:57373/socket.io/?EIO=4&transport=websocket'});
+const io = require('socket.io')(server);
 
 
 const timeToExplain = 11;
