@@ -190,7 +190,8 @@ io.on('connection', function(socket) {
         socket.broadcast.emit("end-of-round-reached");
     });
 
-    socket.on('start-new-round', () => {
+    socket.on('start-new-round', (data) => {
+        countdown = data.countdown;
         socket.broadcast.emit("new-round-started");
         console.log("in start-new-round, countdown: ", countdown);
         if (countdown > 0) {
