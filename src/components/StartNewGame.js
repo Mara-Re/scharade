@@ -13,46 +13,48 @@ const useStyles = makeStyles({
         position: "absolute",
         bottom: 0,
         width: "100%",
-        height: "2.5rem",
+        // height: "2.8rem",
+        padding: "5px 20px",
+        backgroundColor: "#eeeeee"
     }
 });
 
-const RestartGame = (props) => {
-    const {onRestartGame} = props;
+const StartNewGame = (props) => {
+    const {onStartNewGame} = props;
     const classes = useStyles();
 
-    const [restartDialogOpen, setRestartDialogOpen] = useState(false);
+    const [startNewGameDialogOpen, setStartNewGameDialogOpen] = useState(false);
 
-    const onRestartClick = () => {
-        onRestartGame();
-        setRestartDialogOpen(false);
+    const onStartNewGameClick = () => {
+        onStartNewGame();
+        setStartNewGameDialogOpen(false);
     };
 
 
     return (
         <>
-            <Box className={classes.footer}>
-                <Button onClick={() => setRestartDialogOpen(true)}>Restart game</Button>
+            <Box className={classes.footer} display='flex' alignSelf="center">
+                <Button onClick={() => setStartNewGameDialogOpen(true)}>Start new game</Button>
 
             </Box>
             <Dialog
-            open={restartDialogOpen}
-            onClose={() => setRestartDialogOpen(false)}
+            open={startNewGameDialogOpen}
+            onClose={() => setStartNewGameDialogOpen(false)}
                 >
                 <DialogTitle >
-                Restart Game
+                Start new game
                 </DialogTitle>
                 <DialogContent>
                     <DialogContentText>
-                        Are you sure you want to restart the game?
+                        Are you sure you want to start a new game?
                     </DialogContentText>
                 </DialogContent>
                 <DialogActions>
-                <Button autoFocus onClick={() => setRestartDialogOpen(false)} color="primary">
+                <Button autoFocus onClick={() => setStartNewGameDialogOpen(false)} color="primary">
                     Cancel
                     </Button>
-                <Button onClick={onRestartClick} color="primary">
-                    Restart Game
+                <Button onClick={onStartNewGameClick} color="primary">
+                    Start new game
                 </Button>
                 </DialogActions>
             </Dialog>
@@ -60,4 +62,4 @@ const RestartGame = (props) => {
     );
 }
 
-export default RestartGame;
+export default StartNewGame;

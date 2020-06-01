@@ -15,15 +15,13 @@ import PlayArrowIcon from '@material-ui/icons/PlayArrow';
 import ReplayIcon from '@material-ui/icons/Replay';
 
 import {socket} from './start';
-import RestartGame from "./components/RestartGame"
+import StartNewGame from "./components/StartNewGame"
+import EnterWords from "./components/EnterWords";
+import StartGame from "./components/StartGame";
 
 const timeToExplain = 11;
 
-// TODO s
-// add round column to games table and add get and post request to set the round
-// show time over when game status === "timeOver"
-
-// TODO s bauernscharade
+//DONE bauernscharade
 // add status to game for setup
 // enable players to enter words to the game
 // add functionality to start game after words have been entered
@@ -42,6 +40,12 @@ const timeToExplain = 11;
 // TODO handle exceptions / fix bugs
 // handle case if reloading game and status is end of round reached
 // make sure that only one person can be explaining at a time
+
+// TODO collection
+// add round column to games table and add get and post request to set the round
+// add two restart choices: restart game with same words, restart game with new words
+
+
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -111,14 +115,24 @@ const App = () => {
         setTimeout(() => {setError(undefined)}, 2000);
     }
 
+    //---------SOCKET EVENT LISTENERS-----------------------
+    useEffect(() => {
+        socket.on("game-started", () => {
+            updateStatus("start");
+        });
+    }, []);
+    useEffect(() => {
+        socket.on("new-game-started", () => {
+            updateStatus("setup");
+        });
+    }, []);
+
     useEffect(() => {
         socket.on("other-player-starts-explaining", () => {
             onOtherPlayerStartsExplaining();
         });
     }, []);
 
-
-    //---------SOCKET EVENT LISTENERS-----------------------
     useEffect(() => {
         socket.on("end-of-round-reached", () => {
             setGameStatus("endOfRoundReached");
@@ -174,11 +188,9 @@ const App = () => {
     }
 
     const onOtherPlayerStartsExplaining = () => {
-        setGameStatus("playerExplaining");
         setPlayerExplaining("other");
-        setWordToExplain({});
-        setWordsExplained([]);
-        setWordsDiscarded([]);
+        updateStatus("playerExplaining");
+
         setScore(undefined);
     };
 
@@ -190,7 +202,7 @@ const App = () => {
             setCountdown(timeToExplain);
             setPlayerExplaining("self");
             setWordsExplained([]);
-            setWordsDiscarded({});
+            setWordsDiscarded([]);
             setGameStatus("playerExplaining");
             socket.emit("start-explaining");
         } catch(e) {
@@ -211,16 +223,31 @@ const App = () => {
         }
 
     }
-    const onRestartGame = async () => {
+    const onStartGame = async () => {
         try {
-            await axios.post('/restart-game');
-            setGameStatus("start");
-            setWordsExplained([]);
-            setWordsDiscarded([]);
-            setWordToExplain({});
+            await axios.post('/start-game');
+            socket.emit("start-game");
+            updateStatus("start");
         } catch (error) {
             onError(error);
         }
+    }
+
+    const onStartNewGame = async () => {
+        try {
+            await axios.post('/start-new-game');
+            socket.emit("start-new-game");
+            updateStatus("setup");
+        } catch (error) {
+            onError(error);
+        }
+    }
+
+    const updateStatus = (status) => {
+        setGameStatus(status);
+        setWordsExplained([]);
+        setWordsDiscarded([]);
+        setWordToExplain({});
     }
 
     const getRandomWord = async () => {
@@ -235,7 +262,7 @@ const App = () => {
 
     const onWordGuessed = async () => {
         try {
-            await axios.post('/words', {id: wordToExplain.id, status: "guessed"});
+            await axios.post('/words-status', {id: wordToExplain.id, status: "guessed"});
             setWordsExplained([...wordsExplained, wordToExplain]);
             await getRandomWord();
         } catch (error) {
@@ -245,9 +272,10 @@ const App = () => {
 
     const onWordDiscarded = async () => {
         try {
-            await axios.post('/words', {id: wordToExplain.id, status: "discarded"});
+            await axios.post('/words-status', {id: wordToExplain.id, status: "discarded"});
             setWordsDiscarded([...wordsDiscarded, wordToExplain]);
             await getRandomWord();
+
         } catch (error) {
             onError(error);
         }
@@ -268,10 +296,13 @@ const App = () => {
             <AppBar position="static">
                 <Toolbar className={classes.toolbar}>
                     <Typography className={classes.title} variant="h6" noWrap>
-                        Bauern-Scharade
+                        Zettelchen
                     </Typography>
                     { showTimer &&
                     <Timer>{countdown}</Timer>}
+                    {gameStatus === "setup" &&
+                    <StartGame onStartGame={onStartGame}>StartGame</StartGame>
+                    }
                 </Toolbar>
             </AppBar>
             <Snackbar
@@ -285,13 +316,19 @@ const App = () => {
             />
             <Box className={classes.contentContainer}>
                 <Box display="flex" alignSelf="center" justifyContent="center" className={classes.centerBox} >
+                    {gameStatus === "setup" &&
+                    <EnterWords
+                        onError={onError}
+                        onStartGame={onStartGame}
+                    />
+                    }
                     {showStartExplaining &&
-                   <ActionMessage
-                       onAction={onStartExplaining}
-                       actionIcon={<PlayArrowIcon fontSize="large"/>}
-                   >
+                    <ActionMessage
+                        onAction={onStartExplaining}
+                        actionIcon={<PlayArrowIcon fontSize="large"/>}
+                    >
                        Is it your turn? Start explaining.
-                   </ActionMessage>}
+                    </ActionMessage>}
 
 
                     {showWordCard &&
@@ -329,10 +366,11 @@ const App = () => {
                     <WordsList title="Discarded Words" >{wordsDiscarded}</WordsList>
                     }
                 </Box>
-                <RestartGame
-                    onRestartGame={onRestartGame}
-                />
             </Box>
+            {gameStatus && gameStatus !== "setup" &&
+            <StartNewGame
+                onStartNewGame={onStartNewGame}
+            />}
         </div>
     );
 }

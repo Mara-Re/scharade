@@ -7,6 +7,10 @@ import CheckIcon from '@material-ui/icons/Check';
 import ClearIcon from '@material-ui/icons/Clear';
 
 const useStyles = makeStyles({
+    wordBox: {
+        maxWidth: "60vw",
+        overflowWrap: "break-word"
+    },
     guessed: {
         color: '#4caf50',
         marginBottom: 10
@@ -31,8 +35,8 @@ const WordCard = (props) => {
     return (
         <Box display='flex' justifyContent='center' alignSelf="center">
             <Box display="flex" justifyContent='space-between'>
-                <Box alignSelf="center">
-                    <Typography variant="h4">
+                <Box alignSelf="center" className={classes.wordBox}>
+                    <Typography variant="h4" >
                         {children}
                     </Typography>
                 </Box>

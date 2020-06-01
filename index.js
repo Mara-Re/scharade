@@ -30,20 +30,11 @@ app.use(express.json());
 
 
 //-------------------------ROUTES-------------------------
-
-app.get('/words', async (req, res) => {
-    try {
-        const {rows} = await db.getWords();
-        await res.json(rows);
-    } catch(error) {
-        console.log('error in /words: ', error);
-    }
-
-});
-
 app.get('/random-word', async (req, res) => {
+    console.log('route /random-word');
+
     try {
-        const {rows} = await db.getRandomWord();
+        const {rows} = await db.getRandomWord(1); // hardcoded gameId
         await res.json(rows);
     } catch(error) {
         console.log('error in /random-word: ', error);
@@ -52,7 +43,7 @@ app.get('/random-word', async (req, res) => {
 
 app.get('/is-end-of-round-reached', async (req, res) => {
     try {
-        const {rows} = await db.getRandomWord();
+        const {rows} = await db.getRandomWord(1); //hardcoded gameId
         console.log("rows in is end of round reached: ", rows);
         if (rows.length) {
             await res.json({endOfRoundReached: false});
@@ -64,12 +55,22 @@ app.get('/is-end-of-round-reached', async (req, res) => {
     }
 });
 
-app.post('/words', async (req, res) => {
+app.post('/words-status', async (req, res) => {
     try {
         await db.setWordStatus(req.body.id, req.body.status);
         await res.json({ success: true});
     } catch(error) {
-        console.log('error in /word-guessed: ', error);
+        console.log('error in /words-status: ', error);
+    }
+});
+
+
+app.post('/words', async (req, res) => {
+    try {
+        const {rows} = await db.addWord(1, req.body.word); // hardcoded gameId
+        await res.json(rows);
+    } catch(error) {
+        console.log('error in /words: ', error);
     }
 });
 
@@ -119,7 +120,7 @@ app.post('/game-status', async (req, res) => {
 
 app.post('/reset-words-status', async (req, res) => {
     try {
-        await db.resetWords();
+        await db.resetWords(1); //hardcoded gameId
         await res.json({success: true});
     } catch(error) {
         console.log('error in /reset-words-status: ', error);
@@ -128,21 +129,32 @@ app.post('/reset-words-status', async (req, res) => {
 
 app.post('/reset-discarded-words', async (req, res) => {
     try {
-        await db.resetDiscardedWords();
+        await db.resetDiscardedWords(1); //hardcoded gameId
         await res.json({success: true});
     } catch(error) {
         console.log('error in /reset-discarded-words: ', error);
     }
 });
 
-app.post('/restart-game', async (req, res) => {
-    console.log('restart-game route');
+app.post('/start-game', async (req, res) => {
+    console.log('start-game route');
     try {
-        await db.restartGame(1); //hardcoded gameId
-        await db.resetWords();
+        await db.startGame(1); //hardcoded gameId
         await res.json({success: true});
     } catch(error) {
-        console.log('error in /restart-game: ', error);
+        console.log('error in /start-game: ', error);
+    }
+});
+
+
+app.post('/start-new-game', async (req, res) => {
+    console.log('start-new-game route');
+    try {
+        await db.startNewGame(1); //hardcoded gameId
+        await db.deleteWords(1); //hardcoded gameId
+        await res.json({success: true});
+    } catch(error) {
+        console.log('error in /start-new-game: ', error);
     }
 });
 
@@ -168,6 +180,14 @@ io.on('connection', function(socket) {
     let timerId;
     let timerIdStartNewRound;
     let countdown = timeToExplain;
+
+    socket.on('start-game', () => {
+        socket.broadcast.emit("game-started");
+    });
+
+    socket.on('start-new-game', () => {
+        socket.broadcast.emit("new-game-started");
+    });
 
     socket.on('start-explaining', () => {
         socket.broadcast.emit("other-player-starts-explaining");

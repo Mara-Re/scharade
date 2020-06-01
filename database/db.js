@@ -1,23 +1,20 @@
 const spicedPg = require('spiced-pg');
 const db = spicedPg(process.env.DATABASE_URL ||'postgres:postgres:postgres@localhost:5433/scharade');
 
-module.exports.getWords = function getWords() {
-    return db.query('SELECT * FROM words');
-};
-
-module.exports.getRandomWord = function getRandomWord() {
+module.exports.getRandomWord = function getRandomWord(gameId) {
     return db.query(
         `SELECT * FROM words
-        WHERE status='pile'
+        WHERE status = 'pile' AND game_id = $1
         ORDER BY RANDOM()
-        LIMIT 1`
+        LIMIT 1`,
+        [gameId]
     );
 };
 
 module.exports.getGameStatus = function getGameStatus(gameId) {
     return db.query(
         `SELECT * FROM games
-        WHERE id=$1`
+        WHERE id = $1`
         ,
         [gameId]
     );
@@ -33,7 +30,16 @@ module.exports.setGameStatus = function getGameStatus(gameId, status) {
 };
 
 //also set id_player_explaining to null
-module.exports.restartGame = function restartGame(gameId) {
+module.exports.startNewGame=function startNewGame(gameId) {
+    return db.query(
+        `UPDATE games
+            SET status = 'setup'
+            WHERE id = $1`,
+        [gameId]
+    );
+};
+
+module.exports.startGame = function startGame(gameId) {
     return db.query(
         `UPDATE games
             SET status = 'start'
@@ -42,7 +48,7 @@ module.exports.restartGame = function restartGame(gameId) {
     );
 };
 
-module.exports.setTimerId = function setTimerId(gameId, timerId) {
+module.exports.setTimerId=function setTimerId(gameId, timerId) {
     return db.query(
         `UPDATE games
             SET timer_id = $2
@@ -54,24 +60,35 @@ module.exports.setTimerId = function setTimerId(gameId, timerId) {
 module.exports.getTimerId = function getTimerId(gameId) {
     return db.query(
         `SELECT timer_id FROM games
-        WHERE id=$1`
+        WHERE id = $1`
         ,
         [gameId]
     );
 };
 
-module.exports.resetWords = function resetWords() {
-    return db.query(
-        `UPDATE words
-            SET status = 'pile'`
-    );
-};
-
-module.exports.resetDiscardedWords = function resetDiscardedWords() {
+module.exports.resetWords = function resetWords(gameId) {
     return db.query(
         `UPDATE words
             SET status = 'pile'
-            WHERE status = 'discarded'`
+            WHERE game_id = $1`,
+        [gameId]
+    );
+};
+
+module.exports.deleteWords = function deleteWords(gameId) {
+    return db.query(
+        `DELETE FROM words
+            WHERE game_id = $1`,
+        [gameId]
+    );
+};
+
+module.exports.resetDiscardedWords = function resetDiscardedWords(gameId) {
+    return db.query(
+        `UPDATE words
+            SET status = 'pile'
+            WHERE game_id = $1 AND status = 'discarded'`,
+        [gameId]
     );
 };
 
@@ -80,7 +97,7 @@ module.exports.setWordStatus = function setWordStatus(id, status) {
     return db.query(
         `UPDATE words
             SET status = $2
-            WHERE id=$1`,
+            WHERE id = $1`,
         [id, status]
     );
 };
@@ -104,9 +121,10 @@ module.exports.setWordStatus = function setWordStatus(id, status) {
 // };
 
 
-// exports.addWord = function addWord(word) {
-//     return db.query(
-//         'INSERT INTO words (word, status) VALUES ($1, $2)',
-//         [ word, "pile" ]
-//     );
-// };
+exports.addWord = function addWord(gameId, word) {
+    return db.query(
+        `INSERT INTO words (game_id, word, status) VALUES ($1, $2, $3) 
+        RETURNING word, id`,
+        [ gameId, word, 'pile' ]
+    );
+};
