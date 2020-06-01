@@ -15,12 +15,13 @@ import PlayArrowIcon from '@material-ui/icons/PlayArrow';
 import ReplayIcon from '@material-ui/icons/Replay';
 
 import {socket} from './start';
-import RestartGame from "./components/RestartGame";
+import RestartGame from "./components/RestartGame"
+
+const timeToExplain = 11;
 
 // TODO s
-// upload to Heroku
 // add round column to games table and add get and post request to set the round
-// immediately set timer to timeToExplain in frontend after click on 'start explaining'
+// show time over when game status === "timeOver"
 
 // TODO s bauernscharade
 // add status to game for setup
@@ -186,6 +187,7 @@ const App = () => {
             await axios.post('/game-status', {status: 'playerExplaining'});
             await axios.post('/reset-discarded-words');
             await getRandomWord();
+            setCountdown(timeToExplain);
             setPlayerExplaining("self");
             setGameStatus("playerExplaining");
             socket.emit("start-explaining");
