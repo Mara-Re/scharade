@@ -19,7 +19,7 @@ import StartNewGame from "./components/StartNewGame"
 import EnterWords from "./components/EnterWords";
 import StartGame from "./components/StartGame";
 
-const timeToExplain = 11;
+const timeToExplain = 60;
 
 //DONE bauernscharade
 // add status to game for setup
