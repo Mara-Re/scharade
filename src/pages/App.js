@@ -1,23 +1,22 @@
 import React, {useState, useEffect} from 'react';
 import Box from "@material-ui/core/Box";
-import AppBar from "@material-ui/core/AppBar";
+import AppBar from "../components/AppBar";
 import Snackbar from '@material-ui/core/Snackbar';
-import Toolbar from "@material-ui/core/Toolbar";
-import Typography from "@material-ui/core/Typography";
 import { makeStyles } from '@material-ui/core/styles';
 import axios from 'axios';
-import WordCard from "./components/WordCard";
-import Timer from "./components/Timer";
-import WordsList from "./components/WordsList";
-import ActionMessage from "./components/ActionMessage";
-import CssBaseline from '@material-ui/core/CssBaseline';
+import WordCard from "../components/WordCard";
+import WordsList from "../components/WordsList";
+import ActionMessage from "../components/ActionMessage";
 import PlayArrowIcon from '@material-ui/icons/PlayArrow';
 import ReplayIcon from '@material-ui/icons/Replay';
+// import {socket} from '../start';
+import StartNewGame from "../components/StartNewGame";
+import EnterWords from "../components/EnterWords";
+import GameLinkDialog from "../components/GameLinkDialog";
 
-import {socket} from './start';
-import StartNewGame from "./components/StartNewGame"
-import EnterWords from "./components/EnterWords";
-import StartGame from "./components/StartGame";
+import * as io from 'socket.io-client';
+export const socket = io.connect();
+
 
 const timeToExplain = 11;
 
@@ -26,16 +25,21 @@ const timeToExplain = 11;
 // enable players to enter words to the game
 // add functionality to start game after words have been entered
 
+//DONE private games
+// add uid for games for url
+// add functionality to set up a private game
+// reset cookie gameSetup after copying link or closing the link dialog
+// add redirect to "/" home if url is visited with gameUid that does not exist
+// add socket functionality for private games
+
+// TODO s private games
+// use req.params.uid to retrieve games and words from db
+
 // TODO s players
 // enable players to enter their names
 // show which players are currently in the game
 // show which player is currently explaining
 // show live with socket, which players are in the game and which have left
-
-// TODO s private games
-// add uuid for games for url
-// add socket functionality for private games
-// add functionality to set up a private game
 
 // TODO handle exceptions / fix bugs
 // handle case if reloading game and status is end of round reached
@@ -44,6 +48,7 @@ const timeToExplain = 11;
 // TODO collection
 // add round column to games table and add get and post request to set the round
 // add two restart choices: restart game with same words, restart game with new words
+// add error handling to <Home />
 
 
 
@@ -53,16 +58,6 @@ const useStyles = makeStyles((theme) => ({
     },
     menuButton: {
         marginRight: theme.spacing(2),
-    },
-    toolbar: {
-        minHeight: 100,
-        alignItems: 'flex-start',
-        paddingTop: theme.spacing(2),
-        paddingBottom: theme.spacing(2),
-    },
-    title: {
-        flexGrow: 1,
-        alignSelf: 'center',
     },
     centerBox: {
         minHeight: "40vh",
@@ -89,22 +84,32 @@ const App = () => {
     const [countdown, setCountdown] = useState();
     const [playerExplaining, setPlayerExplaining] = useState(); // undefined, "self", "other"
     const [gameStatus, setGameStatus] = useState(""); // "start", "playerExplaining", "timeOver", "endOfRoundReached"
+    const [gameUid, setGameUid] = useState("");
     const [score, setScore] = useState();
+    const [showGameLinkDialog, setShowGameLinkDialog] = useState();
     const [error, setError] = useState();
 
     useEffect(() => {
         getGameStatus();
     }, []);
 
+    useEffect(() => {
+        socket.on("bla", () => {
+            console.log("socket.on bla");
+        });
+        socket.on("bli", () => {
+            console.log("socket.on bli");
+        });
+    }, []);
+
     const getGameStatus = async () => {
         try {
             const {data} = await axios.get('/game-status');
-            if (data[0].success === false) {
-                onError();
-                return;
-            }
-            const gameStatus = data[0].status;
-            setGameStatus(gameStatus);
+            console.log("data", data);
+            console.log("data.showGameLinkDialog", data.showGameLinkDialog);
+            setShowGameLinkDialog(data.showGameLinkDialog);
+            setGameStatus(data[0].status);
+            setGameUid(data[0].uid);
         } catch (error) {
             onError(error);
         }
@@ -157,7 +162,7 @@ const App = () => {
     //^^^^^^^^SOCKET EVENT LISTENERS^^^^^^^^^^--------
 
     useEffect(() => {
-        if (countdown === undefined) {
+        if (countdown === undefined && gameStatus && gameStatus !== "start" && gameStatus !== "setup") {
             onTimerOver();
         }
     }, [countdown]);
@@ -289,22 +294,22 @@ const App = () => {
     const showWordsDiscardedList =(gameStatus === "playerExplaining" || gameStatus === "timeOver" || gameStatus === "endOfRoundReached") && !!wordsDiscarded.length && playerExplaining === "self";
     const showScore = gameStatus === "timeOver" && playerExplaining === "self" && score !== undefined;
     const showEndOfRoundReached = gameStatus === "endOfRoundReached";
-    
+
+    console.log("showStartExplaining", showStartExplaining);
+    // console.log("showStartExplaining", showStartExplaining);
+
     return (
         <div className={classes.pageContainer}>
-            <CssBaseline />
-            <AppBar position="static">
-                <Toolbar className={classes.toolbar}>
-                    <Typography className={classes.title} variant="h6" noWrap>
-                        Zettelchen
-                    </Typography>
-                    { showTimer &&
-                    <Timer>{countdown}</Timer>}
-                    {gameStatus === "setup" &&
-                    <StartGame onStartGame={onStartGame}>StartGame</StartGame>
-                    }
-                </Toolbar>
-            </AppBar>
+            <AppBar
+                showTimer={showTimer}
+                gameStatus={gameStatus}
+                countdown={countdown}
+                onStartGame={onStartGame}
+            />
+            <GameLinkDialog
+                open={showGameLinkDialog}
+                setShowGameLinkDialog={setShowGameLinkDialog}
+            />
             <Snackbar
                 anchorOrigin={{
                     vertical: 'bottom',

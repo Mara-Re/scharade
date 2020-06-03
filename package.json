@@ -25,6 +25,7 @@
         "babel-loader": "^8.0.5",
         "bcryptjs": "^2.4.3",
         "compression": "^1.7.0",
+        "cookie-parser": "^1.4.5",
         "cookie-session": "^2.0.0-alpha.2",
         "csurf": "^1.9.0",
         "eslint": "^4.19.1",
@@ -44,12 +45,12 @@
         "redux-devtools-extension": "^2.13.2",
         "redux-promise": "^0.5.3",
         "socket.io": "^2.2.0",
+        "socket.io-client": "latest",
         "spiced-pg": "^1.0.0",
         "uglifyjs-webpack-plugin": "^2.1.2",
         "uid-safe": "^2.1.4",
         "webpack": "^4.29.6",
-        "webpack-dev-middleware": "^1.8.4",
-      "socket.io-client": "latest"
+        "webpack-dev-middleware": "^1.8.4"
     },
     "jest": {
         "setupFiles": [

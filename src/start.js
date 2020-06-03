@@ -1,13 +1,21 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import App from './app';
-import * as io from 'socket.io-client';
+import App from './pages/App';
+import Home from './pages/Home';
+import CssBaseline from "@material-ui/core/CssBaseline";
 
+let page = <Home />;
 
-export const socket = io.connect();
+if (location.pathname != '/') {
+    page = <App/>;
+}
+
 
 ReactDOM.render(
-    <App />,
+    <>
+        <CssBaseline />
+        {page}
+    </>,
     document.querySelector('main')
 );
 

@@ -1,6 +1,15 @@
 const spicedPg = require('spiced-pg');
 const db = spicedPg(process.env.DATABASE_URL ||'postgres:postgres:postgres@localhost:5433/scharade');
 
+exports.addNewGame = function addNewGame(gameUid) {
+    return db.query(
+        `INSERT INTO games (uid, status) VALUES ($1, $2) 
+        RETURNING *`,
+        [ gameUid, 'setup' ]
+    );
+};
+
+
 module.exports.getRandomWord = function getRandomWord(gameId) {
     return db.query(
         `SELECT * FROM words
@@ -17,6 +26,15 @@ module.exports.getGameStatus = function getGameStatus(gameId) {
         WHERE id = $1`
         ,
         [gameId]
+    );
+};
+
+module.exports.getGame = function getGame(gameUid) {
+    return db.query(
+        `SELECT * FROM games
+        WHERE uid = $1`
+        ,
+        [gameUid]
     );
 };
 

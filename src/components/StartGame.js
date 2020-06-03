@@ -12,12 +12,6 @@ import Typography from "@material-ui/core/Typography";
 import PlayArrowIcon from '@material-ui/icons/PlayArrow';
 
 const useStyles = makeStyles({
-    footer: {
-        position: "absolute",
-        bottom: 0,
-        width: "100%",
-        height: "2.5rem",
-    },
     startGameButton: {
         color: "#fff"
     },
