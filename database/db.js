@@ -38,22 +38,12 @@ module.exports.getGame = function getGame(gameUid) {
     );
 };
 
-module.exports.setGameStatus = function getGameStatus(gameUid, status) {
+module.exports.setGameStatus = function setGameStatus(gameUid, status) {
     return db.query(
         `UPDATE games
             SET status = $2
             WHERE uid = $1`,
         [gameUid, status]
-    );
-};
-
-//also set id_player_explaining to null
-module.exports.startNewGame=function startNewGame(gameUid) {
-    return db.query(
-        `UPDATE games
-            SET status = 'setup'
-            WHERE uid = $1`,
-        [gameUid]
     );
 };
 
@@ -75,13 +65,22 @@ module.exports.getTimerId = function getTimerId(gameUid) {
     );
 };
 
-module.exports.resetWords = function resetWords(gameUid) {
+module.exports.resetWords = function resetWords(gameUid, status, previousStatus) {
+    if (previousStatus) {
+        return db.query(
+            `UPDATE words
+            SET status = $2
+            WHERE game_uid = $1 AND status = $3`,
+            [gameUid, status, previousStatus]
+        );
+    }
     return db.query(
         `UPDATE words
-            SET status = 'pile'
+            SET status = $2
             WHERE game_uid = $1`,
-        [gameUid]
+        [gameUid, status]
     );
+
 };
 
 module.exports.deleteWords = function deleteWords(gameUid) {
@@ -92,14 +91,6 @@ module.exports.deleteWords = function deleteWords(gameUid) {
     );
 };
 
-module.exports.resetDiscardedWords = function resetDiscardedWords(gameUid) {
-    return db.query(
-        `UPDATE words
-            SET status = 'pile'
-            WHERE game_uid = $1 AND status = 'discarded'`,
-        [gameUid]
-    );
-};
 
 module.exports.setWordStatus = function setWordStatus(id, status, gameUid) {
     return db.query(
@@ -110,10 +101,10 @@ module.exports.setWordStatus = function setWordStatus(id, status, gameUid) {
     );
 };
 
-exports.addWord = function addWord(gameUid, word) {
+exports.addWord = function addWord(word) {
     return db.query(
         `INSERT INTO words (game_uid, word, status) VALUES ($1, $2, $3) 
         RETURNING word, id`,
-        [ gameUid, word, 'pile' ]
+        [ word.gameUid, word.word, word.status ]
     );
 };

@@ -105,7 +105,7 @@ const App = () => {
 
     const getGameStatus = async () => {
         try {
-            const {data} = await axios.get(`/game-status/${gameUid}`);
+            const {data} = await axios.get(`/games/${gameUid}/status`);
             setShowGameLinkDialog(data.showGameLinkDialog);
             setGameStatus(data[0].status);
         } catch (error) {
@@ -174,7 +174,7 @@ const App = () => {
 
     const onEndOfRoundReached = async () => {
         try {
-            await axios.post(`/game-status/${gameUid}`, {status: "endOfRoundReached"});
+            await axios.post(`/games/${gameUid}/status`, {status: "endOfRoundReached"});
             socket.emit("end-of-round");
             setGameStatus("endOfRoundReached");
         } catch (error) {
@@ -199,8 +199,11 @@ const App = () => {
 
     const onStartExplaining = async () => {
         try {
-            await axios.post(`/game-status/${gameUid}`, {status: 'playerExplaining'});
-            await axios.post(`/reset-discarded-words/${gameUid}`);
+            await axios.post(`/games/${gameUid}/status`, {status: 'playerExplaining'});
+            await axios.post(`/games/${gameUid}/words/resetStatus`, {
+                status: "pile",
+                previousStatus: "discarded"
+            });
             await getRandomWord();
             setCountdown(timeToExplain);
             setPlayerExplaining("self");
@@ -215,8 +218,10 @@ const App = () => {
 
     const onStartNewRound = async () => {
         try {
-            await axios.post(`/reset-words-status/${gameUid}`);
-            await axios.post(`/game-status/${gameUid}`, {status: "playerExplaining"});
+            await axios.post(`/games/${gameUid}/words/resetStatus`, {
+                status: "pile"
+            });
+            await axios.post(`/games/${gameUid}/status`, {status: "playerExplaining"});
             setGameStatus("playerExplaining");
             socket.emit("start-new-round", {countdown});
             if (playerExplaining === "self") {
@@ -229,7 +234,7 @@ const App = () => {
     }
     const onStartGame = async () => {
         try {
-            await axios.post(`/start-game/${gameUid}`);
+            await axios.post(`/games/${gameUid}/status`, {status: "start"});
             socket.emit("start-game");
             updateStatus("start");
         } catch (error) {
@@ -239,7 +244,8 @@ const App = () => {
 
     const onStartNewGame = async () => {
         try {
-            await axios.post(`/start-new-game/${gameUid}`);
+            await axios.post(`/games/${gameUid}/status`, {status: "setup"});
+            await axios.delete(`/games/${gameUid}/words`);
             socket.emit("start-new-game");
             updateStatus("setup");
         } catch (error) {
@@ -256,7 +262,7 @@ const App = () => {
 
     const getRandomWord = async () => {
         try {
-            const {data} = await axios.get(`/random-word/${gameUid}`);
+            const {data} = await axios.get(`/games/${gameUid}/words/random`);
             const randomWord = data[0];
             setWordToExplain(randomWord);
         } catch (error) {
@@ -266,7 +272,7 @@ const App = () => {
 
     const onWordGuessed = async () => {
         try {
-            await axios.post(`/words-status/${gameUid}`, {id: wordToExplain.id, status: "guessed"});
+            await axios.post(`/games/${gameUid}/words/${wordToExplain.id}/status`, {status: "guessed"});
             setWordsExplained([...wordsExplained, wordToExplain]);
             await getRandomWord();
         } catch (error) {
@@ -276,7 +282,7 @@ const App = () => {
 
     const onWordDiscarded = async () => {
         try {
-            await axios.post(`/words-status/${gameUid}`, {id: wordToExplain.id, status: "discarded"});
+            await axios.post(`/games/${gameUid}/words/${wordToExplain.id}/status`, {status: "discarded"});
             setWordsDiscarded([...wordsDiscarded, wordToExplain]);
             await getRandomWord();
 

@@ -36,9 +36,10 @@ const Home = () => {
 
     const onSetupNewGame = async() => {
         try {
-            const {data} = await axios.post('/setup-new-game');
+            const {data} = await axios.post('/games');
             location.replace(`/game/${data[0].uid}/`);
         } catch (error) {
+            // TODO: add error handling
             // onError(error);
         }
     }

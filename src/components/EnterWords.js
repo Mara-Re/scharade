@@ -43,7 +43,11 @@ const EnterWords = (props) => {
             return;
         }
         try {
-            const {data} = await axios.post(`/words/${gameUid}`, {word: wordInput});
+            const {data} = await axios.post(`/games/${gameUid}/words`, {word: {
+                word: wordInput,
+                status: 'pile',
+                gameUid
+            }});
             setWordsSubmitted([...wordsSubmitted, data[0]]);
             setWordInput("");
         } catch (error) {
