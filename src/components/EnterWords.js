@@ -7,6 +7,7 @@ import { makeStyles } from "@material-ui/core/styles";
 import axios from "axios";
 import WordsList from "./WordsList";
 import StartGame from "./StartGame";
+import { getGameUid } from "../helper/getGameUid";
 
 const useStyles = makeStyles({
     enterWordsBox: {
@@ -28,6 +29,7 @@ const EnterWords = (props) => {
         onError
     } = props;
 
+    const gameUid = getGameUid();
     const classes = useStyles();
     const [wordInput, setWordInput] = useState("");
     const [wordsSubmitted, setWordsSubmitted] = useState([])
@@ -41,7 +43,7 @@ const EnterWords = (props) => {
             return;
         }
         try {
-            const {data} = await axios.post('/words', {word: wordInput});
+            const {data} = await axios.post(`/words/${gameUid}`, {word: wordInput});
             setWordsSubmitted([...wordsSubmitted, data[0]]);
             setWordInput("");
         } catch (error) {

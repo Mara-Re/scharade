@@ -48,10 +48,8 @@ const GameLinkDialog = (props) => {
     const resetGameSetupCookie = async () => {
         try {
             await axios.post('/reset-game-setup-cookie');
-            console.log("done!");
         } catch (error) {
             // onError(error);
-            console.log("error in resetGameSetupCookie");
         }
     }
 

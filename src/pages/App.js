@@ -9,16 +9,16 @@ import WordsList from "../components/WordsList";
 import ActionMessage from "../components/ActionMessage";
 import PlayArrowIcon from '@material-ui/icons/PlayArrow';
 import ReplayIcon from '@material-ui/icons/Replay';
-// import {socket} from '../start';
 import StartNewGame from "../components/StartNewGame";
 import EnterWords from "../components/EnterWords";
 import GameLinkDialog from "../components/GameLinkDialog";
 
 import * as io from 'socket.io-client';
+import { getGameUid } from "../helper/getGameUid";
 export const socket = io.connect();
 
 
-const timeToExplain = 11;
+const timeToExplain = 60;
 
 //DONE bauernscharade
 // add status to game for setup
@@ -31,9 +31,18 @@ const timeToExplain = 11;
 // reset cookie gameSetup after copying link or closing the link dialog
 // add redirect to "/" home if url is visited with gameUid that does not exist
 // add socket functionality for private games
-
-// TODO s private games
 // use req.params.uid to retrieve games and words from db
+
+// TODO s other:
+// add round column to games table and add get and post request to set the round
+// track score for single players throughout the whole game via cookie
+
+// TODO s onboarding
+// Explain the game to players
+// Explain enter words
+// Explain explanation rounds
+// Explain necessary setup steps: enter 5 words, form 2 teams, note scores for each player,
+// Explain the different rounds - 1. explaining, 2. pantomime, 3. one-word explanation, 4. finger pantomime, 5. make a sound
 
 // TODO s players
 // enable players to enter their names
@@ -41,14 +50,14 @@ const timeToExplain = 11;
 // show which player is currently explaining
 // show live with socket, which players are in the game and which have left
 
-// TODO handle exceptions / fix bugs
+// TODO handle exceptions / fix bugs / error handling
 // handle case if reloading game and status is end of round reached
 // make sure that only one person can be explaining at a time
-
-// TODO collection
-// add round column to games table and add get and post request to set the round
-// add two restart choices: restart game with same words, restart game with new words
 // add error handling to <Home />
+
+
+// TODO ideas
+// ? add two restart choices: restart game with same words, restart game with new words
 
 
 
@@ -84,32 +93,22 @@ const App = () => {
     const [countdown, setCountdown] = useState();
     const [playerExplaining, setPlayerExplaining] = useState(); // undefined, "self", "other"
     const [gameStatus, setGameStatus] = useState(""); // "start", "playerExplaining", "timeOver", "endOfRoundReached"
-    const [gameUid, setGameUid] = useState("");
+    // const [gameUid, setGameUid] = useState("");
     const [score, setScore] = useState();
     const [showGameLinkDialog, setShowGameLinkDialog] = useState();
     const [error, setError] = useState();
+    const gameUid = getGameUid();
+
 
     useEffect(() => {
         getGameStatus();
     }, []);
 
-    useEffect(() => {
-        socket.on("bla", () => {
-            console.log("socket.on bla");
-        });
-        socket.on("bli", () => {
-            console.log("socket.on bli");
-        });
-    }, []);
-
     const getGameStatus = async () => {
         try {
-            const {data} = await axios.get('/game-status');
-            console.log("data", data);
-            console.log("data.showGameLinkDialog", data.showGameLinkDialog);
+            const {data} = await axios.get(`/game-status/${gameUid}`);
             setShowGameLinkDialog(data.showGameLinkDialog);
             setGameStatus(data[0].status);
-            setGameUid(data[0].uid);
         } catch (error) {
             onError(error);
         }
@@ -176,7 +175,7 @@ const App = () => {
 
     const onEndOfRoundReached = async () => {
         try {
-            await axios.post('/game-status', {status: "endOfRoundReached"});
+            await axios.post(`/game-status/${gameUid}`, {status: "endOfRoundReached"});
             socket.emit("end-of-round");
             setGameStatus("endOfRoundReached");
         } catch (error) {
@@ -201,8 +200,8 @@ const App = () => {
 
     const onStartExplaining = async () => {
         try {
-            await axios.post('/game-status', {status: 'playerExplaining'});
-            await axios.post('/reset-discarded-words');
+            await axios.post(`/game-status/${gameUid}`, {status: 'playerExplaining'});
+            await axios.post(`/reset-discarded-words/${gameUid}`);
             await getRandomWord();
             setCountdown(timeToExplain);
             setPlayerExplaining("self");
@@ -217,7 +216,8 @@ const App = () => {
 
     const onStartNewRound = async () => {
         try {
-            await axios.post('/reset-words-status');
+            await axios.post(`/reset-words-status/${gameUid}`);
+            await axios.post(`/game-status/${gameUid}`, {status: "playerExplaining"});
             setGameStatus("playerExplaining");
             socket.emit("start-new-round", {countdown});
             if (playerExplaining === "self") {
@@ -230,7 +230,7 @@ const App = () => {
     }
     const onStartGame = async () => {
         try {
-            await axios.post('/start-game');
+            await axios.post(`/start-game/${gameUid}`);
             socket.emit("start-game");
             updateStatus("start");
         } catch (error) {
@@ -240,7 +240,7 @@ const App = () => {
 
     const onStartNewGame = async () => {
         try {
-            await axios.post('/start-new-game');
+            await axios.post(`/start-new-game/${gameUid}`);
             socket.emit("start-new-game");
             updateStatus("setup");
         } catch (error) {
@@ -257,7 +257,7 @@ const App = () => {
 
     const getRandomWord = async () => {
         try {
-            const {data} = await axios.get('/random-word');
+            const {data} = await axios.get(`/random-word/${gameUid}`);
             const randomWord = data[0];
             setWordToExplain(randomWord);
         } catch (error) {
@@ -267,7 +267,7 @@ const App = () => {
 
     const onWordGuessed = async () => {
         try {
-            await axios.post('/words-status', {id: wordToExplain.id, status: "guessed"});
+            await axios.post(`/words-status/${gameUid}`, {id: wordToExplain.id, status: "guessed"});
             setWordsExplained([...wordsExplained, wordToExplain]);
             await getRandomWord();
         } catch (error) {
@@ -277,7 +277,7 @@ const App = () => {
 
     const onWordDiscarded = async () => {
         try {
-            await axios.post('/words-status', {id: wordToExplain.id, status: "discarded"});
+            await axios.post(`/words-status/${gameUid}`, {id: wordToExplain.id, status: "discarded"});
             setWordsDiscarded([...wordsDiscarded, wordToExplain]);
             await getRandomWord();
 
@@ -294,9 +294,6 @@ const App = () => {
     const showWordsDiscardedList =(gameStatus === "playerExplaining" || gameStatus === "timeOver" || gameStatus === "endOfRoundReached") && !!wordsDiscarded.length && playerExplaining === "self";
     const showScore = gameStatus === "timeOver" && playerExplaining === "self" && score !== undefined;
     const showEndOfRoundReached = gameStatus === "endOfRoundReached";
-
-    console.log("showStartExplaining", showStartExplaining);
-    // console.log("showStartExplaining", showStartExplaining);
 
     return (
         <div className={classes.pageContainer}>

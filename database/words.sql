@@ -2,7 +2,7 @@ CREATE TABLE words (
     id SERIAL primary key,
     word VARCHAR(255) NOT NULL,
     status VARCHAR(255),
-    game_id VARCHAR(255)
+    game_uid VARCHAR(255)
 );
 
 

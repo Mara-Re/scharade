@@ -10,22 +10,22 @@ exports.addNewGame = function addNewGame(gameUid) {
 };
 
 
-module.exports.getRandomWord = function getRandomWord(gameId) {
+module.exports.getRandomWord = function getRandomWord(gameUid) {
     return db.query(
         `SELECT * FROM words
-        WHERE status = 'pile' AND game_id = $1
+        WHERE status = 'pile' AND game_uid = $1
         ORDER BY RANDOM()
         LIMIT 1`,
-        [gameId]
+        [gameUid]
     );
 };
 
-module.exports.getGameStatus = function getGameStatus(gameId) {
+module.exports.getGameStatus = function getGameStatus(gameUid) {
     return db.query(
         `SELECT * FROM games
-        WHERE id = $1`
+        WHERE uid = $1`
         ,
-        [gameId]
+        [gameUid]
     );
 };
 
@@ -38,111 +38,82 @@ module.exports.getGame = function getGame(gameUid) {
     );
 };
 
-module.exports.setGameStatus = function getGameStatus(gameId, status) {
+module.exports.setGameStatus = function getGameStatus(gameUid, status) {
     return db.query(
         `UPDATE games
             SET status = $2
-            WHERE id = $1`,
-        [gameId, status]
+            WHERE uid = $1`,
+        [gameUid, status]
     );
 };
 
 //also set id_player_explaining to null
-module.exports.startNewGame=function startNewGame(gameId) {
+module.exports.startNewGame=function startNewGame(gameUid) {
     return db.query(
         `UPDATE games
             SET status = 'setup'
-            WHERE id = $1`,
-        [gameId]
+            WHERE uid = $1`,
+        [gameUid]
     );
 };
 
-module.exports.startGame = function startGame(gameId) {
+module.exports.startGame = function startGame(gameUid) {
     return db.query(
         `UPDATE games
             SET status = 'start'
-            WHERE id = $1`,
-        [gameId]
+            WHERE uid = $1`,
+        [gameUid]
     );
 };
 
-module.exports.setTimerId=function setTimerId(gameId, timerId) {
-    return db.query(
-        `UPDATE games
-            SET timer_id = $2
-            WHERE id = $1`,
-        [gameId, timerId]
-    );
-};
-
-module.exports.getTimerId = function getTimerId(gameId) {
+module.exports.getTimerId = function getTimerId(gameUid) {
     return db.query(
         `SELECT timer_id FROM games
-        WHERE id = $1`
+        WHERE uid = $1`
         ,
-        [gameId]
+        [gameUid]
     );
 };
 
-module.exports.resetWords = function resetWords(gameId) {
+module.exports.resetWords = function resetWords(gameUid) {
     return db.query(
         `UPDATE words
             SET status = 'pile'
-            WHERE game_id = $1`,
-        [gameId]
+            WHERE game_uid = $1`,
+        [gameUid]
     );
 };
 
-module.exports.deleteWords = function deleteWords(gameId) {
+module.exports.deleteWords = function deleteWords(gameUid) {
     return db.query(
         `DELETE FROM words
-            WHERE game_id = $1`,
-        [gameId]
+            WHERE game_uid = $1`,
+        [gameUid]
     );
 };
 
-module.exports.resetDiscardedWords = function resetDiscardedWords(gameId) {
+module.exports.resetDiscardedWords = function resetDiscardedWords(gameUid) {
     return db.query(
         `UPDATE words
             SET status = 'pile'
-            WHERE game_id = $1 AND status = 'discarded'`,
-        [gameId]
+            WHERE game_uid = $1 AND status = 'discarded'`,
+        [gameUid]
     );
 };
 
-
-module.exports.setWordStatus = function setWordStatus(id, status) {
+module.exports.setWordStatus = function setWordStatus(id, status, gameUid) {
     return db.query(
         `UPDATE words
             SET status = $2
-            WHERE id = $1`,
-        [id, status]
+            WHERE id = $1 AND game_uid = $3` ,
+        [id, status, gameUid]
     );
 };
 
-// module.exports.setPlayerExplaining = function setPlayerExplaining(gameId, playerExplaining) {
-//     return db.query(
-//         `UPDATE games
-//             SET player_explaining=$2
-//             WHERE id=$1`,
-//         [gameId, playerExplaining]
-//     );
-// };
-
-// module.exports.getPlayerExplaining = function getPlayerExplaining(gameId) {
-//     return db.query(
-//         `SELECT id, player_explaining FROM games
-//         WHERE id=$1
-//         `,
-//         [gameId]
-//     );
-// };
-
-
-exports.addWord = function addWord(gameId, word) {
+exports.addWord = function addWord(gameUid, word) {
     return db.query(
-        `INSERT INTO words (game_id, word, status) VALUES ($1, $2, $3) 
+        `INSERT INTO words (game_uid, word, status) VALUES ($1, $2, $3) 
         RETURNING word, id`,
-        [ gameId, word, 'pile' ]
+        [ gameUid, word, 'pile' ]
     );
 };

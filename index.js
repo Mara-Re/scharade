@@ -47,34 +47,20 @@ app.post('/setup-new-game', async (req, res) => {
     }
 });
 
-app.get('/random-word', async (req, res) => {
+app.get('/random-word/:uid', async (req, res) => {
     console.log('route /random-word');
 
     try {
-        const {rows} = await db.getRandomWord(1); // hardcoded gameId
+        const {rows} = await db.getRandomWord(req.params.uid);
         await res.json(rows);
     } catch(error) {
         console.log('error in /random-word: ', error);
     }
 });
 
-app.get('/is-end-of-round-reached', async (req, res) => {
+app.post('/words-status/:uid', async (req, res) => {
     try {
-        const {rows} = await db.getRandomWord(1); //hardcoded gameId
-        console.log("rows in is end of round reached: ", rows);
-        if (rows.length) {
-            await res.json({endOfRoundReached: false});
-        } else {
-            await res.json({endOfRoundReached: true});
-        }
-    } catch(error) {
-        console.log('error in /is-end-of-round-reached: ', error);
-    }
-});
-
-app.post('/words-status', async (req, res) => {
-    try {
-        await db.setWordStatus(req.body.id, req.body.status);
+        await db.setWordStatus(req.body.id, req.body.status, req.params.uid);
         await res.json({ success: true});
     } catch(error) {
         console.log('error in /words-status: ', error);
@@ -82,50 +68,32 @@ app.post('/words-status', async (req, res) => {
 });
 
 
-app.post('/words', async (req, res) => {
+app.post('/words/:uid', async (req, res) => {
     try {
-        const {rows} = await db.addWord(1, req.body.word); // hardcoded gameId
+        const {rows} = await db.addWord(req.params.uid, req.body.word);
         await res.json(rows);
     } catch(error) {
         console.log('error in /words: ', error);
     }
 });
 
-// app.post('/set-player-explaining', async (req, res) => {
-//     try {
-//         await db.setPlayerExplaining(req.body.gameId, req.body.playerExplaining);
-//         await res.json({ success: true});
-//     } catch(error) {
-//         console.log('error in /set-player-explaining: ', error);
-//     }
-// });
-//
-// app.get('/get-player-explaining', async (req, res) => {
-//     try {
-//         const {rows} = await db.getPlayerExplaining(1);
-//         await res.json(rows);
-//     } catch(error) {
-//         console.log('error in /word-guessed: ', error);
-//     }
-// });
-
-app.get('/game-status', async (req, res) => {
+app.get('/game-status/:uid', async (req, res) => {
     try {
-        const {rows} = await db.getGameStatus(1); // hardcoded gameId
+        const {rows} = await db.getGameStatus(req.params.uid);
         await res.json({...rows, showGameLinkDialog: req.cookies.gameSetup === "true" });
     } catch(error) {
         console.log('error in /get-game-status: ', error);
     }
 });
 
-app.post('/game-status', async (req, res) => {
+app.post('/game-status/:uid', async (req, res) => {
     console.log("post /game-status: ", req.body.status);
     try {
-        const {rows} = await db.getGameStatus(1); // hardcoded gameId
+        const {rows} = await db.getGameStatus(req.params.uid);
         if (rows[0].status === req.body.status) {
             throw Error;
         } else {
-            await db.setGameStatus(1, req.body.status);  // hardcoded gameId
+            await db.setGameStatus(req.params.uid, req.body.status);
             await res.json({success: true});
         }
     } catch(error) {
@@ -147,28 +115,28 @@ app.post('/reset-game-setup-cookie', async (req, res) => {
 });
 
 
-app.post('/reset-words-status', async (req, res) => {
+app.post('/reset-words-status/:uid', async (req, res) => {
     try {
-        await db.resetWords(1); //hardcoded gameId
+        await db.resetWords(req.params.uid);
         await res.json({success: true});
     } catch(error) {
         console.log('error in /reset-words-status: ', error);
     }
 });
 
-app.post('/reset-discarded-words', async (req, res) => {
+app.post('/reset-discarded-words/:uid', async (req, res) => {
     try {
-        await db.resetDiscardedWords(1); //hardcoded gameId
+        await db.resetDiscardedWords(req.params.uid);
         await res.json({success: true});
     } catch(error) {
         console.log('error in /reset-discarded-words: ', error);
     }
 });
 
-app.post('/start-game', async (req, res) => {
+app.post('/start-game/:uid', async (req, res) => {
     console.log('start-game route');
     try {
-        await db.startGame(1); //hardcoded gameId
+        await db.startGame(req.params.uid);
         await res.json({success: true});
     } catch(error) {
         console.log('error in /start-game: ', error);
@@ -176,11 +144,11 @@ app.post('/start-game', async (req, res) => {
 });
 
 
-app.post('/start-new-game', async (req, res) => {
+app.post('/start-new-game/:uid', async (req, res) => {
     console.log('start-new-game route');
     try {
-        await db.startNewGame(1); //hardcoded gameId
-        await db.deleteWords(1); //hardcoded gameId
+        await db.startNewGame(req.params.uid);
+        await db.deleteWords(req.params.uid);
         await res.json({success: true});
     } catch(error) {
         console.log('error in /start-new-game: ', error);
@@ -213,8 +181,9 @@ server.listen(process.env.PORT || 8080, function() {
 
 //-------------------------SOCKET IO-------------------------
 io.on('connection', function(socket) {
-    console.log(socket.handshake.headers.referer.split("/game/"));
-    const gameUid = socket.handshake.headers.referer.split("/game/")[1];
+    const url = socket.handshake.headers.referer;
+    console.log("socket connection!, url: ", url);
+    const gameUid = url.split("/game/")[1] && url.split("/game/")[1].replace(/\//g, "");
     console.log("gameUid: ", gameUid);
     if (gameUid){
         socket.join(gameUid);
@@ -237,9 +206,9 @@ io.on('connection', function(socket) {
             io.in(gameUid).emit('timer', { countdown, timerId});
             countdown--;
             if (countdown < 0) {
-                io.sockets.emit('timer', { countdown: undefined });
+                io.in(gameUid).emit('timer', { countdown: undefined });
                 countdown = timeToExplain;
-                db.setGameStatus(1, "timeOver"); // hardcoded gameId
+                db.setGameStatus(gameUid, "timeOver");
                 clearInterval(timerId);
                 return;
             }
@@ -262,7 +231,7 @@ io.on('connection', function(socket) {
                 countdown--;
                 if (countdown < 0) {
                     io.in(gameUid).emit('timer', { countdown: undefined });
-                    db.setGameStatus(1, "timeOver");
+                    db.setGameStatus(gameUid, "timeOver");
                     countdown = timeToExplain;
                     clearInterval(timerIdStartNewRound);
                     return;

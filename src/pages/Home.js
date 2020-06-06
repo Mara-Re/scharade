@@ -22,8 +22,8 @@ const useStyles = makeStyles({
         padding: "0 20px"
     },
     iconButton: {
-        height: '60px',
-        width: '60px'
+        height: '100px',
+        width: '100px'
     },
     icon: {
         height: '60px',
@@ -40,7 +40,6 @@ const Home = () => {
             location.replace(`/game/${data[0].uid}/`);
         } catch (error) {
             // onError(error);
-            console.log("error in onSetupNewGame: ", error);
         }
     }
 
