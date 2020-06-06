@@ -17,7 +17,6 @@ import * as io from 'socket.io-client';
 import { getGameUid } from "../helper/getGameUid";
 export const socket = io.connect();
 
-
 const timeToExplain = 60;
 
 //DONE bauernscharade

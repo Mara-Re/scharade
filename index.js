@@ -7,7 +7,7 @@ const io = require('socket.io')(server);
 const uidSafe = require('uid-safe');
 
 
-const timeToExplain = 11;
+const timeToExplain = 60;
 
 //-------------------------MIDDLEWARE-------------------------
 
