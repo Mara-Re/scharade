@@ -1,20 +1,24 @@
 import React from 'react';
 import Box from "@material-ui/core/Box";
 import { makeStyles } from '@material-ui/core/styles';
+import IconButton from '@material-ui/core/IconButton';
 import Table from '@material-ui/core/Table';
 import TableBody from '@material-ui/core/TableBody';
 import TableCell from '@material-ui/core/TableCell';
 import TableContainer from '@material-ui/core/TableContainer';
 import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
-import { green, red } from "@material-ui/core/colors";
+import CheckIcon from '@material-ui/icons/Check';
+import ClearIcon from '@material-ui/icons/Clear';
+import axios from "axios";
+import { getGameUid } from "../helper/getGameUid";
 
 const useStyles = makeStyles({
     green: {
-        color: green
+        color: "#4caf50"
     },
     red: {
-        color: red
+        color: "#d32f2f"
     },
     wordsListBox: {
         paddingBottom: "20px"
@@ -25,25 +29,59 @@ const useStyles = makeStyles({
 const WordsList = (props) => {
     const {
         children,
-        title
+        title,
+        setWordsList,
     } = props;
 
     const classes = useStyles();
+    const gameUid = getGameUid();
+
+
+    const getStatusColor = (status) =>  status === "guessed" && "green" || status === "discarded" && "red" || "noColor";
+
+    const changeWordStatus = async (wordId, oldWordStatus) => {
+        if (oldWordStatus === "pile") return;
+        const newWordStatus = (oldWordStatus === "guessed" && "discarded") || (oldWordStatus === "discarded" || oldWordStatus === "notGuessed") && "guessed";
+        console.log("newWordStatus", newWordStatus);
+
+        // TODO: fix bug if the same word is in list twice because new round was started. (Fix in db update AND calc of newWordsList)
+
+        await axios.post(`/games/${gameUid}/words/${wordId}/status`, {status: newWordStatus});
+
+        const newWordsList = children.map(word => {
+            if (word.id === wordId) {
+                return {...word, status: newWordStatus};
+            }
+            return word;
+        });
+        setWordsList(newWordsList);
+    }
+
     return (
         <Box display='flex' justifyContent='center' alignSelf="center" className={classes.wordsListBox}>
-
             <TableContainer >
                 <Table>
                     <TableHead>
                         <TableRow>
                             <TableCell>{title}</TableCell>
+                            <TableCell />
+                            <TableCell />
                         </TableRow>
                     </TableHead>
                     <TableBody>
                         {children.map(word => (
                             <TableRow key={word.id}>
-                                <TableCell color={green} className="green">
+                                <TableCell className={classes[getStatusColor(word.status)]}>
                                     {word.word}
+                                </TableCell>
+                                <TableCell className={classes[getStatusColor(word.status)]}>
+                                    {word.status === "guessed" && "+1" || word.status === "discarded" && "-1" || undefined}
+                                </TableCell>
+                                <TableCell >
+                                    <IconButton onClick={() => changeWordStatus(word.id, word.status)}>
+                                        {word.status === "guessed" && <ClearIcon fontSize="small"/>}
+                                        {(word.status === "discarded" || word.status === "notGuessed")&& <CheckIcon fontSize="small"/>}
+                                    </IconButton>
                                 </TableCell>
                             </TableRow>
                         ))}

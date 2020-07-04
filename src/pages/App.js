@@ -87,12 +87,10 @@ const useStyles = makeStyles((theme) => ({
 const App = () => {
     const classes = useStyles();
     const [wordToExplain, setWordToExplain] = useState({});
-    const [wordsExplained, setWordsExplained] = useState([]);
-    const [wordsDiscarded, setWordsDiscarded] = useState([]);
+    const [wordsList, setWordsList] = useState([]);           //  {id: number | string, word: string, status: "guessed" | "discarded" | "notGuessed", game_uid: string }
     const [countdown, setCountdown] = useState();
     const [playerExplaining, setPlayerExplaining] = useState(); // undefined, "self", "other"
     const [gameStatus, setGameStatus] = useState(""); // "start", "playerExplaining", "timeOver", "endOfRoundReached"
-    // const [gameUid, setGameUid] = useState("");
     const [score, setScore] = useState();
     const [showGameLinkDialog, setShowGameLinkDialog] = useState();
     const [error, setError] = useState();
@@ -160,10 +158,10 @@ const App = () => {
     //^^^^^^^^SOCKET EVENT LISTENERS^^^^^^^^^^--------
 
     useEffect(() => {
-        if (countdown === undefined && gameStatus && gameStatus !== "start" && gameStatus !== "setup") {
+        if (countdown === undefined && gameStatus && gameStatus !== "start" && gameStatus !== "setup" && gameStatus !== "timeOver") {
             onTimerOver();
         }
-    }, [countdown]);
+    }, [countdown, gameStatus]);
 
     useEffect(() => {
         if (playerExplaining === "self" && !wordToExplain) {
@@ -185,30 +183,37 @@ const App = () => {
 
     const onTimerOver = async () => {
         setGameStatus("timeOver");
-        if (playerExplaining == "self" && wordsExplained) {
-            setScore(wordsExplained.length);
+        if (playerExplaining === "self" && wordToExplain) {
+            setWordsList([...wordsList, {...wordToExplain, status: "notGuessed"}]);
         }
     }
+
+    useEffect(() => {
+        if (!wordsList) return;
+        const score = (wordsList|| []).reduce((scoreAccumulator, word) => {
+            const points = (word.status === "guessed" && 1) || (word.status === "discarded" && -1) || 0;
+            return scoreAccumulator + points;
+        }, 0);
+        setScore(score);
+    }, [wordsList]);
 
     const onOtherPlayerStartsExplaining = () => {
         setPlayerExplaining("other");
         updateStatus("playerExplaining");
-
         setScore(undefined);
     };
 
     const onStartExplaining = async () => {
         try {
             await axios.post(`/games/${gameUid}/status`, {status: 'playerExplaining'});
-            await axios.post(`/games/${gameUid}/words/resetStatus`, {
+            await axios.post(`/games/${gameUid}/resetWordsStatus`, {
                 status: "pile",
                 previousStatus: "discarded"
             });
             await getRandomWord();
             setCountdown(timeToExplain);
             setPlayerExplaining("self");
-            setWordsExplained([]);
-            setWordsDiscarded([]);
+            setWordsList([]);
             setGameStatus("playerExplaining");
             socket.emit("start-explaining");
         } catch(e) {
@@ -218,7 +223,7 @@ const App = () => {
 
     const onStartNewRound = async () => {
         try {
-            await axios.post(`/games/${gameUid}/words/resetStatus`, {
+            await axios.post(`/games/${gameUid}/resetWordsStatus`, {
                 status: "pile"
             });
             await axios.post(`/games/${gameUid}/status`, {status: "playerExplaining"});
@@ -255,14 +260,13 @@ const App = () => {
 
     const updateStatus = (status) => {
         setGameStatus(status);
-        setWordsExplained([]);
-        setWordsDiscarded([]);
+        setWordsList([]);
         setWordToExplain({});
     }
 
     const getRandomWord = async () => {
         try {
-            const {data} = await axios.get(`/games/${gameUid}/words/random`);
+            const {data} = await axios.get(`/games/${gameUid}/getRandomWord`);
             const randomWord = data[0];
             setWordToExplain(randomWord);
         } catch (error) {
@@ -273,7 +277,7 @@ const App = () => {
     const onWordGuessed = async () => {
         try {
             await axios.post(`/games/${gameUid}/words/${wordToExplain.id}/status`, {status: "guessed"});
-            setWordsExplained([...wordsExplained, wordToExplain]);
+            setWordsList([...wordsList, {...wordToExplain, status: "guessed"}]);
             await getRandomWord();
         } catch (error) {
             onError(error);
@@ -283,7 +287,7 @@ const App = () => {
     const onWordDiscarded = async () => {
         try {
             await axios.post(`/games/${gameUid}/words/${wordToExplain.id}/status`, {status: "discarded"});
-            setWordsDiscarded([...wordsDiscarded, wordToExplain]);
+            setWordsList([...wordsList, {...wordToExplain, status: "discarded"}]);
             await getRandomWord();
 
         } catch (error) {
@@ -295,8 +299,7 @@ const App = () => {
     const showStartExplaining = gameStatus === "start" || gameStatus === "timeOver" && playerExplaining !== "self";
     const showWordCard = gameStatus === "playerExplaining" && wordToExplain && playerExplaining === "self";
     const showOtherPlayerExplaining = gameStatus === "playerExplaining" && playerExplaining === "other";
-    const showWordsExplainedList =(gameStatus === "playerExplaining" || gameStatus === "timeOver" || gameStatus === "endOfRoundReached") && !!wordsExplained.length && playerExplaining === "self";
-    const showWordsDiscardedList =(gameStatus === "playerExplaining" || gameStatus === "timeOver" || gameStatus === "endOfRoundReached") && !!wordsDiscarded.length && playerExplaining === "self";
+    const showWordsList =(gameStatus === "playerExplaining" || gameStatus === "timeOver" || gameStatus === "endOfRoundReached") && !!wordsList.length && playerExplaining === "self";
     const showScore = gameStatus === "timeOver" && playerExplaining === "self" && score !== undefined;
     const showEndOfRoundReached = gameStatus === "endOfRoundReached";
 
@@ -366,11 +369,8 @@ const App = () => {
                     </ActionMessage>}
                 </Box>
                 <Box className={classes.wordsListBox}>
-                    {showWordsExplainedList &&
-                    <WordsList title="Explained Words" >{wordsExplained}</WordsList>
-                    }
-                    {showWordsDiscardedList &&
-                    <WordsList title="Discarded Words" >{wordsDiscarded}</WordsList>
+                    {showWordsList &&
+                    <WordsList title="Words" setWordsList={setWordsList}>{wordsList}</WordsList>
                     }
                 </Box>
             </Box>
