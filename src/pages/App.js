@@ -17,7 +17,7 @@ import * as io from 'socket.io-client';
 import { getGameUid } from "../helper/getGameUid";
 export const socket = io.connect();
 
-const timeToExplain = 11;
+const timeToExplain = 60;
 
 // DONE
 // the state of discarded/guessed Words in WordsList can be changed
