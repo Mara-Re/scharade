@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from 'react';
+import React, { useState, useEffect, useCallback } from "react";
 import Box from "@material-ui/core/Box";
 import AppBar from "../components/AppBar";
 import Snackbar from '@material-ui/core/Snackbar';
@@ -149,6 +149,12 @@ const App = () => {
     }, []);
 
     useEffect(() => {
+        socket.on("timeOver", () => {
+            onTimerOver();
+        });
+    }, []);
+
+    useEffect(() => {
         socket.on("new-round-started", () => {
             setGameStatus("playerExplaining");
             if (playerExplaining === "self") {
@@ -158,12 +164,6 @@ const App = () => {
     }, [playerExplaining]);
 
     //^^^^^^^^SOCKET EVENT LISTENERS^^^^^^^^^^--------
-
-    useEffect(() => {
-        if (countdown === undefined && gameStatus && gameStatus !== "start" && gameStatus !== "setup" && gameStatus !== "timeOver") {
-            onTimerOver();
-        }
-    }, [countdown, gameStatus]);
 
     useEffect(() => {
         if (playerExplaining === "self" && !wordToExplain) {
@@ -180,15 +180,17 @@ const App = () => {
         } catch (error) {
             onError(error);
         }
-
     }
 
-    const onTimerOver = async () => {
+    const onTimerOver = useCallback(() => {
         setGameStatus("timeOver");
-        if (playerExplaining === "self" && wordToExplain) {
+    }, [playerExplaining, wordToExplain]);
+
+    useEffect(() => {
+        if (gameStatus === "timeOver" && playerExplaining === "self" && wordToExplain) {
             setWordsList([...wordsList, {...wordToExplain, status: "notGuessed"}]);
         }
-    }
+    }, [gameStatus, playerExplaining, wordToExplain]);
 
     useEffect(() => {
         if (!wordsList) return;

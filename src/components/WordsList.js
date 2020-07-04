@@ -42,7 +42,6 @@ const WordsList = (props) => {
     const changeWordStatus = async (wordId, oldWordStatus) => {
         if (oldWordStatus === "pile") return;
         const newWordStatus = (oldWordStatus === "guessed" && "discarded") || (oldWordStatus === "discarded" || oldWordStatus === "notGuessed") && "guessed";
-        console.log("newWordStatus", newWordStatus);
 
         // TODO: fix bug if the same word is in list twice because new round was started. (Fix in db update AND calc of newWordsList)
 

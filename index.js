@@ -180,6 +180,7 @@ io.on('connection', function(socket) {
             countdown--;
             if (countdown < 0) {
                 io.in(gameUid).emit('timer', { countdown: undefined });
+                io.in(gameUid).emit('timeOver');
                 countdown = timeToExplain;
                 db.setGameStatus(gameUid, "timeOver");
                 clearInterval(timerId);
@@ -203,6 +204,7 @@ io.on('connection', function(socket) {
                 countdown--;
                 if (countdown < 0) {
                     io.in(gameUid).emit('timer', { countdown: undefined });
+                    io.in(gameUid).emit('timeOver');
                     db.setGameStatus(gameUid, "timeOver");
                     countdown = timeToExplain;
                     clearInterval(timerIdStartNewRound);
