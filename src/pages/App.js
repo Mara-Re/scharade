@@ -17,27 +17,27 @@ import * as io from 'socket.io-client';
 import { getGameUid } from "../helper/getGameUid";
 export const socket = io.connect();
 
-const timeToExplain = 60;
+const timeToExplain = 11;
 
-//DONE bauernscharade
-// add status to game for setup
-// enable players to enter words to the game
-// add functionality to start game after words have been entered
+// DONE
+// the state of discarded/guessed Words in WordsList can be changed
 
-//DONE private games
-// add uid for games for url
-// add functionality to set up a private game
-// reset cookie gameSetup after copying link or closing the link dialog
-// add redirect to "/" home if url is visited with gameUid that does not exist
-// add socket functionality for private games
-// use req.params.uid to retrieve games and words from db
+// TODO s teams and score tracking
+// players can join a team in the setup phase of the game
+// players can change team during the game
+// teams explain in alternating order
+// players see which team is explaining
+// scores are tracked per team
+// players can click on 'finish game'/'show (final) score' to see their team's score
 
-// TODO s other:
+
+// TODO s rounds
+// 5 rounds: - 1. explaining, 2. pantomime, 3. one-word explanation, 4. finger pantomime, 5. make a sound
 // add round column to games table and add get and post request to set the round
-// track score for single players throughout the whole game via cookie
+// game ends when player clicks on end game, show final scores or after 5 rounds
 
 // TODO s onboarding
-// Explain the game to players
+// Explain game
 // Explain enter words
 // Explain explanation rounds
 // Explain necessary setup steps: enter 5 words, form 2 teams, note scores for each player,
@@ -53,6 +53,8 @@ const timeToExplain = 60;
 // handle case if reloading game and status is end of round reached
 // make sure that only one person can be explaining at a time
 // add error handling to <Home />
+// remove hardcoded timeToExplain from App.js -> retrieve via get request instead
+// fix bug in WordsList -> changeWordStatus: handle case if the same word is in list more than once because new round was started. (Fix in db update AND calc of newWordsList)
 
 
 // TODO ideas
