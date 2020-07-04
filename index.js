@@ -74,7 +74,7 @@ app.post('/games/:uid/status', async (req, res) => {
 
 //-------------------------WORDS ROUTES-------------------------
 
-app.get('/games/:uid/words/random/', async (req, res) => {
+app.get('/games/:uid/getRandomWord/', async (req, res) => {
     try {
         const {rows} = await db.getRandomWord(req.params.uid);
         await res.json(rows);
@@ -101,8 +101,7 @@ app.post('/games/:uid/words/:id/status', async (req, res) => {
     }
 });
 
-// TODO: test reset of discarded words when new player starts explaining
-app.post('/games/:uid/words/resetStatus', async (req, res) => {
+app.post('/games/:uid/resetWordsStatus', async (req, res) => {
     try {
         await db.resetWords(req.params.uid, req.body.status, req.body.previousStatus);
         await res.json({success: true});
@@ -198,7 +197,6 @@ io.on('connection', function(socket) {
     socket.on('start-new-round', (data) => {
         countdown = data.countdown;
         socket.to(gameUid).emit("new-round-started");
-        console.log("in start-new-round, countdown: ", countdown);
         if (countdown > 0) {
             timerIdStartNewRound = setInterval(function() {
                 io.in(gameUid).emit('timer', { countdown });
