@@ -119,14 +119,81 @@ app.delete('/games/:uid/words', async (req, res) => {
     }
 });
 
-//-------------------------Cookie ROUTE -------------------------
+//-------------------------TEAMS ROUTES-------------------------
+
+app.get('/games/:uid/teams', async (req, res) => {
+    try {
+        const {rows} = await db.getTeams(req.params.uid);
+        await res.json(rows);
+    } catch(error) {
+        console.log('error in /games/:uid/teams get route: ', error);
+    }
+});
+
+app.post('/games/:uid/createTeams', async (req, res) => {
+    try {
+        await db.addTeams(req.params.uid);
+        await res.json({success: true});
+    } catch(error) {
+        console.log('/games/:uid/words post route: ', error);
+        await res.json({success: false});
+    }
+});
+
+app.post('/games/:uid/teams/addToScore', async (req, res) => {
+    try {
+        console.log("addToScore route");
+        console.log("req.cookies.team", req.cookies.team);
+        console.log("req.body.addPoints", req.body.addPoints);
+        await db.addToTeamscore(req.params.uid, req.cookies.team, req.body.addPoints);
+        await res.json({success: true});
+    } catch(error) {
+        console.log('/games/:uid/words post route: ', error);
+        await res.json({success: false});
+    }
+});
+
+app.post('/games/:uid/teams/resetScore', async (req, res) => {
+    console.log('resetScore route');
+    try {
+        await db.resetTeamScore(req.params.uid, req.cookies.team);
+        await res.json({success: true});
+    } catch(error) {
+        console.log('/games/:uid/words post route: ', error);
+        await res.json({success: false});
+    }
+});
+
+//-------------------------Cookie ROUTES -------------------------
 
 app.post('/reset-game-setup-cookie', async (req, res) => {
     try {
         res.cookie("gameSetup", null);
         await res.json({success: true});
     } catch(error) {
-        console.log('error in /get-game-status: ', error);
+        console.log('error in /reset-game-setup-cookie: ', error);
+        await res.json({success: false});
+    }
+});
+
+app.post('/set-team-cookie', async (req, res) => {
+    const team = req.body.team || req.cookies.team || Math.floor(Math.random() * 2) + 1;
+    console.log("team:", team);
+    try {
+        res.cookie("team", team);
+        await res.json({success: true});
+    } catch(error) {
+        console.log('error in /set-team-cookie ', error);
+        await res.json({success: false});
+    }
+});
+
+app.get('/team-cookie', async (req, res) => {
+    // TODO: reset team cookie at some point?
+    try {
+        await res.json({team: req.cookies.team});
+    } catch(error) {
+        console.log('error in /team-cookie route ', error);
         await res.json({success: false});
     }
 });
