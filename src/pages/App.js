@@ -23,17 +23,16 @@ const timeToExplain = 60;
 // DONE
 // the state of discarded/guessed Words in WordsList can be changed
 // players can join a team in the setup phase of the game
-
-// TODO: getTeam or setTeamCookie? define which call is made when!
-// TODO: fix bug -> if setPlayerScore is set to undefined and wordsList is updated onOtherPlayerStartsExplaining --> TEAMSCORE is also updated and therefore set to 0 after each round!!
+// fix bug -> if setPlayerScore is set to undefined and wordsList is updated onOtherPlayerStartsExplaining --> TEAMSCORE is also updated and set to 0 after each round
+// getTeam & setTeamCookie - define which call is made when
+// scores are tracked per team
 
 
 // TODO s teams and score tracking
 // players can change team during the game
+// players can click on 'finish game'/'show (final) score' to see their team's score
 // teams explain in alternating order
 // players see which team is explaining
-// scores are tracked per team
-// players can click on 'finish game'/'show (final) score' to see their team's score
 
 // TODO s rounds
 // 5 rounds: - 1. explaining, 2. pantomime, 3. one-word explanation, 4. finger pantomime, 5. make a sound
@@ -102,6 +101,9 @@ const App = () => {
     const gameUid = getGameUid();
 
     useEffect(() => {
+        if (!team) {
+            return;
+        }
         setTeamCookie();
     }, [team]);
 
@@ -110,7 +112,6 @@ const App = () => {
     }, []);
 
 
-    // TODO: getTeam or setTeamCookie? define which call is made when!
     const getTeam = useCallback(async () => {
         try {
             const { data } = await axios.get(`/team-cookie`);
@@ -237,17 +238,16 @@ const App = () => {
         console.log("newPlayersScore:", newPlayersScore);
         console.log("playersScore:", playersScore);
         console.log("addPoints:", newPlayersScore - playersScore);
-        if ((!newPlayersScore && newPlayersScore!== 0)&& playersScore) {
-            console.log("1st if statement");
+        if ((!newPlayersScore && newPlayersScore!== 0) && playersScore) {
+            console.log("1st if statement in addScore");
             setPlayersScore(newPlayersScore);
         } else if (isNaN(playersScore)) {
-            console.log("2cnd if statement");
+            console.log("2cnd if statement  in addScore");
             await axios.post(`/games/${gameUid}/teams/addToScore`, {
                 addPoints: newPlayersScore
             });
             setPlayersScore(newPlayersScore);
         } else {
-            console.log("3rd if statement");
             await axios.post(`/games/${gameUid}/teams/addToScore`, {
                 addPoints: newPlayersScore - playersScore,
             });
@@ -257,8 +257,7 @@ const App = () => {
     }, [playersScore]);
 
     useEffect(() => {
-        if (!wordsList) return;
-        // TODO: fix bug -> if setPlayerScore is set to undefined and wordsList is updated onOtherPlayerStartsExplaining --> TEAMSCORE is also updated and therefore set to 0 after each round!!
+        if (!wordsList || !wordsList.length) return;
         const newPlayersScore = (wordsList || []).reduce((scoreAccumulator, word) => {
             const points =
                 (word.status === "guessed" && 1) ||
