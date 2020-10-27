@@ -125,6 +125,14 @@ module.exports.addTeams = function addTeams(gameUid) {
     );
 };
 
+module.exports.getTeams = function getTeamscore(gameUid) {
+    return db.query(
+        `SELECT * FROM teams
+            WHERE game_uid = $1` ,
+        [gameUid]
+    );
+};
+
 module.exports.addToTeamscore = function addToTeamscore(gameUid, team1or2, addPoints) {
     return db.query(
         `UPDATE teams
@@ -134,12 +142,11 @@ module.exports.addToTeamscore = function addToTeamscore(gameUid, team1or2, addPo
     );
 };
 
-module.exports.resetTeamScore = function resetTeamScore(gameUid, team1or2) {
+module.exports.deleteTeams = function resetTeamScore(gameUid) {
     return db.query(
-        `UPDATE teams
-            SET score = 0
-            WHERE game_uid = $1 AND team_1_or_2 = $2`,
-        [gameUid, team1or2]
+        `DELETE FROM teams
+            WHERE game_uid = $1`,
+        [gameUid]
     );
 };
 

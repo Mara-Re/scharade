@@ -88,7 +88,7 @@ app.post('/games/:uid/words', async (req, res) => {
         const {rows} = await db.addWord(req.body.word);
         await res.json(rows);
     } catch(error) {
-        console.log('/games/:uid/words post route: ', error);
+        console.log('error in /games/:uid/words post route: ', error);
     }
 });
 
@@ -135,16 +135,25 @@ app.post('/games/:uid/createTeams', async (req, res) => {
         await db.addTeams(req.params.uid);
         await res.json({success: true});
     } catch(error) {
-        console.log('/games/:uid/words post route: ', error);
+        console.log('error in /games/:uid/words post route: ', error);
         await res.json({success: false});
     }
 });
 
+//-------------------------TEAMS SCORE ROUTES-------------------------
+app.get('/games/:uid/teams', async (req, res) => {
+    try {
+        const {rows} = await db.getTeams(req.params.uid);
+        await res.json(rows);
+    } catch(error) {
+        console.log('/games/:uid/teams/getTeamData get route: ', error);
+        await res.json({success: false});
+    }
+});
+
+
 app.post('/games/:uid/teams/addToScore', async (req, res) => {
     try {
-        console.log("addToScore route");
-        console.log("req.cookies.team", req.cookies.team);
-        console.log("req.body.addPoints", req.body.addPoints);
         await db.addToTeamscore(req.params.uid, req.cookies.team, req.body.addPoints);
         await res.json({success: true});
     } catch(error) {
@@ -153,10 +162,9 @@ app.post('/games/:uid/teams/addToScore', async (req, res) => {
     }
 });
 
-app.post('/games/:uid/teams/resetScore', async (req, res) => {
-    console.log('resetScore route');
+app.delete('/games/:uid/teams/', async (req, res) => {
     try {
-        await db.resetTeamScore(req.params.uid, req.cookies.team);
+        await db.deleteTeams(req.params.uid);
         await res.json({success: true});
     } catch(error) {
         console.log('/games/:uid/words post route: ', error);
@@ -178,7 +186,6 @@ app.post('/reset-game-setup-cookie', async (req, res) => {
 
 app.post('/set-team-cookie', async (req, res) => {
     const team = req.body.team || req.cookies.team || Math.floor(Math.random() * 2) + 1;
-    console.log("team:", team);
     try {
         res.cookie("team", team);
         await res.json({success: true});
@@ -233,11 +240,21 @@ io.on('connection', function(socket) {
     let countdown = timeToExplain;
 
     socket.on('start-game', () => {
+        timerId && clearInterval(timerId);
+        timerIdStartNewRound && clearInterval(timerIdStartNewRound);
         socket.to(gameUid).emit("game-started");
     });
 
     socket.on('start-new-game', () => {
+        timerId && clearInterval(timerId);
+        timerIdStartNewRound && clearInterval(timerIdStartNewRound);
         socket.to(gameUid).emit("new-game-started");
+    });
+
+    socket.on('end-game', () => {
+        timerId && clearInterval(timerId);
+        timerIdStartNewRound && clearInterval(timerIdStartNewRound);
+        socket.to(gameUid).emit("game-ended");
     });
 
     socket.on('start-explaining', () => {

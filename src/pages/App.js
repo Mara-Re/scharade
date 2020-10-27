@@ -10,9 +10,13 @@ import ActionMessage from "../components/ActionMessage";
 import PlayArrowIcon from "@material-ui/icons/PlayArrow";
 import ReplayIcon from "@material-ui/icons/Replay";
 import StartNewGame from "../components/StartNewGame";
+import EndGame from "../components/EndGame";
+import Footer from "../components/Footer";
 import ChooseTeam from "../components/ChooseTeam";
+import TeamIndicator from "../components/TeamIndicator";
 import EnterWords from "../components/EnterWords";
 import GameLinkDialog from "../components/GameLinkDialog";
+import FinalTeamScores from "../components/FinalTeamScores";
 
 import * as io from "socket.io-client";
 import { getGameUid } from "../helper/getGameUid";
@@ -26,11 +30,11 @@ const timeToExplain = 60;
 // fix bug -> if setPlayerScore is set to undefined and wordsList is updated onOtherPlayerStartsExplaining --> TEAMSCORE is also updated and set to 0 after each round
 // getTeam & setTeamCookie - define which call is made when
 // scores are tracked per team
+// players can change team during the game
+// players can click on 'end game' to see their team's final score
 
 
 // TODO s teams and score tracking
-// players can change team during the game
-// players can click on 'finish game'/'show (final) score' to see their team's score
 // teams explain in alternating order
 // players see which team is explaining
 
@@ -70,8 +74,9 @@ const useStyles = makeStyles((theme) => ({
         marginRight: theme.spacing(2),
     },
     centerBox: {
-        minHeight: "40vh",
-        paddingBottom: "30px",
+        minHeight: "30vh",
+        padding: "8vh 0 30px",
+        position: "relative"
     },
 
     pageContainer: {
@@ -82,7 +87,7 @@ const useStyles = makeStyles((theme) => ({
         paddingBottom: "50px",
     },
     contentContainer: {
-        padding: "0 20px",
+        padding: "20px",
     },
 }));
 
@@ -92,8 +97,9 @@ const App = () => {
     const [wordsList, setWordsList] = useState([]); //  {id: number | string, word: string, status: "guessed" | "discarded" | "notGuessed", game_uid: string }
     const [countdown, setCountdown] = useState();
     const [playerExplaining, setPlayerExplaining] = useState(); // undefined, "self", "other"
-    const [gameStatus, setGameStatus] = useState(""); // "start", "playerExplaining", "timeOver", "endOfRoundReached"
+    const [gameStatus, setGameStatus] = useState(""); // "start", "playerExplaining", "timeOver", "endOfRoundReached", "end"
     const [playersScore, setPlayersScore] = useState();
+        const [finalTeamScores, setFinalTeamScores] = useState(); // [{team1Or2: 1, score: 15}, {team1Or2: 2, score: 23}]
     const [showGameLinkDialog, setShowGameLinkDialog] = useState();
     const [error, setError] = useState();
 
@@ -165,6 +171,12 @@ const App = () => {
     }, []);
 
     useEffect(() => {
+        socket.on("game-ended", () => {
+            updateStatus("end");
+        });
+    }, []);
+
+    useEffect(() => {
         socket.on("other-player-starts-explaining", () => {
             onOtherPlayerStartsExplaining();
         });
@@ -205,6 +217,18 @@ const App = () => {
         }
     }, [wordToExplain, playerExplaining]);
 
+    const getFinalTeamData = useCallback(async () => {
+        const { data } = await axios.get(`/games/${gameUid}/teams/`);
+        socket.emit("end-game");
+        setFinalTeamScores(data);
+    }, []);
+
+    useEffect(() => {
+        if (gameStatus === "end") {
+            getFinalTeamData();
+        }
+    }, [gameStatus]);
+
     const onEndOfRoundReached = async () => {
         try {
             await axios.post(`/games/${gameUid}/status`, {
@@ -218,8 +242,14 @@ const App = () => {
     };
 
     const onTimerOver = useCallback(() => {
-        setGameStatus("timeOver");
-    }, [playerExplaining, wordToExplain]);
+        setGameStatus((gameStatus) => {
+            // ignore onTimerOver when game is currently not ongoing:
+            if (gameStatus === "end" || gameStatus === "start" ) {
+                return gameStatus;
+            }
+            return "timeOver";
+        });
+    }, [playerExplaining, wordToExplain, gameStatus]);
 
     useEffect(() => {
         if (
@@ -235,14 +265,9 @@ const App = () => {
     }, [gameStatus, playerExplaining, wordToExplain]);
 
     const addScore = useCallback(async (newPlayersScore) => {
-        console.log("newPlayersScore:", newPlayersScore);
-        console.log("playersScore:", playersScore);
-        console.log("addPoints:", newPlayersScore - playersScore);
         if ((!newPlayersScore && newPlayersScore!== 0) && playersScore) {
-            console.log("1st if statement in addScore");
             setPlayersScore(newPlayersScore);
         } else if (isNaN(playersScore)) {
-            console.log("2cnd if statement  in addScore");
             await axios.post(`/games/${gameUid}/teams/addToScore`, {
                 addPoints: newPlayersScore
             });
@@ -327,8 +352,7 @@ const App = () => {
         try {
             await axios.post(`/games/${gameUid}/status`, { status: "setup" });
             await axios.delete(`/games/${gameUid}/words`);
-            await axios.post(`/games/${gameUid}/teams/resetScore`);
-
+            await axios.delete(`/games/${gameUid}/teams/`);
             socket.emit("start-new-game");
             updateStatus("setup");
         } catch (error) {
@@ -341,6 +365,16 @@ const App = () => {
         setWordsList([]);
         setWordToExplain({});
     };
+
+    const onEndGame = useCallback(async () => {
+        try {
+            await axios.post(`/games/${gameUid}/status`, { status: "end" });
+            socket.emit("end-game");
+            updateStatus("end");
+        } catch (error) {
+            onError(error);
+        }
+    }, [updateStatus]);
 
     const getRandomWord = async () => {
         try {
@@ -409,6 +443,8 @@ const App = () => {
         playerExplaining === "self" &&
         playersScore !== undefined;
     const showEndOfRoundReached = gameStatus === "endOfRoundReached";
+
+    const showFinalTeamScores =  gameStatus === "end" && finalTeamScores;
 
     return (
         <div className={classes.pageContainer}>
@@ -485,6 +521,10 @@ const App = () => {
                             You scored {playersScore} points in this round!
                         </ActionMessage>
                     )}
+
+                    {showFinalTeamScores && (
+                        <FinalTeamScores finalTeamScores={finalTeamScores}/>
+                    )}
                 </Box>
                 <Box className={classes.wordsListBox}>
                     {showWordsList && (
@@ -494,9 +534,16 @@ const App = () => {
                     )}
                 </Box>
             </Box>
-            {gameStatus && gameStatus !== "setup" && (
-                <StartNewGame onStartNewGame={onStartNewGame} />
-            )}
+            <Footer>
+                {gameStatus && gameStatus !== "setup" && (
+                    <>
+                        {gameStatus !== "end" && <EndGame onEndGame={onEndGame} />}
+                        {gameStatus === "end" && <StartNewGame onStartNewGame={onStartNewGame} />}
+                        <TeamIndicator team={team} setTeam={setTeam}/>
+                    </>
+                )}
+
+            </Footer>
         </div>
     );
 };
