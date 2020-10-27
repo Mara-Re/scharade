@@ -27,16 +27,9 @@ const timeToExplain = 60;
 // DONE
 // the state of discarded/guessed Words in WordsList can be changed
 // players can join a team in the setup phase of the game
-// fix bug -> if setPlayerScore is set to undefined and wordsList is updated onOtherPlayerStartsExplaining --> TEAMSCORE is also updated and set to 0 after each round
-// getTeam & setTeamCookie - define which call is made when
 // scores are tracked per team
 // players can change team during the game
 // players can click on 'end game' to see their team's final score
-
-
-// TODO s teams and score tracking
-// teams explain in alternating order
-// players see which team is explaining
 
 // TODO s rounds
 // 5 rounds: - 1. explaining, 2. pantomime, 3. one-word explanation, 4. finger pantomime, 5. make a sound
@@ -50,6 +43,10 @@ const timeToExplain = 60;
 // Explain necessary setup steps: enter 5 words, form 2 teams, note scores for each player,
 // Explain the different rounds - 1. explaining, 2. pantomime, 3. one-word explanation, 4. finger pantomime, 5. make a sound
 
+// TODO s teams alternating order
+// teams explain in alternating order
+// players see which team is explaining
+
 // TODO s players
 // enable players to enter their names
 // show which players are currently in the game
@@ -61,6 +58,7 @@ const timeToExplain = 60;
 // make sure that only one person can be explaining at a time
 // add error handling to <Home />
 // remove hardcoded timeToExplain from App.js -> retrieve via get request instead
+// fix team score calculation if team is changed while (gameStatus === "playerExplaining" || gameStatus === "timerOver" || gameStatus === "endOfRoundReached") && playerExplaining="self" or while
 // fix bug in WordsList -> changeWordStatus: handle case if the same word is in list more than once because new round was started. (Fix in db update AND calc of newWordsList)
 
 // TODO ideas
