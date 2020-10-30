@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Button from "@material-ui/core/Button";
 import TeamEmoji from "./TeamEmoji";
 import DialogTitle from "@material-ui/core/DialogTitle";
@@ -22,6 +22,12 @@ const TeamIndicator = (props) => {
 
     const classes = useStyles();
 
+    useEffect(() => {
+        if (!team) {
+            setChooseTeamModalOpen(true);
+        }
+    }, [team]);
+
     const [chooseTeamModalOpen, setChooseTeamModalOpen] = useState(false);
 
     return (
@@ -34,6 +40,7 @@ const TeamIndicator = (props) => {
             <Dialog
                 open={chooseTeamModalOpen}
                 onClose={() => setChooseTeamModalOpen(false)}
+                disableBackdropClick={!team}
             >
                 <DialogTitle >
                     Choose Team
@@ -44,9 +51,11 @@ const TeamIndicator = (props) => {
                     </DialogContentText>
                 </DialogContent>
                 <DialogActions>
-                    <Button onClick={() => setChooseTeamModalOpen(false)} color="primary">
-                        Done
-                    </Button>
+                    {team && (
+                        <Button onClick={() => setChooseTeamModalOpen(false)} color="primary">
+                            Done
+                        </Button>
+                    )}
                 </DialogActions>
             </Dialog>
         </>
