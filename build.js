@@ -7,6 +7,9 @@ const conf = {
         path: __dirname,
         filename: 'bundle.js'
     },
+    resolve: {
+        extensions: [".ts", ".tsx", ".js", ".jsx"]
+    },
     performance: {
         hints: false
     },
@@ -19,14 +22,14 @@ const conf = {
     module: {
         rules: [
             {
-                test: /\.js$/,
-                loader: 'babel-loader',
-                query: {
-                    presets: ['@babel/preset-react', '@babel/preset-env']
-                }
-            }
+                test: /\.(t|j)sx?$/,
+                use: { loader: 'ts-loader' },
+                exclude: /node_modules/
+            },
+            { enforce: "pre", test: /\.js$/, exclude: /node_modules/, loader: "source-map-loader" }
         ]
-    }
+    },
+    devtool: "source-map"
 };
 
 if (require.main == module) {
