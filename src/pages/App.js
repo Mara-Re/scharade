@@ -130,7 +130,7 @@ const App = () => {
     const [showGameLinkDialog, setShowGameLinkDialog] = useState();
     const [error, setError] = useState();
 
-    const [team, setTeam] = useState();
+    const [team, setTeam] = useState();  // undefined (waiting for async call) | null (no cookie set)| 1 | 2
     const gameUid = getGameUid();
 
     useEffect(() => {
@@ -148,7 +148,6 @@ const App = () => {
     const getTeam = useCallback(async () => {
         try {
             const { data } = await axios.get(`/team-cookie`);
-            console.log("team from getTeam: ", data.team);
             setTeam(data.team);
         } catch (error) {
             onError(error);
@@ -157,7 +156,6 @@ const App = () => {
 
     const setTeamCookie = useCallback(async () => {
         try {
-            console.log("set team cookie to: ", team);
             const { data } = await axios.post(`/set-team-cookie`, {team});
         } catch (error) {
             onError(error);

@@ -23,7 +23,7 @@ const TeamIndicator = (props) => {
     const classes = useStyles();
 
     useEffect(() => {
-        if (!team) {
+        if (team === null) {
             setChooseTeamModalOpen(true);
         }
     }, [team]);
