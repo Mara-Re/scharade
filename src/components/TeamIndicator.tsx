@@ -1,4 +1,4 @@
-import React, {useState, FunctionComponent } from "react";
+import React, {useState, FunctionComponent, useEffect } from "react";
 import { Button } from "@material-ui/core/";
 import TeamEmoji from "./TeamEmoji";
 import DialogTitle from "@material-ui/core/DialogTitle";
@@ -22,14 +22,16 @@ interface TeamIndicatorProps {
     setTeam: () => void;
 }
 
-const Test: FunctionComponent<TeamIndicatorProps> = ({team}) => {
-    return <><p>!</p></>;
-}
-
-const TeamIndicator: FunctionComponent<TeamIndicatorProps> = (props)  => {
+const TeamIndicator: FunctionComponent<TeamIndicatorProps> = (props) => {
     const {team, setTeam} = props;
 
     const classes = useStyles();
+
+    useEffect(() => {
+        if (team === null) {
+            setChooseTeamModalOpen(true);
+        }
+    }, [team]);
 
     const [chooseTeamModalOpen, setChooseTeamModalOpen] = useState(false);
 
@@ -40,24 +42,27 @@ const TeamIndicator: FunctionComponent<TeamIndicatorProps> = (props)  => {
                     <TeamEmoji teamNumber={team}/>
                 </div>
             </BorderedIconButton>
-            {/*<Dialog*/}
-            {/*    open={chooseTeamModalOpen}*/}
-            {/*    onClose={() => setChooseTeamModalOpen(false)}*/}
-            {/*>*/}
-            {/*    <DialogTitle >*/}
-            {/*        Choose Team*/}
-            {/*    </DialogTitle>*/}
-            {/*    <DialogContent>*/}
-            {/*        <DialogContentText>*/}
-            {/*            <ChooseTeam setTeam={setTeam} team={team} displayTitle={false}/>*/}
-            {/*        </DialogContentText>*/}
-            {/*    </DialogContent>*/}
-            {/*    <DialogActions>*/}
-            {/*        <Button onClick={() => setChooseTeamModalOpen(false)} color="primary">*/}
-            {/*            Done*/}
-            {/*        </Button>*/}
-            {/*    </DialogActions>*/}
-            {/*</Dialog>*/}
+            <Dialog
+                open={chooseTeamModalOpen}
+                onClose={() => setChooseTeamModalOpen(false)}
+                disableBackdropClick={!team}
+            >
+                <DialogTitle >
+                    Choose Team
+                </DialogTitle>
+                <DialogContent>
+                    <DialogContentText>
+                        <ChooseTeam setTeam={setTeam} team={team} displayTitle={false}/>
+                    </DialogContentText>
+                </DialogContent>
+                <DialogActions>
+                    {team && (
+                        <Button onClick={() => setChooseTeamModalOpen(false)} color="primary">
+                            Done
+                        </Button>
+                    )}
+                </DialogActions>
+            </Dialog>
         </>
     );
 }
