@@ -24,6 +24,35 @@ export const socket = io.connect();
 
 const timeToExplain = 60;
 
+///// Allow socket reconnects on mobile devices without page reload////
+let isConnected = false;
+let socketTimeoutId;
+const RETRY_INTERVAL = 2000;
+
+socket.on('connected', function() {
+    isConnected = true;
+    clearTimeout(socketTimeoutId);
+});
+
+socket.on('disconnected', function() {
+    isConnected = false;
+    retryConnectOnFailure(RETRY_INTERVAL);
+});
+
+const retryConnectOnFailure = (retryInMilliseconds) => {
+    setTimeout(function() {
+        if (!isConnected) {
+            $.get('/ping', () => {
+                isConnected = true;
+                window.location.href = unescape(window.location.pathname);
+            });
+            retryConnectOnFailure(retryInMilliseconds);
+        }
+    }, retryInMilliseconds);
+}
+retryConnectOnFailure(RETRY_INTERVAL);
+//////////////////////////////////////////////////
+
 // DONE
 // the state of discarded/guessed Words in WordsList can be changed
 // players can join a team in the setup phase of the game
@@ -101,7 +130,7 @@ const App = () => {
     const [showGameLinkDialog, setShowGameLinkDialog] = useState();
     const [error, setError] = useState();
 
-    const [team, setTeam] = useState();
+    const [team, setTeam] = useState();  // undefined (waiting for async call) | null (no cookie set)| 1 | 2
     const gameUid = getGameUid();
 
     useEffect(() => {
@@ -119,7 +148,6 @@ const App = () => {
     const getTeam = useCallback(async () => {
         try {
             const { data } = await axios.get(`/team-cookie`);
-            console.log("team from getTeam: ", data.team);
             setTeam(data.team);
         } catch (error) {
             onError(error);
@@ -128,7 +156,6 @@ const App = () => {
 
     const setTeamCookie = useCallback(async () => {
         try {
-            console.log("set team cookie to: ", team);
             const { data } = await axios.post(`/set-team-cookie`, {team});
         } catch (error) {
             onError(error);

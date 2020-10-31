@@ -198,7 +198,7 @@ app.post('/set-team-cookie', async (req, res) => {
 app.get('/team-cookie', async (req, res) => {
     // TODO: reset team cookie at some point?
     try {
-        await res.json({team: req.cookies.team});
+        await res.json({team: req.cookies.team || null});
     } catch(error) {
         console.log('error in /team-cookie route ', error);
         await res.json({success: false});
@@ -228,6 +228,12 @@ server.listen(process.env.PORT || 8080, function() {
 
 //-------------------------SOCKET IO-------------------------
 io.on('connection', function(socket) {
+    socket.emit("connected");
+
+    socket.on('disconnect', function() {
+        socket.emit("disconnected");
+    });
+
     const url = socket.handshake.headers.referer;
     const gameUid = url.split("/game/")[1] && url.split("/game/")[1].replace(/\//g, "");
 
