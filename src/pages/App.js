@@ -24,6 +24,35 @@ export const socket = io.connect();
 
 const timeToExplain = 60;
 
+///// Allow socket reconnects on mobile devices without page reload////
+let isConnected = false;
+let socketTimeoutId;
+const RETRY_INTERVAL = 2000;
+
+socket.on('connected', function() {
+    isConnected = true;
+    clearTimeout(socketTimeoutId);
+});
+
+socket.on('disconnected', function() {
+    isConnected = false;
+    retryConnectOnFailure(RETRY_INTERVAL);
+});
+
+const retryConnectOnFailure = (retryInMilliseconds) => {
+    setTimeout(function() {
+        if (!isConnected) {
+            $.get('/ping', () => {
+                isConnected = true;
+                window.location.href = unescape(window.location.pathname);
+            });
+            retryConnectOnFailure(retryInMilliseconds);
+        }
+    }, retryInMilliseconds);
+}
+retryConnectOnFailure(RETRY_INTERVAL);
+//////////////////////////////////////////////////
+
 // DONE
 // the state of discarded/guessed Words in WordsList can be changed
 // players can join a team in the setup phase of the game
