@@ -1,3 +1,5 @@
+DROP TABLE IF EXISTS games;
+
 CREATE TABLE games (
     id SERIAL primary key,
     uid VARCHAR(255),

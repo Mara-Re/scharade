@@ -1,3 +1,5 @@
+DROP TABLE IF EXISTS words;
+
 CREATE TABLE words (
     id SERIAL primary key,
     word VARCHAR(255) NOT NULL,

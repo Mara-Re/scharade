@@ -1,3 +1,6 @@
+DROP TABLE IF EXISTS teams;
+
+
 CREATE TABLE teams (
     id SERIAL primary key,
     team_1_or_2 VARCHAR(255),
