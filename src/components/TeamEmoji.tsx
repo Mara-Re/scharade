@@ -1,6 +1,7 @@
-import React from "react";
+import React, { FunctionComponent } from "react";
 
 import { makeStyles } from "@material-ui/core/styles";
+import { Team } from "../pages/App";
 
 const useStyles = makeStyles({
     noOpacity: {
@@ -22,7 +23,11 @@ const useStyles = makeStyles({
     },
 });
 
-const TeamEmoji = ({ teamNumber }) => {
+interface TeamEmojiProps {
+    teamNumber: Team | null;
+}
+
+const TeamEmoji: FunctionComponent<TeamEmojiProps> = ({ teamNumber }) => {
     const classes = useStyles();
 
 

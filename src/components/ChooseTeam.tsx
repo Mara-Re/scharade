@@ -1,10 +1,11 @@
-import React from "react";
+import React, { FunctionComponent } from "react";
 import Box from "@material-ui/core/Box";
 import ToggleButtonGroup from "@material-ui/lab/ToggleButtonGroup";
 import ToggleButton from "@material-ui/lab/ToggleButton";
 import Typography from "@material-ui/core/Typography";
 import { makeStyles } from "@material-ui/core/styles";
 import TeamEmoji from "./TeamEmoji";
+import { Team } from "../pages/App";
 
 const useStyles = makeStyles({
     chooseTeamBox: {
@@ -13,11 +14,17 @@ const useStyles = makeStyles({
     }
 });
 
-const ChooseTeam = (props) => {
+interface ChooseTeamProps {
+    team?: Team | null;
+    setTeam: (team: Team) => void;
+    displayTitle?: boolean;
+}
+
+const ChooseTeam: FunctionComponent<ChooseTeamProps> = (props) => {
     const {team, setTeam, displayTitle = true} = props;
     const classes = useStyles();
 
-    const handleTeamChoice = (event, newTeamChoice) => {
+    const handleTeamChoice = (_: any, newTeamChoice: Team | undefined) => {
         if (!newTeamChoice) return;
         setTeam(newTeamChoice);
     }
@@ -32,13 +39,13 @@ const ChooseTeam = (props) => {
                 exclusive
                 onChange={handleTeamChoice}
             >
-                <ToggleButton value="1">
-                    <Typography variant={team === "1" ? "h3" : "h6"}>
+                <ToggleButton value={1}>
+                    <Typography variant={team === 1 ? "h3" : "h6"}>
                         <TeamEmoji teamNumber={1}/>
                     </Typography>
                 </ToggleButton>
-                <ToggleButton value="2">
-                    <Typography variant={team === "2" ? "h3" : "h6"}>
+                <ToggleButton value={2}>
+                    <Typography variant={team === 2 ? "h3" : "h6"}>
                         <TeamEmoji teamNumber={2}/>
                     </Typography>
                 </ToggleButton>
