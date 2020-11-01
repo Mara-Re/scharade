@@ -1,6 +1,7 @@
 import React, {useState, FunctionComponent, useEffect } from "react";
 import { Button } from "@material-ui/core/";
 import TeamEmoji from "./TeamEmoji";
+import { Team } from "./../pages/App";
 import DialogTitle from "@material-ui/core/DialogTitle";
 import DialogContent from "@material-ui/core/DialogContent";
 import DialogContentText from "@material-ui/core/DialogContentText";
@@ -18,8 +19,8 @@ const useStyles = makeStyles({
 });
 
 interface TeamIndicatorProps {
-    team: "1" | "2";
-    setTeam: () => void;
+    team: Team | null;
+    setTeam: (team: Team) => void;
 }
 
 const TeamIndicator: FunctionComponent<TeamIndicatorProps> = (props) => {

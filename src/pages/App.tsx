@@ -26,7 +26,7 @@ const timeToExplain = 60;
 
 ///// Allow socket reconnects on mobile devices without page reload////
 let isConnected = false;
-let socketTimeoutId;
+let socketTimeoutId: number;
 const RETRY_INTERVAL = 2000;
 
 socket.on('connected', function() {
@@ -39,13 +39,9 @@ socket.on('disconnected', function() {
     retryConnectOnFailure(RETRY_INTERVAL);
 });
 
-const retryConnectOnFailure = (retryInMilliseconds) => {
+const retryConnectOnFailure = (retryInMilliseconds: number) => {
     setTimeout(function() {
         if (!isConnected) {
-            $.get('/ping', () => {
-                isConnected = true;
-                window.location.href = unescape(window.location.pathname);
-            });
             retryConnectOnFailure(retryInMilliseconds);
         }
     }, retryInMilliseconds);
@@ -118,19 +114,39 @@ const useStyles = makeStyles((theme) => ({
     },
 }));
 
+type WordStatus = "guessed" | "discarded" | "notGuessed";
+type GameStatus = "setup" | "start" | "playerExplaining" | "timeOver" | "endOfRoundReached"| "end";
+type PlayerExplaining = "self" | "other" | undefined;
+export type Team = 1 | 2
+
+interface Word {
+    id: number;
+    word: string;
+    game_id: string;
+}
+
+interface WordWithStatus extends Word {
+    status: WordStatus;
+}
+
+interface TeamScore {
+    team1_or_2: Team;
+    score: number;
+}
+
 const App = () => {
     const classes = useStyles();
-    const [wordToExplain, setWordToExplain] = useState({});
-    const [wordsList, setWordsList] = useState([]); //  {id: number | string, word: string, status: "guessed" | "discarded" | "notGuessed", game_uid: string }
-    const [countdown, setCountdown] = useState();
-    const [playerExplaining, setPlayerExplaining] = useState(); // undefined, "self", "other"
-    const [gameStatus, setGameStatus] = useState(""); // "start", "playerExplaining", "timeOver", "endOfRoundReached", "end"
-    const [playersScore, setPlayersScore] = useState();
-        const [finalTeamScores, setFinalTeamScores] = useState(); // [{team1Or2: 1, score: 15}, {team1Or2: 2, score: 23}]
-    const [showGameLinkDialog, setShowGameLinkDialog] = useState();
-    const [error, setError] = useState();
+    const [wordToExplain, setWordToExplain] = useState<Word>();
+    const [wordsList, setWordsList] = useState<WordWithStatus[]>([]); //  {id: number | string, word: string, status: "guessed" | "discarded" | "notGuessed", game_uid: string }
+    const [countdown, setCountdown] = useState<number>();
+    const [playerExplaining, setPlayerExplaining] = useState<PlayerExplaining>(); // undefined, "self", "other"
+    const [gameStatus, setGameStatus] = useState<GameStatus>(); // "start", "playerExplaining", "timeOver", "endOfRoundReached", "end"
+    const [playersScore, setPlayersScore] = useState<number>();
+    const [finalTeamScores, setFinalTeamScores] = useState<TeamScore[]>(); // [{team1Or2: 1, score: 15}, {team1Or2: 2, score: 23}]
+    const [showGameLinkDialog, setShowGameLinkDialog] = useState<boolean>();
+    const [error, setError] = useState<any>();
 
-    const [team, setTeam] = useState();  // undefined (waiting for async call) | null (no cookie set)| 1 | 2
+    const [team, setTeam] = useState<Team | null>();  // undefined (waiting for async call) | null (no cookie set)| 1 | 2
     const gameUid = getGameUid();
 
     useEffect(() => {
@@ -166,7 +182,7 @@ const App = () => {
         getGameStatus();
     }, []);
 
-    const getGameStatus = async () => {
+    const getGameStatus = useCallback(async () => {
         try {
             const { data } = await axios.get(`/games/${gameUid}/status`);
             setShowGameLinkDialog(data.showGameLinkDialog);
@@ -174,10 +190,10 @@ const App = () => {
         } catch (error) {
             onError(error);
         }
-    };
+    }, []);
 
-    const onError = (e) => {
-        setError(true);
+    const onError = (error: any) => {
+        setError(error);
         setTimeout(() => {
             setError(undefined);
         }, 2000);
@@ -214,7 +230,7 @@ const App = () => {
     }, []);
 
     useEffect(() => {
-        socket.on("timer", (data) => {
+        socket.on("timer", (data: {countdown: number}) => {
             setCountdown(data.countdown);
         });
     }, []);
@@ -246,7 +262,7 @@ const App = () => {
         const { data } = await axios.get(`/games/${gameUid}/teams/`);
         socket.emit("end-game");
         setFinalTeamScores(data);
-    }, []);
+    }, [gameUid]);
 
     useEffect(() => {
         if (gameStatus === "end") {
@@ -254,7 +270,7 @@ const App = () => {
         }
     }, [gameStatus]);
 
-    const onEndOfRoundReached = async () => {
+    const onEndOfRoundReached = useCallback(async () => {
         try {
             await axios.post(`/games/${gameUid}/status`, {
                 status: "endOfRoundReached",
@@ -264,7 +280,7 @@ const App = () => {
         } catch (error) {
             onError(error);
         }
-    };
+    }, [gameUid]);
 
     const onTimerOver = useCallback(() => {
         setGameStatus((gameStatus) => {
@@ -282,8 +298,8 @@ const App = () => {
             playerExplaining === "self" &&
             wordToExplain
         ) {
-            setWordsList([
-                ...wordsList,
+            setWordsList((prevWordsList) => [
+                ...prevWordsList,
                 { ...wordToExplain, status: "notGuessed" },
             ]);
         }
@@ -292,7 +308,7 @@ const App = () => {
     const addScore = useCallback(async (newPlayersScore) => {
         if ((!newPlayersScore && newPlayersScore!== 0) && playersScore) {
             setPlayersScore(newPlayersScore);
-        } else if (isNaN(playersScore)) {
+        } else if (playersScore === undefined) {
             await axios.post(`/games/${gameUid}/teams/addToScore`, {
                 addPoints: newPlayersScore
             });
@@ -318,13 +334,13 @@ const App = () => {
         addScore(newPlayersScore);
     }, [wordsList]);
 
-    const onOtherPlayerStartsExplaining = () => {
+    const onOtherPlayerStartsExplaining = useCallback(() => {
         setPlayerExplaining("other");
         updateStatus("playerExplaining");
         setPlayersScore(undefined);
-    };
+    }, []);
 
-    const onStartExplaining = async () => {
+    const onStartExplaining = useCallback(async () => {
         try {
             await axios.post(`/games/${gameUid}/status`, {
                 status: "playerExplaining",
@@ -342,9 +358,20 @@ const App = () => {
         } catch (e) {
             onError(error);
         }
-    };
+    }, [gameUid, timeToExplain]);
 
-    const onStartNewRound = async () => {
+    const getRandomWord = useCallback(async () => {
+        try {
+            const { data } = await axios.get(`/games/${gameUid}/getRandomWord`);
+            const randomWord = data[0];
+            setWordToExplain(randomWord);
+        } catch (error) {
+            console.log("catch getRandomWord");
+            onError(error);
+        }
+    }, [gameUid, onError]);
+
+    const onStartNewRound = useCallback(async () => {
         try {
             await axios.post(`/games/${gameUid}/resetWordsStatus`, {
                 status: "pile",
@@ -360,8 +387,15 @@ const App = () => {
         } catch (error) {
             onError(error);
         }
-    };
-    const onStartGame = async () => {
+    }, [gameUid, countdown, playerExplaining, getRandomWord, onError]);
+
+    const updateStatus = useCallback((status: GameStatus) => {
+        setGameStatus(status);
+        setWordsList([]);
+        setWordToExplain(undefined);
+    }, []);
+
+    const onStartGame = useCallback(async () => {
         try {
             await axios.post(`/games/${gameUid}/status`, { status: "start" });
             await axios.post(`/games/${gameUid}/createTeams`);
@@ -371,9 +405,9 @@ const App = () => {
         } catch (error) {
             onError(error);
         }
-    };
+    }, [gameUid, updateStatus, onError]);
 
-    const onStartNewGame = async () => {
+    const onStartNewGame = useCallback(async () => {
         try {
             await axios.post(`/games/${gameUid}/status`, { status: "setup" });
             await axios.delete(`/games/${gameUid}/words`);
@@ -383,13 +417,7 @@ const App = () => {
         } catch (error) {
             onError(error);
         }
-    };
-
-    const updateStatus = (status) => {
-        setGameStatus(status);
-        setWordsList([]);
-        setWordToExplain({});
-    };
+    }, [gameUid, updateStatus, onError]);
 
     const onEndGame = useCallback(async () => {
         try {
@@ -401,17 +429,13 @@ const App = () => {
         }
     }, [updateStatus]);
 
-    const getRandomWord = async () => {
-        try {
-            const { data } = await axios.get(`/games/${gameUid}/getRandomWord`);
-            const randomWord = data[0];
-            setWordToExplain(randomWord);
-        } catch (error) {
-            onError(error);
+    const onWordGuessed = useCallback(async () => {
+        console.log("onWordGuessed runs, wordToExplain", wordToExplain);
+        if (!wordToExplain) {
+            console.log("!wordToExplain in onWordGuessed")
+            onError("noWordToExplain");
+            return;
         }
-    };
-
-    const onWordGuessed = async () => {
         try {
             await axios.post(
                 `/games/${gameUid}/words/${wordToExplain.id}/status`,
@@ -423,11 +447,16 @@ const App = () => {
             ]);
             await getRandomWord();
         } catch (error) {
+            console.log("catch onWordGuessed");
             onError(error);
         }
-    };
+    }, [wordToExplain]);
 
-    const onWordDiscarded = async () => {
+    const onWordDiscarded = useCallback(async () => {
+        if (!wordToExplain) {
+            onError("noWordToExplain");
+            return;
+        }
         try {
             await axios.post(
                 `/games/${gameUid}/words/${wordToExplain.id}/status`,
@@ -441,7 +470,7 @@ const App = () => {
         } catch (error) {
             onError(error);
         }
-    };
+    }, [wordToExplain]);
 
     const showTimer =
         (!!countdown &&
@@ -494,7 +523,6 @@ const App = () => {
             />
             <Box className={classes.contentContainer}>
                 <Box
-                    // display="flex"
                     alignSelf="center"
                     justifyContent="center"
                     className={classes.centerBox}
@@ -522,7 +550,7 @@ const App = () => {
                             onWordGuessed={onWordGuessed}
                             onWordDiscarded={onWordDiscarded}
                         >
-                            {wordToExplain.word}
+                            {wordToExplain?.word}
                         </WordCard>
                     )}
 
@@ -564,7 +592,7 @@ const App = () => {
                     <>
                         {gameStatus !== "end" && <EndGame onEndGame={onEndGame} />}
                         {gameStatus === "end" && <StartNewGame onStartNewGame={onStartNewGame} />}
-                        <TeamIndicator team={team} setTeam={setTeam}/>
+                        {team !== undefined && <TeamIndicator team={team} setTeam={setTeam} />}
                     </>
                 )}
 
