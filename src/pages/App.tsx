@@ -117,7 +117,7 @@ const useStyles = makeStyles((theme) => ({
 type WordStatus = "guessed" | "discarded" | "notGuessed";
 type GameStatus = "setup" | "start" | "playerExplaining" | "timeOver" | "endOfRoundReached"| "end";
 type PlayerExplaining = "self" | "other" | undefined;
-export type Team = 1 | 2
+export type Team = "A" | "B"
 
 interface Word {
     id: number;
@@ -130,7 +130,7 @@ interface WordWithStatus extends Word {
 }
 
 interface TeamScore {
-    team1_or_2: Team;
+    team_a_or_b: Team;
     score: number;
 }
 
@@ -142,7 +142,7 @@ const App = () => {
     const [playerExplaining, setPlayerExplaining] = useState<PlayerExplaining>(); // undefined, "self", "other"
     const [gameStatus, setGameStatus] = useState<GameStatus>(); // "start", "playerExplaining", "timeOver", "endOfRoundReached", "end"
     const [playersScore, setPlayersScore] = useState<number>();
-    const [finalTeamScores, setFinalTeamScores] = useState<TeamScore[]>(); // [{team1Or2: 1, score: 15}, {team1Or2: 2, score: 23}]
+    const [finalTeamScores, setFinalTeamScores] = useState<TeamScore[]>(); // [{team_a_or_b: "A", score: 15}, {team_a_or_b: "B", score: 23}]
     const [showGameLinkDialog, setShowGameLinkDialog] = useState<boolean>();
     const [error, setError] = useState<any>();
 
@@ -366,7 +366,6 @@ const App = () => {
             const randomWord = data[0];
             setWordToExplain(randomWord);
         } catch (error) {
-            console.log("catch getRandomWord");
             onError(error);
         }
     }, [gameUid, onError]);
@@ -430,9 +429,7 @@ const App = () => {
     }, [updateStatus]);
 
     const onWordGuessed = useCallback(async () => {
-        console.log("onWordGuessed runs, wordToExplain", wordToExplain);
         if (!wordToExplain) {
-            console.log("!wordToExplain in onWordGuessed")
             onError("noWordToExplain");
             return;
         }
@@ -447,7 +444,6 @@ const App = () => {
             ]);
             await getRandomWord();
         } catch (error) {
-            console.log("catch onWordGuessed");
             onError(error);
         }
     }, [wordToExplain]);

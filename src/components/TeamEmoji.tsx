@@ -24,15 +24,15 @@ const useStyles = makeStyles({
 });
 
 interface TeamEmojiProps {
-    teamNumber: Team | null;
+    team: Team | null;
 }
 
-const TeamEmoji: FunctionComponent<TeamEmojiProps> = ({ teamNumber }) => {
+const TeamEmoji: FunctionComponent<TeamEmojiProps> = ({ team }) => {
     const classes = useStyles();
 
 
-    if (teamNumber == 1) return <span className={classes.noOpacity}>🥦</span>;
-    if (teamNumber == 2) return <span className={classes.noOpacity}>🌶</span>;
+    if (team == "A") return <span className={classes.noOpacity}>🥦</span>;
+    if (team == "B") return <span className={classes.noOpacity}>🌶</span>;
     return null;
 
 }

@@ -39,14 +39,14 @@ const ChooseTeam: FunctionComponent<ChooseTeamProps> = (props) => {
                 exclusive
                 onChange={handleTeamChoice}
             >
-                <ToggleButton value={1}>
-                    <Typography variant={team === 1 ? "h3" : "h6"}>
-                        <TeamEmoji teamNumber={1}/>
+                <ToggleButton value="A">
+                    <Typography variant={team === "A" ? "h3" : "h6"}>
+                        <TeamEmoji team="A"/>
                     </Typography>
                 </ToggleButton>
-                <ToggleButton value={2}>
-                    <Typography variant={team === 2 ? "h3" : "h6"}>
-                        <TeamEmoji teamNumber={2}/>
+                <ToggleButton value="B">
+                    <Typography variant={team === "B" ? "h3" : "h6"}>
+                        <TeamEmoji team="B"/>
                     </Typography>
                 </ToggleButton>
             </ToggleButtonGroup>

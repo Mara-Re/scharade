@@ -133,12 +133,12 @@ module.exports.getTeams = function getTeamscore(gameUid) {
     );
 };
 
-module.exports.addToTeamscore = function addToTeamscore(gameUid, team1or2, addPoints) {
+module.exports.addToTeamscore = function addToTeamscore(gameUid, teamAorB, addPoints) {
     return db.query(
         `UPDATE teams
             SET score = score + $3
             WHERE game_uid = $1 AND team_1_or_2 = $2` ,
-        [gameUid, team1or2, addPoints]
+        [gameUid, teamAorB, addPoints]
     );
 };
 

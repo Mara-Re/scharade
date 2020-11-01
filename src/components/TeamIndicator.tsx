@@ -40,7 +40,7 @@ const TeamIndicator: FunctionComponent<TeamIndicatorProps> = (props) => {
         <>
             <BorderedIconButton onClick={() => setChooseTeamModalOpen(true)}>
                 <div className={classes.square}>
-                    <TeamEmoji teamNumber={team}/>
+                    <TeamEmoji team={team}/>
                 </div>
             </BorderedIconButton>
             <Dialog open={chooseTeamModalOpen}
