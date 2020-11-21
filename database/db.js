@@ -120,7 +120,7 @@ module.exports.getTeams = function getTeams(gameUid) {
 
 module.exports.addTeams = function addTeams(gameUid) {
     return db.query(
-        `INSERT INTO teams (game_uid, team_1_or_2) VALUES ($1, 1), ($1, 2)`,
+        `INSERT INTO teams (game_uid, team_a_or_b) VALUES ($1, 'A'), ($1, 'B')`,
         [ gameUid ]
     );
 };
@@ -137,7 +137,7 @@ module.exports.addToTeamscore = function addToTeamscore(gameUid, teamAorB, addPo
     return db.query(
         `UPDATE teams
             SET score = score + $3
-            WHERE game_uid = $1 AND team_1_or_2 = $2` ,
+            WHERE game_uid = $1 AND team_a_or_b = $2` ,
         [gameUid, teamAorB, addPoints]
     );
 };

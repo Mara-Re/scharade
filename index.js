@@ -185,7 +185,8 @@ app.post('/reset-game-setup-cookie', async (req, res) => {
 });
 
 app.post('/set-team-cookie', async (req, res) => {
-    const team = req.body.team || req.cookies.team || Math.floor(Math.random() * 2) + 1;
+    const randomTeamAorB = Math.floor(Math.random() * 2) + 1 === 1 ? "A" : "B";
+    const team = req.body.team || req.cookies.team || randomTeamAorB;
     try {
         res.cookie("team", team);
         await res.json({success: true});

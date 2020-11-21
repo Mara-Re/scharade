@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, FunctionComponent } from "react";
 import Button from "@material-ui/core/Button";
 import Dialog from "@material-ui/core/Dialog";
 import DialogTitle from "@material-ui/core/DialogTitle";
@@ -6,8 +6,11 @@ import DialogContent from "@material-ui/core/DialogContent";
 import DialogContentText from "@material-ui/core/DialogContentText";
 import DialogActions from "@material-ui/core/DialogActions";
 
+interface EndGameProps {
+    onEndGame: () => void;
+}
 
-const EndGame = (props) => {
+const EndGame: FunctionComponent<EndGameProps> = (props) => {
     const {onEndGame} = props;
 
     const [endGameDialogOpen, setEndGameDialogOpen] = useState(false);
@@ -16,7 +19,6 @@ const EndGame = (props) => {
         onEndGame();
         setEndGameDialogOpen(false);
     };
-
 
     return (
         <>

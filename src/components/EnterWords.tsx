@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { FunctionComponent, useState } from "react";
 import Box from "@material-ui/core/Box";
 import Typography from "@material-ui/core/Typography";
 import Button from "@material-ui/core/Button";
@@ -6,8 +6,8 @@ import TextField from '@material-ui/core/TextField';
 import { makeStyles } from "@material-ui/core/styles";
 import axios from "axios";
 import WordsList from "./WordsList";
-import StartGame from "./StartGame";
 import { getGameUid } from "../helper/getGameUid";
+import { Word } from "../pages/App";
 
 const useStyles = makeStyles({
     enterWordsBox: {
@@ -24,17 +24,21 @@ const useStyles = makeStyles({
     }
 });
 
-const EnterWords = (props) => {
+interface EnterWordsProps {
+    onError: (error: any) => void;
+}
+
+const EnterWords: FunctionComponent<EnterWordsProps> = (props) => {
     const {
         onError
     } = props;
 
     const gameUid = getGameUid();
     const classes = useStyles();
-    const [wordInput, setWordInput] = useState("");
-    const [wordsSubmitted, setWordsSubmitted] = useState([])
+    const [wordInput, setWordInput] = useState<string>("");
+    const [wordsSubmitted, setWordsSubmitted] = useState<Word[]>([]);
 
-    const onChange = (event) => {
+    const onChange = (event: any) => {
         setWordInput(event.target.value);
     }
 
@@ -55,7 +59,7 @@ const EnterWords = (props) => {
         }
     }
 
-    const onEnter = async (event) => {
+    const onEnter = async (event: any) => {
         if (event.key === "Enter") {
             await onWordSubmit();
         }
@@ -70,9 +74,6 @@ const EnterWords = (props) => {
             <Button variant='contained' color='primary' onClick={onWordSubmit} className={classes.submitButton}>Add word to pile</Button>
             {!!wordsSubmitted.length && <WordsList title="Words you added">{wordsSubmitted}</WordsList>}
         </Box>
-
-
-
     );
 }
 

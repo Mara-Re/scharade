@@ -55,6 +55,17 @@ retryConnectOnFailure(RETRY_INTERVAL);
 // scores are tracked per team
 // players can change team during the game
 // players can click on 'end game' to see their team's final score
+// convert FinalTeamScore to tsx
+// fix end game -> endOfRoundReached bug
+// FinalTeamScore: handle undefined, handle 0!
+
+
+
+// TODO s
+// convert all other components to tsx
+// convert Home to tsx
+// convert start.js to ts
+// when restart game -> start new game id, do not delete old game, lead to other url & show other players hint to switch to new game room
 
 // TODO s rounds
 // 5 rounds: - 1. explaining, 2. pantomime, 3. one-word explanation, 4. finger pantomime, 5. make a sound
@@ -72,10 +83,12 @@ retryConnectOnFailure(RETRY_INTERVAL);
 // teams explain in alternating order
 // players see which team is explaining
 
+
 // TODO s players
 // enable players to enter their names
 // show which players are currently in the game
 // show which player is currently explaining
+// enable players to kick out other players
 // show live with socket, which players are in the game and which have left
 
 // TODO handle exceptions / fix bugs / error handling
@@ -119,17 +132,16 @@ type GameStatus = "setup" | "start" | "playerExplaining" | "timeOver" | "endOfRo
 type PlayerExplaining = "self" | "other" | undefined;
 export type Team = "A" | "B"
 
-interface Word {
+export interface Word {
     id: number;
     word: string;
-    game_id: string;
 }
 
 interface WordWithStatus extends Word {
     status: WordStatus;
 }
 
-interface TeamScore {
+export interface TeamScore {
     team_a_or_b: Team;
     score: number;
 }
@@ -253,7 +265,7 @@ const App = () => {
     //^^^^^^^^SOCKET EVENT LISTENERS^^^^^^^^^^--------
 
     useEffect(() => {
-        if (playerExplaining === "self" && !wordToExplain) {
+        if (playerExplaining === "self" && !wordToExplain && gameStatus === "playerExplaining") {
             onEndOfRoundReached();
         }
     }, [wordToExplain, playerExplaining]);
@@ -268,7 +280,7 @@ const App = () => {
         if (gameStatus === "end") {
             getFinalTeamData();
         }
-    }, [gameStatus]);
+    }, [gameStatus, getFinalTeamData]);
 
     const onEndOfRoundReached = useCallback(async () => {
         try {
@@ -528,7 +540,6 @@ const App = () => {
                             <ChooseTeam setTeam={setTeam} team={team}/>
                             <EnterWords
                                 onError={onError}
-                                onStartGame={onStartGame}
                             />
                         </>
                     )}
@@ -571,7 +582,7 @@ const App = () => {
                         </ActionMessage>
                     )}
 
-                    {showFinalTeamScores && (
+                    {showFinalTeamScores && finalTeamScores && finalTeamScores.length && (
                         <FinalTeamScores finalTeamScores={finalTeamScores}/>
                     )}
                 </Box>
