@@ -155,7 +155,7 @@ const App = () => {
     const [gameStatus, setGameStatus] = useState<GameStatus>(); // "start", "playerExplaining", "timeOver", "endOfRoundReached", "end"
     const [playersScore, setPlayersScore] = useState<number>();
     const [finalTeamScores, setFinalTeamScores] = useState<TeamScore[]>(); // [{team_a_or_b: "A", score: 15}, {team_a_or_b: "B", score: 23}]
-    const [showGameLinkDialog, setShowGameLinkDialog] = useState<boolean>();
+    const [showGameLinkDialog, setShowGameLinkDialog] = useState(false);
     const [error, setError] = useState<any>();
 
     const [team, setTeam] = useState<Team | null>();  // undefined (waiting for async call) | null (no cookie set)| 1 | 2
