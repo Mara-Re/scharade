@@ -1,4 +1,4 @@
-import React from "react";
+import React, { FunctionComponent } from "react";
 import Box from "@material-ui/core/Box";
 import { makeStyles } from '@material-ui/core/styles';
 import Typography from "@material-ui/core/Typography";
@@ -31,7 +31,8 @@ const useStyles = makeStyles({
     }
 });
 
-const Home = () => {
+
+const Home: FunctionComponent<{}> = () => {
     const classes = useStyles();
 
     const onSetupNewGame = async() => {
@@ -50,7 +51,7 @@ const Home = () => {
             <Box className={classes.contentContainer}>
                 <Box alignSelf="center" justifyContent="center" className={classes.centerBox} >
                     <>
-                        <Typography variant="h6" className={classes.title}>
+                        <Typography variant="h6">
                             Start a new Zettelchen game
                         </Typography>
                         <IconButton className={classes.iconButton} onClick={onSetupNewGame}>

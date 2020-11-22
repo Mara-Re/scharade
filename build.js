@@ -2,7 +2,7 @@ const webpack = require('webpack');
 const UglifyJsPlugin = require('uglifyjs-webpack-plugin')
 
 const conf = {
-    entry: ["@babel/polyfill", __dirname + '/src/start.js'],
+    entry: ["@babel/polyfill", __dirname + '/src/start.tsx'],
     output: {
         path: __dirname,
         filename: 'bundle.js'

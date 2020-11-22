@@ -62,8 +62,6 @@ retryConnectOnFailure(RETRY_INTERVAL);
 
 
 // TODO s
-// convert Home to tsx
-// convert start.js to ts
 // when restart game -> start new game id, do not delete old game, lead to other url & show other players hint to switch to new game room
 
 // TODO s rounds
