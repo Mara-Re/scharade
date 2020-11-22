@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { FunctionComponent } from "react";
 import Box from "@material-ui/core/Box";
 import { makeStyles } from '@material-ui/core/styles';
 import IconButton from '@material-ui/core/IconButton';
@@ -12,6 +12,7 @@ import CheckIcon from '@material-ui/icons/Check';
 import ClearIcon from '@material-ui/icons/Clear';
 import axios from "axios";
 import { getGameUid } from "../helper/getGameUid";
+import { Word, WordStatus } from "../pages/App";
 
 const useStyles = makeStyles({
     green: {
@@ -25,21 +26,26 @@ const useStyles = makeStyles({
     }
 });
 
+// interface WordsListProps {
+//     children: Word[];
+//     title: string;
+//     setWordsList?: (wordsList: Word[]) => void;
+// }
 
 const WordsList = (props) => {
     const {
         children,
         title,
-        setWordsList,
+        setWordsList = () => {},
     } = props;
 
     const classes = useStyles();
     const gameUid = getGameUid();
 
 
-    const getStatusColor = (status) =>  status === "guessed" && "green" || status === "discarded" && "red" || "noColor";
+    const getStatusColor = (status: WordStatus) =>  status === "guessed" && "green" || status === "discarded" && "red" || undefined;
 
-    const changeWordStatus = async (wordId, oldWordStatus) => {
+    const changeWordStatus = async (wordId: number, oldWordStatus: WordStatus) => {
         if (oldWordStatus === "pile") return;
         const newWordStatus = (oldWordStatus === "guessed" && "discarded") || (oldWordStatus === "discarded" || oldWordStatus === "notGuessed") && "guessed";
 
@@ -47,7 +53,7 @@ const WordsList = (props) => {
 
         await axios.post(`/games/${gameUid}/words/${wordId}/status`, {status: newWordStatus});
 
-        const newWordsList = children.map(word => {
+        const newWordsList = (children || []).map(word => {
             if (word.id === wordId) {
                 return {...word, status: newWordStatus};
             }

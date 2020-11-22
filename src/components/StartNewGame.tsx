@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { FunctionComponent, useState } from "react";
 import Button from "@material-ui/core/Button";
 import Dialog from "@material-ui/core/Dialog";
 import DialogTitle from "@material-ui/core/DialogTitle";
@@ -6,8 +6,11 @@ import DialogContent from "@material-ui/core/DialogContent";
 import DialogContentText from "@material-ui/core/DialogContentText";
 import DialogActions from "@material-ui/core/DialogActions";
 
+interface StartNewGameProps {
+    onStartNewGame: () => void;
+}
 
-const StartNewGame = (props) => {
+const StartNewGame: FunctionComponent<StartNewGameProps> = (props) => {
     const {onStartNewGame} = props;
 
     const [startNewGameDialogOpen, setStartNewGameDialogOpen] = useState(false);
@@ -17,11 +20,9 @@ const StartNewGame = (props) => {
         setStartNewGameDialogOpen(false);
     };
 
-
     return (
         <>
             <Button onClick={() => setStartNewGameDialogOpen(true)}>Start over</Button>
-
             <Dialog
             open={startNewGameDialogOpen}
             onClose={() => setStartNewGameDialogOpen(false)}

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { FunctionComponent, useState } from "react";
 import Box from "@material-ui/core/Box";
 import { makeStyles } from '@material-ui/core/styles';
 import Button from "@material-ui/core/Button";
@@ -20,7 +20,11 @@ const useStyles = makeStyles({
     }
 });
 
-const StartGame = (props) => {
+interface StartGameProps {
+    onStartGame: () => void;
+}
+
+const StartGame: FunctionComponent<StartGameProps> = (props) => {
     const {onStartGame} = props;
     const classes = useStyles();
 
@@ -31,7 +35,6 @@ const StartGame = (props) => {
         setStartDialogOpen(false);
     };
 
-
     return (
         <>
             <Box display="flex" alignSelf="center">
@@ -40,7 +43,6 @@ const StartGame = (props) => {
                         Start Game
                     </Typography>
                 </Box>
-
                 <Box alignSelf="center">
                     <IconButton onClick={() => setStartDialogOpen(true)} className={classes.startGameButton}>
                         <PlayArrowIcon fontSize="large"/>

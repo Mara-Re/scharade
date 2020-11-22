@@ -127,7 +127,7 @@ const useStyles = makeStyles((theme) => ({
     },
 }));
 
-type WordStatus = "guessed" | "discarded" | "notGuessed";
+export type WordStatus = "guessed" | "discarded" | "notGuessed" | "pile";
 type GameStatus = "setup" | "start" | "playerExplaining" | "timeOver" | "endOfRoundReached"| "end";
 type PlayerExplaining = "self" | "other" | undefined;
 export type Team = "A" | "B"
@@ -135,6 +135,7 @@ export type Team = "A" | "B"
 export interface Word {
     id: number;
     word: string;
+    status?: WordStatus;
 }
 
 interface WordWithStatus extends Word {
