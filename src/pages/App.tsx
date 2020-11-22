@@ -62,7 +62,6 @@ retryConnectOnFailure(RETRY_INTERVAL);
 
 
 // TODO s
-// convert all other components to tsx
 // convert Home to tsx
 // convert start.js to ts
 // when restart game -> start new game id, do not delete old game, lead to other url & show other players hint to switch to new game room
@@ -138,10 +137,6 @@ export interface Word {
     status?: WordStatus;
 }
 
-interface WordWithStatus extends Word {
-    status: WordStatus;
-}
-
 export interface TeamScore {
     team_a_or_b: Team;
     score: number;
@@ -150,7 +145,7 @@ export interface TeamScore {
 const App = () => {
     const classes = useStyles();
     const [wordToExplain, setWordToExplain] = useState<Word>();
-    const [wordsList, setWordsList] = useState<WordWithStatus[]>([]); //  {id: number | string, word: string, status: "guessed" | "discarded" | "notGuessed", game_uid: string }
+    const [wordsList, setWordsList] = useState<Word[]>([]); //  {id: number | string, word: string, status: "guessed" | "discarded" | "notGuessed", game_uid: string }
     const [countdown, setCountdown] = useState<number>();
     const [playerExplaining, setPlayerExplaining] = useState<PlayerExplaining>(); // undefined, "self", "other"
     const [gameStatus, setGameStatus] = useState<GameStatus>(); // "start", "playerExplaining", "timeOver", "endOfRoundReached", "end"
@@ -589,9 +584,7 @@ const App = () => {
                 </Box>
                 <Box className={classes.wordsListBox}>
                     {showWordsList && (
-                        <WordsList title="Words" setWordsList={setWordsList}>
-                            {wordsList}
-                        </WordsList>
+                        <WordsList title="Words" setWordsList={setWordsList} words={wordsList} />
                     )}
                 </Box>
             </Box>

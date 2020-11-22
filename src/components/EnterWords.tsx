@@ -72,7 +72,7 @@ const EnterWords: FunctionComponent<EnterWordsProps> = (props) => {
             </Typography>
             <TextField variant='outlined' onChange={onChange} className={classes.wordInput} value={wordInput} onKeyDown={onEnter}/>
             <Button variant='contained' color='primary' onClick={onWordSubmit} className={classes.submitButton}>Add word to pile</Button>
-            {!!wordsSubmitted.length && <WordsList title="Words you added">{wordsSubmitted}</WordsList>}
+            {!!wordsSubmitted.length && <WordsList title="Words you added" words={wordsSubmitted} />}
         </Box>
     );
 }
