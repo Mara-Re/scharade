@@ -1,11 +1,12 @@
-import React, { FunctionComponent } from "react";
+import React, { FunctionComponent, useCallback, useContext } from "react";
 import Box from "@material-ui/core/Box";
 import ToggleButtonGroup from "@material-ui/lab/ToggleButtonGroup";
 import ToggleButton from "@material-ui/lab/ToggleButton";
 import Typography from "@material-ui/core/Typography";
 import { makeStyles } from "@material-ui/core/styles";
 import TeamEmoji from "./TeamEmoji";
-import { Team } from "../pages/App";
+import axios from "axios";
+import { StatusContext, Team } from "../contexts/StatusContext";
 
 const useStyles = makeStyles({
     chooseTeamBox: {
@@ -15,19 +16,27 @@ const useStyles = makeStyles({
 });
 
 interface ChooseTeamProps {
+    // TODO: remove team and setTeam from props when not needed anymore
     team?: Team | null;
-    setTeam: (team: Team) => void;
+    setTeam?: (team: Team) => void;
     displayTitle?: boolean;
 }
 
 const ChooseTeam: FunctionComponent<ChooseTeamProps> = (props) => {
-    const {team, setTeam, displayTitle = true} = props;
+
+    const {reloadTeam = () => {}, onError = () => {}, team} = useContext(StatusContext);
+    const { displayTitle = true} = props;
     const classes = useStyles();
 
-    const handleTeamChoice = (_: any, newTeamChoice: Team | undefined) => {
+    const handleTeamChoice = useCallback(async (_: any, newTeamChoice: Team | undefined) => {
         if (!newTeamChoice) return;
-        setTeam(newTeamChoice);
-    }
+        try {
+            await axios.post(`/set-team-cookie`, {team: newTeamChoice});
+            reloadTeam();
+        } catch (error) {
+            onError(error);
+        }
+    }, []);
 
     return (
         <Box justifyContent='center' alignItems="center" className={classes.chooseTeamBox}>

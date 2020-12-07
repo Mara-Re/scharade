@@ -1,7 +1,6 @@
-import React, {useState, FunctionComponent, useEffect } from "react";
+import React, { useState, FunctionComponent, useEffect, useContext } from "react";
 import { Button } from "@material-ui/core/";
 import TeamEmoji from "./TeamEmoji";
-import { Team } from "./../pages/App";
 import DialogTitle from "@material-ui/core/DialogTitle";
 import DialogContent from "@material-ui/core/DialogContent";
 import DialogContentText from "@material-ui/core/DialogContentText";
@@ -10,6 +9,7 @@ import { Dialog } from '@material-ui/core';
 import ChooseTeam from "./ChooseTeam";
 import BorderedIconButton from "./IconButton";
 import { makeStyles } from "@material-ui/core/styles";
+import { Team } from "../contexts/StatusContext";
 
 const useStyles = makeStyles({
     square: {
@@ -20,11 +20,10 @@ const useStyles = makeStyles({
 
 interface TeamIndicatorProps {
     team: Team | null;
-    setTeam: (team: Team) => void;
 }
 
 const TeamIndicator: FunctionComponent<TeamIndicatorProps> = (props) => {
-    const {team, setTeam} = props;
+    const {team} = props;
 
     const classes = useStyles();
 
@@ -57,7 +56,7 @@ const TeamIndicator: FunctionComponent<TeamIndicatorProps> = (props) => {
                 </DialogTitle>
                 <DialogContent>
                     <DialogContentText>
-                        <ChooseTeam setTeam={setTeam} team={team} displayTitle={false}/>
+                        <ChooseTeam displayTitle={false}/>
                     </DialogContentText>
                 </DialogContent>
                 <DialogActions>

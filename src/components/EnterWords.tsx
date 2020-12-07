@@ -1,4 +1,4 @@
-import React, { FunctionComponent, useState } from "react";
+import React, { FunctionComponent, useContext, useState } from "react";
 import Box from "@material-ui/core/Box";
 import Typography from "@material-ui/core/Typography";
 import Button from "@material-ui/core/Button";
@@ -7,7 +7,7 @@ import { makeStyles } from "@material-ui/core/styles";
 import axios from "axios";
 import WordsList from "./WordsList";
 import { getGameUid } from "../helper/getGameUid";
-import { Word } from "../pages/App";
+import { StatusContext, Word } from "../contexts/StatusContext";
 
 const useStyles = makeStyles({
     enterWordsBox: {
@@ -24,14 +24,9 @@ const useStyles = makeStyles({
     }
 });
 
-interface EnterWordsProps {
-    onError: (error: any) => void;
-}
 
-const EnterWords: FunctionComponent<EnterWordsProps> = (props) => {
-    const {
-        onError
-    } = props;
+const EnterWords: FunctionComponent<{}> = (props) => {
+    const { onError = () => {}} = useContext(StatusContext);
 
     const gameUid = getGameUid();
     const classes = useStyles();

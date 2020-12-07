@@ -2,7 +2,8 @@ import React, { FunctionComponent } from "react";
 import TeamEmoji from "./TeamEmoji";
 import { makeStyles } from "@material-ui/core/styles";
 import Box from "@material-ui/core/Box";
-import { Team, TeamScore } from "../pages/App";
+import { Team } from "../contexts/StatusContext";
+import { TeamScore } from "../views/EndOfGameView";
 
 const useStyles = makeStyles({
     finalScoresBox: {

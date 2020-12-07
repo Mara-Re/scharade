@@ -2,10 +2,10 @@ const express = require('express');
 const app = express();
 const compression = require('compression');
 const db = require('./database/db');
+const addTurnScoreToTeamScore = require('./helpers/addTurnScoreToTeam');
 const server = require('http').Server(app);
 const io = require('socket.io')(server);
 const uidSafe = require('uid-safe');
-
 
 const timeToExplain = process.env.NODE_ENV != 'production' ? 11 : 60;
 
@@ -34,7 +34,6 @@ app.use(express.json());
 
 ///////////////////////------ ROUTES------///////////////////////
 
-
 //-------------------------GAMES ROUTES-------------------------
 
 app.post('/games', async (req, res) => {
@@ -51,7 +50,7 @@ app.post('/games', async (req, res) => {
 app.get('/games/:uid/status', async (req, res) => {
     try {
         const {rows} = await db.getGameStatus(req.params.uid);
-        await res.json({...rows, showGameLinkDialog: req.cookies.gameSetup === "true" });
+        await res.json({...rows });
     } catch(error) {
         console.log('error in /games/:uid/status get route: ', error);
     }
@@ -60,6 +59,7 @@ app.get('/games/:uid/status', async (req, res) => {
 app.post('/games/:uid/status', async (req, res) => {
     try {
         const {rows} = await db.getGameStatus(req.params.uid);
+
         if (rows[0].status === req.body.status) {
             throw new Error;
         } else {
@@ -67,7 +67,59 @@ app.post('/games/:uid/status', async (req, res) => {
             await res.json({success: true});
         }
     } catch(error) {
-        console.log('error in /games/:uid/status get route: ', error);
+        console.log('error in /games/:uid/status post route: ', error);
+        await res.json({success: false});
+    }
+});
+
+app.post('/games/:uid/startExplaining', async (req, res) => {
+    try {
+        const {rows} = await db.getGameStatus(req.params.uid);
+        if (rows[0].status === "PLAYER_EXPLAINING") {
+            throw new Error;
+        } else {
+            await addTurnScoreToTeamScore(req.params.uid);
+            await db.startExplaining(req.params.uid, req.cookies.team);
+            await db.resetWords(req.params.uid, "pile", "notGuessedThisTurn");
+            await db.resetWords(req.params.uid, "pile", "discardedThisTurn");
+            await db.resetWords(req.params.uid, "guessed", "guessedThisTurn");
+            await res.json({success: true});
+        }
+    } catch(error) {
+        console.log('error in /games/:uid/startExplaining post route: ', error);
+        await res.json({success: false});
+    }
+});
+
+app.post('/games/:uid/startNewRound', async (req, res) => {
+    try {
+        const {rows} = await db.getGameStatus(req.params.uid);
+        if (rows[0].status === "PLAYER_EXPLAINING") {
+            throw new Error;
+        } else {
+            await addTurnScoreToTeamScore(req.params.uid);
+            await db.setGameStatus(req.params.uid, "PLAYER_EXPLAINING");
+            await db.resetWords(req.params.uid, "pile");
+            await res.json({success: true});
+        }
+    } catch(error) {
+        console.log('error in /games/:uid/startNewRound post route: ', error);
+        await res.json({success: false});
+    }
+});
+
+app.post('/games/:uid/endGame', async (req, res) => {
+    try {
+        const {rows} = await db.getGameStatus(req.params.uid);
+        if (rows[0].status === "END") {
+            throw new Error;
+        } else {
+            await addTurnScoreToTeamScore(req.params.uid);
+            await db.setGameStatus(req.params.uid, "END");
+            await res.json({success: true});
+        }
+    } catch(error) {
+        console.log('error in /games/:uid/endGame post route: ', error);
         await res.json({success: false});
     }
 });
@@ -77,9 +129,23 @@ app.post('/games/:uid/status', async (req, res) => {
 app.get('/games/:uid/getRandomWord/', async (req, res) => {
     try {
         const {rows} = await db.getRandomWord(req.params.uid);
+        if (rows[0] && rows[0].id) {
+            const currentDateTime = new Date();
+            const reformattedDate = currentDateTime.toISOString().split('T')[0]+' '+ currentDateTime.toTimeString().split(' ')[0];
+            await db.setWordDrawn(rows[0].id, req.params.uid, reformattedDate);
+        }
         await res.json(rows);
     } catch(error) {
-        console.log('error in /games/:uid/words/random get route: ', error);
+        console.log('error in /games/:uid/getRandomWord/ get route: ', error);
+    }
+});
+
+app.get('/games/:uid/words/', async (req, res) => {
+    try {
+        const {rows} = await db.getWordsList(req.params.uid);
+        await res.json(rows);
+    } catch(error) {
+        console.log('error in /games/:uid/words get route: ', error);
     }
 });
 
@@ -101,15 +167,6 @@ app.post('/games/:uid/words/:id/status', async (req, res) => {
     }
 });
 
-app.post('/games/:uid/resetWordsStatus', async (req, res) => {
-    try {
-        await db.resetWords(req.params.uid, req.body.status, req.body.previousStatus);
-        await res.json({success: true});
-    } catch(error) {
-        console.log('error in /games/:uid/words/resetStatus post route: ', error);
-    }
-});
-
 app.delete('/games/:uid/words', async (req, res) => {
     try {
         await db.deleteWords(req.params.uid);
@@ -127,6 +184,7 @@ app.get('/games/:uid/teams', async (req, res) => {
         await res.json(rows);
     } catch(error) {
         console.log('error in /games/:uid/teams get route: ', error);
+        await res.json({success: false});
     }
 });
 
@@ -135,29 +193,7 @@ app.post('/games/:uid/createTeams', async (req, res) => {
         await db.addTeams(req.params.uid);
         await res.json({success: true});
     } catch(error) {
-        console.log('error in /games/:uid/words post route: ', error);
-        await res.json({success: false});
-    }
-});
-
-//-------------------------TEAMS SCORE ROUTES-------------------------
-app.get('/games/:uid/teams', async (req, res) => {
-    try {
-        const {rows} = await db.getTeams(req.params.uid);
-        await res.json(rows);
-    } catch(error) {
-        console.log('/games/:uid/teams/getTeamData get route: ', error);
-        await res.json({success: false});
-    }
-});
-
-
-app.post('/games/:uid/teams/addToScore', async (req, res) => {
-    try {
-        await db.addToTeamscore(req.params.uid, req.cookies.team, req.body.addPoints);
-        await res.json({success: true});
-    } catch(error) {
-        console.log('/games/:uid/words post route: ', error);
+        console.log('error in /games/:uid/createTeams post route: ', error);
         await res.json({success: false});
     }
 });
@@ -167,7 +203,7 @@ app.delete('/games/:uid/teams/', async (req, res) => {
         await db.deleteTeams(req.params.uid);
         await res.json({success: true});
     } catch(error) {
-        console.log('/games/:uid/words post route: ', error);
+        console.log('error in /games/:uid/teams/ delete route: ', error);
         await res.json({success: false});
     }
 });
@@ -206,6 +242,15 @@ app.get('/team-cookie', async (req, res) => {
     }
 });
 
+app.get('/game-link-dialog-cookie', async (req, res) => {
+    try {
+        await res.json({showGameLinkDialog: req.cookies.gameSetup === "true" });
+    } catch(error) {
+        console.log('error in /game-link-dialog-cookie get route: ', error);
+    }
+});
+
+
 //-------------------------SEND FILE ROUTES: game app (/game/:uid) and home (*) -------------------------
 app.get('/game/:uid', async (req, res) => {
     try {
@@ -228,12 +273,14 @@ server.listen(process.env.PORT || 8080, function() {
 });
 
 //-------------------------SOCKET IO-------------------------
+
 io.on('connection', function(socket) {
     socket.emit("connected");
 
     socket.on('disconnect', function() {
         socket.emit("disconnected");
     });
+
 
     const url = socket.handshake.headers.referer;
     const gameUid = url.split("/game/")[1] && url.split("/game/")[1].replace(/\//g, "");
@@ -243,65 +290,67 @@ io.on('connection', function(socket) {
         socket.join(gameUid);
     }
     let timerId;
-    let timerIdStartNewRound;
     let countdown = timeToExplain;
 
-    socket.on('start-game', () => {
+    const clearAllTimers = () => {
         timerId && clearInterval(timerId);
-        timerIdStartNewRound && clearInterval(timerIdStartNewRound);
+        timerId = undefined;
+    };
+
+    const setCountdownInterval = () => setInterval(function() {
+        io.in(gameUid).emit('timer', { countdown, timerId});
+        countdown--;
+        if (countdown < 0) {
+            io.in(gameUid).emit('timer', { countdown: undefined });
+            io.in(gameUid).emit('timeOver');
+            countdown = timeToExplain;
+            const adjustGameStatus = async () => {
+                // ignore onTimerOver when game is currently not ongoing:
+                const gameStatus = await db.getGameStatus(gameUid);
+                if (gameStatus === "END" || gameStatus === "START" ) {
+                    return gameStatus;
+                }
+                await db.setGameStatus(gameUid, "TIME_OVER");
+            };
+            adjustGameStatus();
+            clearInterval(timerId);
+            timerId = undefined;
+            return;
+        }
+    }, 1000);
+
+    socket.on('start-game', () => {
+        clearAllTimers();
         socket.to(gameUid).emit("game-started");
     });
 
     socket.on('start-new-game', () => {
-        timerId && clearInterval(timerId);
-        timerIdStartNewRound && clearInterval(timerIdStartNewRound);
+        clearAllTimers();
         socket.to(gameUid).emit("new-game-started");
     });
 
     socket.on('end-game', () => {
-        timerId && clearInterval(timerId);
-        timerIdStartNewRound && clearInterval(timerIdStartNewRound);
+        clearAllTimers();
         socket.to(gameUid).emit("game-ended");
     });
 
     socket.on('start-explaining', () => {
         socket.to(gameUid).emit("other-player-starts-explaining");
-        timerId = setInterval(function() {
-            io.in(gameUid).emit('timer', { countdown, timerId});
-            countdown--;
-            if (countdown < 0) {
-                io.in(gameUid).emit('timer', { countdown: undefined });
-                io.in(gameUid).emit('timeOver');
-                countdown = timeToExplain;
-                db.setGameStatus(gameUid, "timeOver");
-                clearInterval(timerId);
-                return;
-            }
-        }, 1000);
+        if (timerId) return;
+        timerId = setCountdownInterval();
     });
 
     socket.on('end-of-round', async () => {
-        clearInterval(timerId);
-        clearInterval(timerIdStartNewRound);
+        clearAllTimers();
         socket.to(gameUid).emit("end-of-round-reached");
     });
 
     socket.on('start-new-round', (data) => {
         countdown = data.countdown;
         socket.to(gameUid).emit("new-round-started");
+        if (timerId) return;
         if (countdown > 0) {
-            timerIdStartNewRound = setInterval(function() {
-                io.in(gameUid).emit('timer', { countdown });
-                countdown--;
-                if (countdown < 0) {
-                    io.in(gameUid).emit('timer', { countdown: undefined });
-                    io.in(gameUid).emit('timeOver');
-                    db.setGameStatus(gameUid, "timeOver");
-                    countdown = timeToExplain;
-                    clearInterval(timerIdStartNewRound);
-                    return;
-                }
-            }, 1000);
+            timerId = setCountdownInterval();
         }
     });
 });
