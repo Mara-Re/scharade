@@ -346,7 +346,7 @@ io.on('connection', function(socket) {
     });
 
     socket.on('start-new-round', (data) => {
-        countdown = data.countdown;
+        countdown = data.countdown || countdown;
         socket.to(gameUid).emit("new-round-started");
         if (timerId) return;
         if (countdown > 0) {
