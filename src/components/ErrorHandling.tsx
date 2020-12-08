@@ -13,7 +13,7 @@ export const ErrorHandling: FunctionComponent<{}> = ({children}) => {
                 horizontal: "right",
             }}
             open={error}
-            autoHideDuration={6000}
+            autoHideDuration={2000}
             message="Something went wrong..."
         />
     )
