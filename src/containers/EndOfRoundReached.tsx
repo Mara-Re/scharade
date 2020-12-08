@@ -1,10 +1,16 @@
 import React, { FunctionComponent, useCallback, useContext } from "react";
-import CentralBox from "../components/CentralBox";
 import ActionMessage from "../components/ActionMessage";
 import ReplayIcon from "@material-ui/icons/Replay";
 import axios from "axios";
 import { socket } from "../pages/App";
 import { GameStatus, StatusContext } from "../contexts/StatusContext";
+import { makeStyles } from "@material-ui/core/styles";
+
+const useStyles = makeStyles({
+    spacingTop: {
+        marginTop: "30px"
+    }
+});
 
 const EndOfRoundReached: FunctionComponent<{}> = () => {
     const {
@@ -13,6 +19,8 @@ const EndOfRoundReached: FunctionComponent<{}> = () => {
         onError = () => {},
         countdown,
     } = useContext(StatusContext);
+
+    const classes = useStyles();
 
     const onStartNewRound = useCallback(async () => {
         try {
@@ -27,12 +35,15 @@ const EndOfRoundReached: FunctionComponent<{}> = () => {
     }, [gameUid, countdown, onError]);
 
     return (
-        <ActionMessage
-            onAction={onStartNewRound}
-            actionIcon={<ReplayIcon fontSize="large" />}
-        >
-            The pile of words is empty. Do you want to start a new round now?
-        </ActionMessage>
+        <div className={classes.spacingTop}>
+            <ActionMessage
+                onAction={onStartNewRound}
+                actionIcon={<ReplayIcon fontSize="large" />}
+            >
+                The pile of words is empty. Do you want to start a new round
+                now?
+            </ActionMessage>
+        </div>
     );
 };
 
