@@ -31,29 +31,28 @@ const retryConnectOnFailure = (retryInMilliseconds: number) => {
 retryConnectOnFailure(RETRY_INTERVAL);
 //////////////////////////////////////////////////
 
-// TODO s
-// when restart game -> start new game id, do not delete old game, lead to other url & show other players hint to switch to new game room
+// TODO
 // show words that were just guessed to non-explaining players
 // show if a to non-explaining players if a word was discarded
 // show list with guessed words and number of discarded words to other players at "time-over" and "end-of-round-reached"
 
-// TODO s rounds
+// TODO rounds
 // 5 rounds: - 1. explaining, 2. pantomime, 3. one-word explanation, 4. finger pantomime, 5. make a sound
 // add round column to games table and add get and post request to set the round
 // game ends when player clicks on end game, show final scores or after 5 rounds
 
-// TODO s onboarding
+// TODO onboarding
 // Explain game
 // Explain enter words
 // Explain explanation rounds
 // Explain necessary setup steps: enter 5 words, form 2 teams, note scores for each player,
 // Explain the different rounds - 1. explaining, 2. pantomime, 3. one-word explanation, 4. finger pantomime, 5. make a sound
 
-// TODO s teams alternating order
+// TODO teams alternating order
 // teams explain in alternating order
 // players see which team is explaining
 
-// TODO s players
+// TODO players
 // enable players to enter their names
 // show which players are currently in the game
 // show which player is currently explaining

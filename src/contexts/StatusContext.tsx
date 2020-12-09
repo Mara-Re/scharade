@@ -72,9 +72,6 @@ const Game: FunctionComponent<{}>  = () => {
         socket.on("game-started", () => {
             getGameStatus();
         });
-        socket.on("new-game-started", () => {
-            getGameStatus();
-        });
         socket.on("game-ended", () => {
             getGameStatus();
         });
