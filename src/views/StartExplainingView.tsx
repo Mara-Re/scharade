@@ -29,7 +29,7 @@ const StartExplainingView: FunctionComponent<{}> = () => {
                 onAction={onStartExplaining}
                 actionIcon={<PlayArrowIcon fontSize="large" />}
             >
-                Did you agree on who should start explaining? If it's your turn click start.
+                Have you agreed on who should start explaining? If it's your turn click start.
             </ActionMessage>
         </CentralBox>
     )
