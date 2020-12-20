@@ -321,6 +321,15 @@ io.on('connection', function(socket) {
         timerId = setCountdownInterval();
     });
 
+    socket.on('guessed-word', (data) => {
+        console.log("guessed-word data", data);
+        socket.to(gameUid).emit("word-was-guessed", data);
+    });
+
+    socket.on('discarded-word', () => {
+        socket.to(gameUid).emit("word-was-discarded");
+    });
+
     socket.on('end-of-round', async () => {
         clearAllTimers();
         socket.to(gameUid).emit("end-of-round-reached");

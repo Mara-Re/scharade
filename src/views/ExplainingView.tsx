@@ -75,21 +75,35 @@ const ExplainingView: FunctionComponent<{}> = () => {
         }
     }, [gameUid]);
 
-    const changeWordStatus = useCallback(async (word: Word, newWordStatus?: WordStatus) => {
-        if (!newWordStatus || word.status === newWordStatus) return;
-        try {
-            await axios.post(
-                `/games/${gameUid}/words/${word.id}/status`,
-                { status: newWordStatus }
-            );
-            await getWordsList();
-            if (word.status === "pile") {
-                await getRandomWord();
+    const changeWordStatus = useCallback(
+        async (word: Word, newWordStatus?: WordStatus) => {
+            if (!newWordStatus || word.status === newWordStatus) return;
+            try {
+                await axios.post(`/games/${gameUid}/words/${word.id}/status`, {
+                    status: newWordStatus,
+                });
+                await getWordsList();
+                if (
+                    gameStatus === GameStatus.PLAYER_EXPLAINING &&
+                    newWordStatus === "guessedThisTurn"
+                ) {
+                    socket.emit("guessed-word", { guessedWord: word.word });
+                }
+                if (
+                    gameStatus === GameStatus.PLAYER_EXPLAINING &&
+                    newWordStatus === "discardedThisTurn"
+                ) {
+                    socket.emit("discarded-word");
+                }
+                if (word.status === "pile") {
+                    await getRandomWord();
+                }
+            } catch (error) {
+                onError(error);
             }
-        } catch (error) {
-            onError(error);
-        }
-    }, [getWordsList, getRandomWord, gameUid]);
+        },
+        [getWordsList, getRandomWord, gameUid, gameStatus]
+    );
 
     const showTurnScore =
         gameStatus === GameStatus.END_OF_ROUND_REACHED ||
@@ -122,8 +136,8 @@ const ExplainingView: FunctionComponent<{}> = () => {
                 words={
                     gameStatus === GameStatus.TIME_OVER
                         ? wordsList
-                        // do not show words that were drawn but not guessed yet in words list
-                        : wordsList.filter(
+                        : // do not show words that were drawn but not guessed yet in words list
+                          wordsList.filter(
                               (word) => word.status !== "notGuessedThisTurn"
                           )
                 }
