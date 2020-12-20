@@ -22,16 +22,14 @@ const StartNewGame: FunctionComponent<{}> = () => {
 
     const onStartNewGame = useCallback(async () => {
         try {
-            await axios.post(`/games/${gameUid}/status`, { status: GameStatus.SETUP });
-            await axios.delete(`/games/${gameUid}/words`);
-            await axios.delete(`/games/${gameUid}/teams/`);
-            socket.emit("start-new-game");
-            reloadStatus();
-            setStartNewGameDialogOpen(false);
+            const { data } = await axios.post("/games");
+            const newGameId = data[0].uid;
+            socket.emit("start-new-game", {gameId: newGameId});
+            location.replace(`/game/${newGameId}/`);
         } catch (error) {
             onError(error);
         }
-    }, [gameUid, reloadStatus, onError]);
+    }, [onError]);
 
     return (
         <>

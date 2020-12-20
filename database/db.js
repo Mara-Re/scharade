@@ -110,15 +110,6 @@ module.exports.resetWords = function resetWords(gameUid, status, previousStatus)
 
 };
 
-module.exports.deleteWords = function deleteWords(gameUid) {
-    return db.query(
-        `DELETE FROM words
-            WHERE game_uid = $1`,
-        [gameUid]
-    );
-};
-
-
 module.exports.setWordStatus = function setWordStatus(id, status, gameUid) {
     return db.query(
         `UPDATE words
@@ -185,12 +176,3 @@ module.exports.addToTeamscore = function addToTeamscore(gameUid, teamAorB, addPo
         [gameUid, teamAorB, addPoints]
     );
 };
-
-module.exports.deleteTeams = function resetTeamScore(gameUid) {
-    return db.query(
-        `DELETE FROM teams
-            WHERE game_uid = $1`,
-        [gameUid]
-    );
-};
-

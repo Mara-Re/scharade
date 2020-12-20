@@ -167,15 +167,6 @@ app.post('/games/:uid/words/:id/status', async (req, res) => {
     }
 });
 
-app.delete('/games/:uid/words', async (req, res) => {
-    try {
-        await db.deleteWords(req.params.uid);
-        await res.json({success: true});
-    } catch(error) {
-        console.log('error in /games/:uid/words delete route: ', error);
-    }
-});
-
 //-------------------------TEAMS ROUTES-------------------------
 
 app.get('/games/:uid/teams', async (req, res) => {
@@ -194,16 +185,6 @@ app.post('/games/:uid/createTeams', async (req, res) => {
         await res.json({success: true});
     } catch(error) {
         console.log('error in /games/:uid/createTeams post route: ', error);
-        await res.json({success: false});
-    }
-});
-
-app.delete('/games/:uid/teams/', async (req, res) => {
-    try {
-        await db.deleteTeams(req.params.uid);
-        await res.json({success: true});
-    } catch(error) {
-        console.log('error in /games/:uid/teams/ delete route: ', error);
         await res.json({success: false});
     }
 });
@@ -324,9 +305,9 @@ io.on('connection', function(socket) {
         socket.to(gameUid).emit("game-started");
     });
 
-    socket.on('start-new-game', () => {
+    socket.on('start-new-game', ({gameId}) => {
         clearAllTimers();
-        socket.to(gameUid).emit("new-game-started");
+        socket.to(gameUid).emit("new-game-started", {gameId});
     });
 
     socket.on('end-game', () => {

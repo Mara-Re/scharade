@@ -1,9 +1,16 @@
-import React, { FunctionComponent, useCallback, useContext, useEffect, useState } from "react";
+import React, {
+    FunctionComponent,
+    useCallback,
+    useContext,
+    useEffect,
+    useState,
+} from "react";
 import CentralBox from "../components/CentralBox";
 import FinalTeamScores from "../components/FinalTeamScores";
 import axios from "axios";
 import { socket } from "../pages/App";
 import { GameStatus, StatusContext, Team } from "../contexts/StatusContext";
+import StartNewGameDialog from "../components/StartNewGameDialog";
 
 export interface TeamScore {
     team_a_or_b: Team;
@@ -11,9 +18,16 @@ export interface TeamScore {
 }
 
 const EndOfGameView: FunctionComponent<{}> = () => {
-    const {gameUid, gameStatus} = useContext(StatusContext);
+    const { gameUid, gameStatus } = useContext(StatusContext);
 
     const [finalTeamScores, setFinalTeamScores] = useState<TeamScore[]>();
+    const [newGameId, setNewGameId] = useState<string>();
+
+    useEffect(() => {
+        socket.on("new-game-started", (data: {gameId: string}) => {
+            setNewGameId(data.gameId);
+        });
+    }, []);
 
     const getFinalTeamData = useCallback(async () => {
         const { data } = await axios.get(`/games/${gameUid}/teams/`);
@@ -28,10 +42,18 @@ const EndOfGameView: FunctionComponent<{}> = () => {
     }, [gameStatus, getFinalTeamData]);
 
     return (
-        <CentralBox>
-            {finalTeamScores && <FinalTeamScores finalTeamScores={finalTeamScores} />}
-        </CentralBox>
-    )
-}
+        <>
+            <StartNewGameDialog
+                setNewGameId={setNewGameId}
+                newGameId={newGameId}
+            />
+            <CentralBox>
+                {finalTeamScores && (
+                    <FinalTeamScores finalTeamScores={finalTeamScores} />
+                )}
+            </CentralBox>
+        </>
+    );
+};
 
 export default EndOfGameView;
