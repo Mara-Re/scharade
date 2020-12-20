@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { FunctionComponent, useContext, useState } from "react";
 import Box from "@material-ui/core/Box";
 import Typography from "@material-ui/core/Typography";
 import Button from "@material-ui/core/Button";
@@ -6,8 +6,8 @@ import TextField from '@material-ui/core/TextField';
 import { makeStyles } from "@material-ui/core/styles";
 import axios from "axios";
 import WordsList from "./WordsList";
-import StartGame from "./StartGame";
 import { getGameUid } from "../helper/getGameUid";
+import { StatusContext, Word } from "../contexts/StatusContext";
 
 const useStyles = makeStyles({
     enterWordsBox: {
@@ -24,17 +24,16 @@ const useStyles = makeStyles({
     }
 });
 
-const EnterWords = (props) => {
-    const {
-        onError
-    } = props;
+
+const EnterWords: FunctionComponent<{}> = (props) => {
+    const { onError = () => {}} = useContext(StatusContext);
 
     const gameUid = getGameUid();
     const classes = useStyles();
-    const [wordInput, setWordInput] = useState("");
-    const [wordsSubmitted, setWordsSubmitted] = useState([])
+    const [wordInput, setWordInput] = useState<string>("");
+    const [wordsSubmitted, setWordsSubmitted] = useState<Word[]>([]);
 
-    const onChange = (event) => {
+    const onChange = (event: any) => {
         setWordInput(event.target.value);
     }
 
@@ -55,7 +54,7 @@ const EnterWords = (props) => {
         }
     }
 
-    const onEnter = async (event) => {
+    const onEnter = async (event: any) => {
         if (event.key === "Enter") {
             await onWordSubmit();
         }
@@ -68,11 +67,8 @@ const EnterWords = (props) => {
             </Typography>
             <TextField variant='outlined' onChange={onChange} className={classes.wordInput} value={wordInput} onKeyDown={onEnter}/>
             <Button variant='contained' color='primary' onClick={onWordSubmit} className={classes.submitButton}>Add word to pile</Button>
-            {!!wordsSubmitted.length && <WordsList title="Words you added">{wordsSubmitted}</WordsList>}
+            {!!wordsSubmitted.length && <WordsList title="Words you added" words={wordsSubmitted} />}
         </Box>
-
-
-
     );
 }
 

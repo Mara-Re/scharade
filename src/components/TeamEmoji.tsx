@@ -1,6 +1,7 @@
-import React from "react";
+import React, { FunctionComponent } from "react";
 
 import { makeStyles } from "@material-ui/core/styles";
+import { Team } from "../contexts/StatusContext";
 
 const useStyles = makeStyles({
     noOpacity: {
@@ -22,12 +23,16 @@ const useStyles = makeStyles({
     },
 });
 
-const TeamEmoji = ({ teamNumber }) => {
+interface TeamEmojiProps {
+    team: Team | null;
+}
+
+const TeamEmoji: FunctionComponent<TeamEmojiProps> = ({ team }) => {
     const classes = useStyles();
 
 
-    if (teamNumber == 1) return <span className={classes.noOpacity}>🥦</span>;
-    if (teamNumber == 2) return <span className={classes.noOpacity}>🌶</span>;
+    if (team == "A") return <span className={classes.noOpacity}>🥦</span>;
+    if (team == "B") return <span className={classes.noOpacity}>🌶</span>;
     return null;
 
 }

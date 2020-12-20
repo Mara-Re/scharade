@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { FunctionComponent, ReactNode } from "react";
 import Box from "@material-ui/core/Box";
 import BorderedIconButton from "./IconButton";
 import Typography from "@material-ui/core/Typography";
@@ -13,8 +13,14 @@ const useStyles = makeStyles({
     }
 });
 
+interface ActionMessageProps {
+    children: ReactNode;
+    onAction?: () => void;
+    actionIcon?: ReactNode;
+}
 
-const ActionMessage = (props) => {
+
+const ActionMessage: FunctionComponent<ActionMessageProps> = (props) => {
     const {
         children,
         onAction = () => {},

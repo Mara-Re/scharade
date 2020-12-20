@@ -1,4 +1,4 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, FunctionComponent } from "react";
 import Button from "@material-ui/core/Button";
 import Dialog from "@material-ui/core/Dialog";
 import DialogTitle from "@material-ui/core/DialogTitle";
@@ -22,14 +22,20 @@ const useStyles = makeStyles((theme) => ({
     }
 }));
 
-const GameLinkDialog = (props) => {
+interface GameLinkDialogProps {
+    open: boolean;
+    setShowGameLinkDialog: (show: boolean) => void;
+}
+
+const GameLinkDialog: FunctionComponent<GameLinkDialogProps> = (props) => {
     const classes = useStyles();
     const {open = false, setShowGameLinkDialog} = props;
 
     const linkTextFieldRef = useRef();
     const [copySuccess, setCopySuccess] = useState(false);
 
-    const onCopyToClipboard = (e) => {
+    const onCopyToClipboard = (e: any) => {
+        // @ts-ignore
         linkTextFieldRef.current.select();
         document.execCommand('copy');
         e.target.focus();
@@ -71,6 +77,7 @@ const GameLinkDialog = (props) => {
                     </DialogContentText>
                     <TextField
                         inputRef={linkTextFieldRef}
+                        // @ts-ignore
                         readOnly={true}
                         fullWidth={true}
                         variant='outlined'
@@ -88,9 +95,6 @@ const GameLinkDialog = (props) => {
                     >
                         {copySuccess ? "Copied!" : "Copy Link"}
                     </Button>
-                    {/*<Button onClick={() => setGameLinkDialogOpen(false)} color="primary">*/}
-                    {/*    Close*/}
-                    {/*</Button>*/}
                 </DialogActions>
             </Dialog>
         </>

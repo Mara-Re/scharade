@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { FunctionComponent } from "react";
 import Box from "@material-ui/core/Box";
 import BorderedIconButton from "./IconButton";
 import Typography from "@material-ui/core/Typography";
@@ -23,8 +23,13 @@ const useStyles = makeStyles({
     }
 });
 
+interface WordCardProps {
+    onWordGuessed: () => void;
+    onWordDiscarded: () => void;
+}
 
-const WordCard = (props) => {
+
+const WordCard: FunctionComponent<WordCardProps> = (props) => {
     const {
         children,
         onWordGuessed,

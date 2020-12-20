@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { FunctionComponent, useCallback, useContext, useState } from "react";
 import Box from "@material-ui/core/Box";
 import { makeStyles } from '@material-ui/core/styles';
 import Button from "@material-ui/core/Button";
@@ -10,6 +10,9 @@ import DialogContentText from "@material-ui/core/DialogContentText";
 import DialogActions from "@material-ui/core/DialogActions";
 import Typography from "@material-ui/core/Typography";
 import PlayArrowIcon from '@material-ui/icons/PlayArrow';
+import axios from "axios";
+import { GameStatus, StatusContext } from "../contexts/StatusContext";
+import { socket } from "../pages/App";
 
 const useStyles = makeStyles({
     startGameButton: {
@@ -20,17 +23,25 @@ const useStyles = makeStyles({
     }
 });
 
-const StartGame = (props) => {
-    const {onStartGame} = props;
+const StartGame: FunctionComponent<{}> = (props) => {
     const classes = useStyles();
+
+    const {gameUid, reloadStatus = () => {}, onError = () => {}} = useContext(StatusContext);
 
     const [startDialogOpen, setStartDialogOpen] = useState(false);
 
-    const onStartClick = () => {
-        onStartGame();
-        setStartDialogOpen(false);
-    };
+    const onStartGame = useCallback(async () => {
+        try {
+            await axios.post(`/games/${gameUid}/status`, { status: GameStatus.START });
+            await axios.post(`/games/${gameUid}/createTeams`);
 
+            socket.emit("start-game");
+            reloadStatus();
+            setStartDialogOpen(false);
+        } catch (error) {
+            onError(error);
+        }
+    }, [gameUid, reloadStatus, onError]);
 
     return (
         <>
@@ -40,7 +51,6 @@ const StartGame = (props) => {
                         Start Game
                     </Typography>
                 </Box>
-
                 <Box alignSelf="center">
                     <IconButton onClick={() => setStartDialogOpen(true)} className={classes.startGameButton}>
                         <PlayArrowIcon fontSize="large"/>
@@ -63,7 +73,7 @@ const StartGame = (props) => {
                     <Button autoFocus onClick={() => setStartDialogOpen(false)} color="primary">
                         Cancel
                     </Button>
-                    <Button onClick={onStartClick} color="primary">
+                    <Button onClick={onStartGame} color="primary">
                         Start Game
                     </Button>
                 </DialogActions>

@@ -5,7 +5,7 @@ exports.addNewGame = function addNewGame(gameUid) {
     return db.query(
         `INSERT INTO games (uid, status) VALUES ($1, $2) 
         RETURNING *`,
-        [ gameUid, 'setup' ]
+        [ gameUid, 'SETUP' ]
     );
 };
 
@@ -16,6 +16,15 @@ module.exports.getRandomWord = function getRandomWord(gameUid) {
         WHERE status = 'pile' AND game_uid = $1
         ORDER BY RANDOM()
         LIMIT 1`,
+        [gameUid]
+    );
+};
+
+module.exports.getWordsList = function getWordsList(gameUid) {
+    return db.query(
+        `SELECT * FROM words
+        WHERE (status = 'guessedThisTurn' OR status = 'discardedThisTurn' OR status = 'notGuessedThisTurn') AND game_uid = $1
+        ORDER BY drawn_at`,
         [gameUid]
     );
 };
@@ -50,8 +59,26 @@ module.exports.setGameStatus = function setGameStatus(gameUid, status) {
 module.exports.startGame = function startGame(gameUid) {
     return db.query(
         `UPDATE games
-            SET status = 'start'
+            SET status = 'START'
             WHERE uid = $1`,
+        [gameUid]
+    );
+};
+
+module.exports.startExplaining = function startExplaining(gameUid, teamAorB) {
+    return db.query(
+        `UPDATE games
+            SET status = $3, team_explaining = $2
+            WHERE uid = $1`,
+        [gameUid, teamAorB, "PLAYER_EXPLAINING"]
+    );
+};
+
+module.exports.getTeamExplaining = function getTeamExplaining(gameUid) {
+    return db.query(
+        `SELECT team_explaining FROM games
+        WHERE uid = $1`
+        ,
         [gameUid]
     );
 };
@@ -101,6 +128,23 @@ module.exports.setWordStatus = function setWordStatus(id, status, gameUid) {
     );
 };
 
+module.exports.setWordDrawn = function setWordDrawn(id, gameUid, date) {
+    return db.query(
+        `
+        UPDATE words
+            SET status = $2, drawn_at = $4
+            WHERE id = $1 AND game_uid = $3` ,
+        [id, "notGuessedThisTurn", gameUid, date]
+    );
+};
+
+// module.exports.getCurrDateTime = function getCurrDateTime() {
+//     return db.query(
+//         `
+//         SELECT GETDATE();`
+//     );
+// };
+
 module.exports.addWord = function addWord(word) {
     return db.query(
         `INSERT INTO words (game_uid, word, status) VALUES ($1, $2, $3) 
@@ -120,7 +164,7 @@ module.exports.getTeams = function getTeams(gameUid) {
 
 module.exports.addTeams = function addTeams(gameUid) {
     return db.query(
-        `INSERT INTO teams (game_uid, team_1_or_2) VALUES ($1, 1), ($1, 2)`,
+        `INSERT INTO teams (game_uid, team_a_or_b) VALUES ($1, 'A'), ($1, 'B')`,
         [ gameUid ]
     );
 };
@@ -133,12 +177,12 @@ module.exports.getTeams = function getTeamscore(gameUid) {
     );
 };
 
-module.exports.addToTeamscore = function addToTeamscore(gameUid, team1or2, addPoints) {
+module.exports.addToTeamscore = function addToTeamscore(gameUid, teamAorB, addPoints) {
     return db.query(
         `UPDATE teams
             SET score = score + $3
-            WHERE game_uid = $1 AND team_1_or_2 = $2` ,
-        [gameUid, team1or2, addPoints]
+            WHERE game_uid = $1 AND team_a_or_b = $2` ,
+        [gameUid, teamAorB, addPoints]
     );
 };
 

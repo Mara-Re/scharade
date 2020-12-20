@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { FunctionComponent } from "react";
 import Box from "@material-ui/core/Box";
 import Typography from "@material-ui/core/Typography";
 import TimerIcon from '@material-ui/icons/Timer';
@@ -10,7 +10,7 @@ const useStyles = makeStyles({
     }
 });
 
-const Timer = (props) => {
+const Timer: FunctionComponent<{}> = (props) => {
     const {
         children,
     } = props;
