@@ -1,4 +1,11 @@
-import React, { createContext, FunctionComponent, useCallback, useEffect, useMemo, useState } from "react";
+import React, {
+    createContext,
+    FunctionComponent,
+    useCallback,
+    useEffect,
+    useMemo,
+    useState,
+} from "react";
 import axios from "axios";
 import { getGameUid } from "../helper/getGameUid";
 import statusMapping from "../helper/status-mapping";
@@ -18,7 +25,7 @@ export enum GameStatus {
 export enum PlayerExplaining {
     SELF = "SELF",
     OTHER = "OTHER",
-    NONE = "NONE"
+    NONE = "NONE",
 }
 
 export interface Word {
@@ -27,22 +34,28 @@ export interface Word {
     status?: WordStatus;
 }
 
-export type WordStatus = "guessed" | "guessedThisTurn" |"discardedThisTurn" | "notGuessedThisTurn" | "pile";
+export type WordStatus =
+    | "guessed"
+    | "guessedThisTurn"
+    | "discardedThisTurn"
+    | "notGuessedThisTurn"
+    | "pile";
 
-export type Team = "A" | "B"
+export type Team = "A" | "B";
 
 interface StatusContextProps {
     playerExplaining?: PlayerExplaining;
-    gameStatus?: GameStatus,
-    setPlayerExplaining: (playerExplaining: PlayerExplaining) => void,
-    reloadStatus: () => void,
-    reloadTeam: () => void,
-    onError: (error: any) => void,
-    error: any,
-    countdown?: number,
-    team?: Team | null,
-    gameUid: string,
-    wordsList: Word[]
+    gameStatus?: GameStatus;
+    setPlayerExplaining: (playerExplaining: PlayerExplaining) => void;
+    reloadStatus: () => void;
+    reloadTeam: () => void;
+    onError: (error: any) => void;
+    error: any;
+    countdown?: number;
+    team?: Team | null;
+    gameUid: string;
+    wordsList: Word[];
+    loadingGameStatus: boolean;
 }
 
 export const StatusContext = createContext<Partial<StatusContextProps>>({
@@ -50,20 +63,22 @@ export const StatusContext = createContext<Partial<StatusContextProps>>({
     onError: () => {},
     setPlayerExplaining: () => {},
     gameUid: "",
-    wordsList: []
+    wordsList: [],
+    loadingGameStatus: false,
 });
 
 // TODO tests
 // test refactored code with 2 open windows! playerExplaining SELF & OTHER!
 
-const Game: FunctionComponent<{}>  = () => {
-
+const Game: FunctionComponent<{}> = () => {
     const [team, setTeam] = useState<Team | null>();
+    const [loadingGameStatus, setLoadingGameStatus] = useState(false);
     const [error, setError] = useState<any>();
     const [gameStatus, setGameStatus] = useState(GameStatus.SETUP);
-    const [playerExplaining, setPlayerExplaining] = useState(PlayerExplaining.NONE);
+    const [playerExplaining, setPlayerExplaining] = useState(
+        PlayerExplaining.NONE
+    );
     const [countdown, setCountdown] = useState<number>();
-
 
     const Component = statusMapping(gameStatus, playerExplaining);
 
@@ -86,7 +101,6 @@ const Game: FunctionComponent<{}>  = () => {
         });
     }, []);
 
-
     useEffect(() => {
         socket.on("other-player-starts-explaining", () => {
             getGameStatus();
@@ -95,7 +109,7 @@ const Game: FunctionComponent<{}>  = () => {
     }, []);
 
     useEffect(() => {
-        socket.on("timer", (data: {countdown: number}) => {
+        socket.on("timer", (data: { countdown: number }) => {
             setCountdown(data.countdown);
         });
     }, []);
@@ -125,12 +139,14 @@ const Game: FunctionComponent<{}>  = () => {
     }, []);
 
     const getGameStatus = useCallback(async () => {
+        setLoadingGameStatus(true);
         try {
             const { data } = await axios.get(`/games/${gameUid}/status`);
             setGameStatus(data[0].status);
         } catch (error) {
             onError(error);
         }
+        setLoadingGameStatus(false);
     }, []);
 
     return (
@@ -146,14 +162,15 @@ const Game: FunctionComponent<{}>  = () => {
                 team: team,
                 gameUid,
                 setPlayerExplaining: setPlayerExplaining,
+                loadingGameStatus: loadingGameStatus,
             }}
         >
             <GameLayout>
-                <Component/>
+                <Component />
                 <ErrorHandling />
             </GameLayout>
         </StatusContext.Provider>
-    )
-}
+    );
+};
 
 export default Game;

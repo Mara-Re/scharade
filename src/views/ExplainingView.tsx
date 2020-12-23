@@ -25,6 +25,7 @@ const ExplainingView: FunctionComponent<{}> = () => {
         onError = () => {},
         reloadStatus = () => {},
         gameStatus,
+        loadingGameStatus,
     } = useContext(StatusContext);
 
     const [wordToExplain, setWordToExplain] = useState<Word>();
@@ -108,6 +109,8 @@ const ExplainingView: FunctionComponent<{}> = () => {
     const showTurnScore =
         gameStatus === GameStatus.END_OF_ROUND_REACHED ||
         gameStatus === GameStatus.TIME_OVER;
+
+    if (loadingGameStatus) return <></>;
 
     return (
         <>
