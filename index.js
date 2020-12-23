@@ -322,7 +322,6 @@ io.on('connection', function(socket) {
     });
 
     socket.on('guessed-word', (data) => {
-        console.log("guessed-word data", data);
         socket.to(gameUid).emit("word-was-guessed", data);
     });
 

@@ -20,6 +20,30 @@ const useStyles = makeStyles({
     buttonBox: {
         marginLeft: 30,
     },
+    fadeOut1: {
+        animation: "$fadeOut1 ease 3s",
+        opacity: "0.1",
+    },
+    fadeOut2: {
+        animation: "$fadeOut2 ease 3s",
+        opacity: "0.1",
+    },
+    "@keyframes fadeOut1": {
+        "0%": {
+            opacity: 1,
+        },
+        "100%": {
+            opacity: 0.1,
+        },
+    },
+    "@keyframes fadeOut2": {
+        "0%": {
+            opacity: 1,
+        },
+        "100%": {
+            opacity: 0.1,
+        },
+    }
 });
 
 interface WordCardProps {
@@ -27,14 +51,21 @@ interface WordCardProps {
     onWordGuessed?: () => void;
     onWordDiscarded?: () => void;
     wordStatus?: "guessedThisTurn" | "discardedThisTurn";
+    fadeOutClassName?: "fadeOut1" | "fadeOut2";
 }
 
 const WordCard: FunctionComponent<WordCardProps> = (props) => {
-    const { children, onWordGuessed, onWordDiscarded, wordStatus } = props;
+    const { children, onWordGuessed, onWordDiscarded, fadeOutClassName, wordStatus } = props;
 
     const classes = useStyles();
+
     return (
-        <Box display="flex" justifyContent="center" alignSelf="center">
+        <Box
+            display="flex"
+            justifyContent="center"
+            alignSelf="center"
+            className={(wordStatus && fadeOutClassName) ? classes[fadeOutClassName]: ""}
+        >
             <Box display="flex" justifyContent="space-between">
                 <Box alignSelf="center" className={classes.wordBox}>
                     <Typography variant="h4">{children}</Typography>

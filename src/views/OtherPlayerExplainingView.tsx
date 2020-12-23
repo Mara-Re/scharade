@@ -1,4 +1,10 @@
-import React, { FunctionComponent, useEffect, useState } from "react";
+import React, {
+    FunctionComponent,
+    useCallback,
+    useEffect,
+    useRef,
+    useState,
+} from "react";
 import CentralBox from "../components/CentralBox";
 import ActionMessage from "../components/ActionMessage";
 import { socket } from "../pages/App";
@@ -15,21 +21,39 @@ const OtherPlayerExplainingView: FunctionComponent<{}> = () => {
         setNewWordGuessedOrDiscarded,
     ] = useState<NewWordGuessedOrDiscarded>();
 
+    const [fadeOutClassName, setFadeOutClassName] = useState<
+        "fadeOut1" | "fadeOut2"
+    >();
+
+    const timeOutRef = useRef<number>();
+
+    const onNewWord = useCallback(
+        (newWordGuessedOrDiscarded: NewWordGuessedOrDiscarded) => {
+            clearTimeout(timeOutRef.current);
+            setNewWordGuessedOrDiscarded(newWordGuessedOrDiscarded);
+            setFadeOutClassName((prevClassName) => {
+                return prevClassName === "fadeOut1" ? "fadeOut2" : "fadeOut1";
+            });
+        },
+        []
+    );
+
     useEffect(() => {
         socket.on("word-was-guessed", (data: { guessedWord: string }) => {
-            setNewWordGuessedOrDiscarded({
+            onNewWord({
                 status: "guessedThisTurn",
                 guessedWord: data.guessedWord,
             });
         });
         socket.on("word-was-discarded", () => {
-            setNewWordGuessedOrDiscarded({ status: "discardedThisTurn" });
+            onNewWord({ status: "discardedThisTurn" });
         });
+
     }, []);
 
     useEffect(() => {
         if (!newWordGuessedOrDiscarded) return;
-        setTimeout(() => {
+        timeOutRef.current = setTimeout(() => {
             setNewWordGuessedOrDiscarded(undefined);
         }, 3000);
     }, [newWordGuessedOrDiscarded]);
@@ -40,7 +64,10 @@ const OtherPlayerExplainingView: FunctionComponent<{}> = () => {
                 Somebody else is explaining...
             </ActionMessage>
             {newWordGuessedOrDiscarded && (
-                <WordCard wordStatus={newWordGuessedOrDiscarded.status}>
+                <WordCard
+                    wordStatus={newWordGuessedOrDiscarded.status}
+                    fadeOutClassName={fadeOutClassName}
+                >
                     {newWordGuessedOrDiscarded.guessedWord}
                 </WordCard>
             )}

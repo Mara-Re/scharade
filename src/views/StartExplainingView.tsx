@@ -13,10 +13,11 @@ const StartExplainingView: FunctionComponent<{}> = () => {
         try {
             await axios.post(`/games/${gameUid}/startExplaining`);
 
+            reloadStatus();
+
             // TODO: is this needed for better UX? so timer is shown right away after click?
             // setCountdown(timeToExplain);
             setPlayerExplaining(PlayerExplaining.SELF);
-            reloadStatus();
             socket.emit("start-explaining");
         } catch (error) {
             onError(error);
