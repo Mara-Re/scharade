@@ -1,4 +1,4 @@
-import { GameStatus, PlayerExplaining } from "../contexts/StatusContext";
+import { GameStatus, PlayerExplaining } from "../pages/Game";
 import { FunctionComponent } from "react";
 import assertUnreachable from "./assert-unreachable";
 import GameSetupView from "../views/GameSetupView";

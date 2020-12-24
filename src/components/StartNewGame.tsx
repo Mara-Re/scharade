@@ -10,13 +10,13 @@ import DialogTitle from "@material-ui/core/DialogTitle";
 import DialogContent from "@material-ui/core/DialogContent";
 import DialogContentText from "@material-ui/core/DialogContentText";
 import DialogActions from "@material-ui/core/DialogActions";
-import { GameStatus, StatusContext } from "../contexts/StatusContext";
-import { socket } from "../pages/App";
+import { StatusContext } from "../contexts/StatusContext";
+import { socket } from "../pages/Game";
 import axios from "axios";
 
 const StartNewGame: FunctionComponent<{}> = () => {
     const [startNewGameDialogOpen, setStartNewGameDialogOpen] = useState(false);
-    const { gameUid, reloadStatus = () => {}, onError = () => {} } = useContext(
+    const { onError = () => {} } = useContext(
         StatusContext
     );
 

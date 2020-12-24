@@ -11,8 +11,9 @@ import DialogActions from "@material-ui/core/DialogActions";
 import Typography from "@material-ui/core/Typography";
 import PlayArrowIcon from '@material-ui/icons/PlayArrow';
 import axios from "axios";
-import { GameStatus, StatusContext } from "../contexts/StatusContext";
-import { socket } from "../pages/App";
+import { GameStatus } from "../pages/Game";
+import { StatusContext } from "../contexts/StatusContext";
+import { socket } from "../pages/Game";
 
 const useStyles = makeStyles({
     startGameButton: {

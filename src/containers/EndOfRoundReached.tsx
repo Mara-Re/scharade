@@ -2,8 +2,9 @@ import React, { FunctionComponent, useCallback, useContext } from "react";
 import ActionMessage from "../components/ActionMessage";
 import ReplayIcon from "@material-ui/icons/Replay";
 import axios from "axios";
-import { socket } from "../pages/App";
-import { GameStatus, StatusContext } from "../contexts/StatusContext";
+import { socket } from "../pages/Game";
+import { StatusContext } from "../contexts/StatusContext";
+import { GameStatus } from "../pages/Game";
 import { makeStyles } from "@material-ui/core/styles";
 
 const useStyles = makeStyles({

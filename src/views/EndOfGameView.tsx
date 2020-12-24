@@ -8,8 +8,9 @@ import React, {
 import CentralBox from "../components/CentralBox";
 import FinalTeamScores from "../components/FinalTeamScores";
 import axios from "axios";
-import { socket } from "../pages/App";
-import { GameStatus, StatusContext, Team } from "../contexts/StatusContext";
+import { socket } from "../pages/Game";
+import { GameStatus, Team } from "../pages/Game";
+import { StatusContext } from "../contexts/StatusContext";
 import StartNewGameDialog from "../components/StartNewGameDialog";
 
 export interface TeamScore {

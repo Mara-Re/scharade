@@ -4,7 +4,7 @@ import React, {
     useEffect,
     useState,
 } from "react";
-import { Word } from "../contexts/StatusContext";
+import { Word } from "../pages/Game";
 import Typography from "@material-ui/core/Typography";
 import Box from "@material-ui/core/Box";
 import { makeStyles } from "@material-ui/core/styles";

@@ -1,4 +1,4 @@
-import React, { FunctionComponent, useCallback, useContext } from "react";
+import React, { FunctionComponent, useCallback } from "react";
 import Box from "@material-ui/core/Box";
 import { makeStyles } from "@material-ui/core/styles";
 import IconButton from "@material-ui/core/IconButton";
@@ -10,10 +10,7 @@ import TableHead from "@material-ui/core/TableHead";
 import TableRow from "@material-ui/core/TableRow";
 import CheckIcon from "@material-ui/icons/Check";
 import ClearIcon from "@material-ui/icons/Clear";
-import axios from "axios";
-import { getGameUid } from "../helper/getGameUid";
-import { WordStatus, Word } from "../contexts/StatusContext";
-import { StatusContext } from "../contexts/StatusContext";
+import { WordStatus, Word } from "../pages/Game";
 
 const useStyles = makeStyles({
     green: {

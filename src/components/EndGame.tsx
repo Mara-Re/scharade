@@ -12,7 +12,7 @@ import DialogContentText from "@material-ui/core/DialogContentText";
 import DialogActions from "@material-ui/core/DialogActions";
 import axios from "axios";
 import { StatusContext } from "../contexts/StatusContext";
-import { socket } from "../pages/App";
+import { socket } from "../pages/Game";
 
 const EndGame: FunctionComponent<{}> = () => {
     const { gameUid, reloadStatus = () => {}, onError = () => {} } = useContext(

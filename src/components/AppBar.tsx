@@ -1,13 +1,12 @@
-import React, { FunctionComponent, useCallback, useContext } from "react";
+import React, { FunctionComponent, useContext } from "react";
 import AppBarMui from "@material-ui/core/AppBar";
 import { makeStyles } from "@material-ui/core/styles";
 import Typography from "@material-ui/core/Typography";
 import Toolbar from "@material-ui/core/Toolbar";
 import Timer from "./Timer";
 import StartGame from "./StartGame";
-import { GameStatus, StatusContext } from "../contexts/StatusContext";
-import axios from "axios";
-import { socket } from "../pages/App";
+import { StatusContext } from "../contexts/StatusContext";
+import {GameStatus} from "../pages/Game";
 
 const useStyles = makeStyles((theme) => ({
     toolbar: {

@@ -1,5 +1,6 @@
 import React, { FunctionComponent, useContext } from "react";
-import { GameStatus, StatusContext } from "../contexts/StatusContext";
+import { StatusContext } from "../contexts/StatusContext";
+import {GameStatus} from "../pages/Game";
 import AppBar from "../components/AppBar";
 import EndGame from "../components/EndGame";
 import Footer from "../components/Footer";

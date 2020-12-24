@@ -1,7 +1,7 @@
 import React, { FunctionComponent } from "react";
 
 import { makeStyles } from "@material-ui/core/styles";
-import { Team } from "../contexts/StatusContext";
+import { Team } from "../pages/Game";
 
 const useStyles = makeStyles({
     noOpacity: {

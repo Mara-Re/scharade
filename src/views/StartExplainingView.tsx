@@ -3,12 +3,17 @@ import CentralBox from "../components/CentralBox";
 import PlayArrowIcon from "@material-ui/icons/PlayArrow";
 import ActionMessage from "../components/ActionMessage";
 import axios from "axios";
-import { socket } from "../pages/App";
-import { PlayerExplaining, StatusContext } from "../contexts/StatusContext";
+import { socket } from "../pages/Game";
+import { StatusContext } from "../contexts/StatusContext";
+import { PlayerExplaining } from "../pages/Game";
 
 const StartExplainingView: FunctionComponent<{}> = () => {
-
-    const {gameUid, onError = () => {}, reloadStatus = () => {}, setPlayerExplaining = () => {} } = useContext(StatusContext);
+    const {
+        gameUid,
+        onError = () => {},
+        reloadStatus = () => {},
+        setPlayerExplaining = () => {},
+    } = useContext(StatusContext);
     const onStartExplaining = useCallback(async () => {
         try {
             await axios.post(`/games/${gameUid}/startExplaining`);
@@ -30,10 +35,11 @@ const StartExplainingView: FunctionComponent<{}> = () => {
                 onAction={onStartExplaining}
                 actionIcon={<PlayArrowIcon fontSize="large" />}
             >
-                Have you agreed on who should start explaining? If it's your turn click start.
+                Have you agreed on who should start explaining? If it's your
+                turn click start.
             </ActionMessage>
         </CentralBox>
-    )
-}
+    );
+};
 
 export default StartExplainingView;

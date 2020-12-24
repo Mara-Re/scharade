@@ -6,18 +6,14 @@ import React, {
     useState,
 } from "react";
 import CentralBox from "../components/CentralBox";
-import {
-    GameStatus,
-    StatusContext,
-    Word,
-    WordStatus,
-} from "../contexts/StatusContext";
+import { StatusContext } from "../contexts/StatusContext";
 import WordCard from "../components/WordCard";
-import { socket } from "../pages/App";
+import { socket } from "../pages/Game";
 import axios from "axios";
 import EndOfRoundReached from "../containers/EndOfRoundReached";
 import TurnScore from "../components/TurnScore";
 import WordsList from "../components/WordsList";
+import { GameStatus, Word, WordStatus } from "../pages/Game";
 
 const ExplainingView: FunctionComponent<{}> = () => {
     const {

@@ -7,7 +7,7 @@ import React, {
 } from "react";
 import CentralBox from "../components/CentralBox";
 import ActionMessage from "../components/ActionMessage";
-import { socket } from "../pages/App";
+import { socket } from "../pages/Game";
 import WordCard from "../components/WordCard";
 
 interface NewWordGuessedOrDiscarded {
