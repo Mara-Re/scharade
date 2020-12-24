@@ -32,7 +32,6 @@ const EndOfGameView: FunctionComponent<{}> = () => {
 
     const getFinalTeamData = useCallback(async () => {
         const { data } = await axios.get(`/games/${gameUid}/teams/`);
-        socket.emit("end-game");
         setFinalTeamScores(data);
     }, [gameUid]);
 
