@@ -26,6 +26,7 @@ const ExplainingView: FunctionComponent<{}> = () => {
 
     const [wordToExplain, setWordToExplain] = useState<Word>();
     const [wordsList, setWordsList] = useState<Word[]>([]);
+    const [loadingWordsList, setLoadingWordsList] = useState(false);
 
     useEffect(() => {
         if (gameStatus == GameStatus.PLAYER_EXPLAINING) {
@@ -63,13 +64,14 @@ const ExplainingView: FunctionComponent<{}> = () => {
     }, [gameUid]);
 
     const getWordsList = useCallback(async () => {
+        setLoadingWordsList(true);
         try {
             const { data } = await axios.get(`/games/${gameUid}/words`);
-
             setWordsList(data);
         } catch (error) {
             onError(error);
         }
+        setLoadingWordsList(false);
     }, [gameUid]);
 
     const changeWordStatus = useCallback(
@@ -103,7 +105,7 @@ const ExplainingView: FunctionComponent<{}> = () => {
     );
 
     const showTurnScore =
-        gameStatus === GameStatus.END_OF_ROUND_REACHED ||
+        (!loadingWordsList && gameStatus === GameStatus.END_OF_ROUND_REACHED) ||
         gameStatus === GameStatus.TIME_OVER;
 
     if (loadingGameStatus) return <></>;
