@@ -22,18 +22,18 @@ const useStyles = makeStyles({
     },
     fadeOut1: {
         animation: "$fadeOut1 ease 3s",
-        opacity: "0.1",
+        opacity: "0",
     },
     fadeOut2: {
         animation: "$fadeOut2 ease 3s",
-        opacity: "0.1",
+        opacity: "0",
     },
     "@keyframes fadeOut1": {
         "0%": {
             opacity: 1,
         },
         "100%": {
-            opacity: 0.1,
+            opacity: 0,
         },
     },
     "@keyframes fadeOut2": {
@@ -41,7 +41,7 @@ const useStyles = makeStyles({
             opacity: 1,
         },
         "100%": {
-            opacity: 0.1,
+            opacity: 0,
         },
     }
 });
