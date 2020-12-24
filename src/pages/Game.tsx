@@ -104,7 +104,7 @@ retryConnectOnFailure(RETRY_INTERVAL);
 
 const Game: FunctionComponent<{}> = () => {
     const [team, setTeam] = useState<Team | null>();
-    const [loadingGameStatus, setLoadingGameStatus] = useState(false);
+    const [loadingGameStatus, setLoadingGameStatus] = useState(true);
     const [error, setError] = useState<any>();
     const [gameStatus, setGameStatus] = useState(GameStatus.SETUP);
     const [playerExplaining, setPlayerExplaining] = useState(
@@ -198,7 +198,7 @@ const Game: FunctionComponent<{}> = () => {
             }}
         >
             <GameLayout>
-                <Component />
+                {!loadingGameStatus && <Component />}
                 <ErrorHandling />
             </GameLayout>
         </StatusContext.Provider>

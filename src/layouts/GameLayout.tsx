@@ -9,13 +9,13 @@ import TeamIndicator from "../components/TeamIndicator";
 import Container from "../components/Container";
 
 export const GameLayout: FunctionComponent<{}> = ({ children }) => {
-    const { gameStatus, team } = useContext(StatusContext);
+    const { gameStatus, team, loadingGameStatus } = useContext(StatusContext);
     return (
         <>
             <AppBar />
             <Container>{children}</Container>
             <Footer>
-                {gameStatus && gameStatus !== GameStatus.SETUP && (
+                {!loadingGameStatus && gameStatus && gameStatus !== GameStatus.SETUP && (
                     <>
                         {gameStatus !== GameStatus.END && <EndGame />}
                         {gameStatus === GameStatus.END && <StartNewGame />}

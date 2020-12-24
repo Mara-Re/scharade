@@ -13,6 +13,7 @@ const StartExplainingView: FunctionComponent<{}> = () => {
         onError = () => {},
         reloadStatus = () => {},
         setPlayerExplaining = () => {},
+        loadingGameStatus,
     } = useContext(StatusContext);
     const onStartExplaining = useCallback(async () => {
         try {
@@ -28,6 +29,8 @@ const StartExplainingView: FunctionComponent<{}> = () => {
             onError(error);
         }
     }, [gameUid]);
+
+    if (loadingGameStatus) return null;
 
     return (
         <CentralBox>

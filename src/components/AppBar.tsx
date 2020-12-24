@@ -22,11 +22,11 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 const AppBar: FunctionComponent<{}> = () => {
-    const { gameStatus, countdown } = useContext(StatusContext);
+    const { gameStatus, countdown, loadingGameStatus } = useContext(StatusContext);
     const classes = useStyles();
 
     const showTimer =
-        (!!countdown &&
+        (!!countdown && !loadingGameStatus &&
             (gameStatus === GameStatus.PLAYER_EXPLAINING ||
                 gameStatus === GameStatus.END_OF_ROUND_REACHED)) ||
         gameStatus === GameStatus.TIME_OVER;
