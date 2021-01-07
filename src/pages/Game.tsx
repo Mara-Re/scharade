@@ -68,12 +68,8 @@ retryConnectOnFailure(RETRY_INTERVAL);
 //////////////////////////////////////////////////
 
 // TODO
-// fix: reloadGameStatus + ... after reconnection
-
-// TODO rounds
-// 5 rounds: - 1. explaining, 2. pantomime, 3. one-word explanation, 4. finger pantomime, 5. make a sound
-// add round column to games table and add get and post request to set the round
-// game ends when player clicks on end game, show final scores or after 5 rounds
+// check behaviour on mobile when deconnected -> reconnected (during timer running, after, before)
+// -> is gameStatus reloaded?
 
 // TODO onboarding
 // Explain game
@@ -81,6 +77,11 @@ retryConnectOnFailure(RETRY_INTERVAL);
 // Explain explanation rounds
 // Explain necessary setup steps: enter 5 words, form 2 teams, note scores for each player,
 // Explain the different rounds - 1. explaining, 2. pantomime, 3. one-word explanation, 4. finger pantomime, 5. make a sound
+
+// TODO rounds
+// 5 rounds: - 1. explaining, 2. pantomime, 3. one-word explanation, 4. finger pantomime, 5. make a sound
+// add round column to games table and add get and post request to set the round
+// game ends when player clicks on end game, show final scores or after 5 rounds
 
 // TODO teams alternating order
 // teams explain in alternating order
