@@ -1,4 +1,4 @@
-import React, { FunctionComponent, useContext, useState } from "react";
+import React, { FunctionComponent, useContext, useEffect, useState } from "react";
 import Box from "@material-ui/core/Box";
 import Typography from "@material-ui/core/Typography";
 import Button from "@material-ui/core/Button";
@@ -9,6 +9,7 @@ import WordsList from "./WordsList";
 import { getGameUid } from "../helper/getGameUid";
 import { StatusContext } from "../contexts/StatusContext";
 import { Word } from "../pages/Game";
+import CheckIcon from '@material-ui/icons/Check';
 
 const useStyles = makeStyles({
     enterWordsBox: {
@@ -22,7 +23,15 @@ const useStyles = makeStyles({
     },
     submitButton: {
         margin: "0 0 1rem",
+        position: "relative"
     },
+    submitSuccess: {
+        color: "transparent !important"
+    },
+    success: {
+        color: "white",
+        position: "absolute"
+    }
 });
 
 const EnterWords: FunctionComponent<{}> = (props) => {
@@ -31,6 +40,7 @@ const EnterWords: FunctionComponent<{}> = (props) => {
     const gameUid = getGameUid();
     const classes = useStyles();
     const [wordInput, setWordInput] = useState<string>("");
+    const [submitSuccess, setSubmitSuccess] = useState(false);
     const [wordsSubmitted, setWordsSubmitted] = useState<Word[]>([]);
 
     const onChange = (event: any) => {
@@ -50,11 +60,20 @@ const EnterWords: FunctionComponent<{}> = (props) => {
                 },
             });
             setWordsSubmitted([...wordsSubmitted, data[0]]);
+            setSubmitSuccess(true);
             setWordInput("");
         } catch (error) {
             onError(error);
         }
     };
+
+    useEffect(() => {
+        if (submitSuccess) {
+            setTimeout(() => {
+                setSubmitSuccess(false);
+            }, 500);
+        }
+    }, [submitSuccess]);
 
     const onEnter = async (event: any) => {
         if (event.key === "Enter") {
@@ -69,7 +88,10 @@ const EnterWords: FunctionComponent<{}> = (props) => {
             className={classes.enterWordsBox}
         >
             <Typography variant="h6" gutterBottom>
-                Enter your word here
+                Enter words
+            </Typography>
+            <Typography variant="body1" gutterBottom>
+                Agree on how many words each player should enter (e.g. 5). Enter word by word.
             </Typography>
             <TextField
                 variant="outlined"
@@ -82,9 +104,11 @@ const EnterWords: FunctionComponent<{}> = (props) => {
                 variant="contained"
                 color="primary"
                 onClick={onWordSubmit}
-                className={classes.submitButton}
+                disabled={submitSuccess}
+                className={`${classes.submitButton} ${submitSuccess ? classes.submitSuccess : ""}`}
             >
                 Add word to pile
+                {submitSuccess && <CheckIcon className={classes.success}/>}
             </Button>
             {!!wordsSubmitted.length && (
                 <WordsList title="Words you added" words={wordsSubmitted} />

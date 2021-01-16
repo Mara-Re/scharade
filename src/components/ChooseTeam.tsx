@@ -50,9 +50,14 @@ const ChooseTeam: FunctionComponent<ChooseTeamProps> = (props) => {
             className={classes.chooseTeamBox}
         >
             {displayTitle && (
-                <Typography variant="h6" gutterBottom>
-                    Choose a Team
-                </Typography>
+                <>
+                    <Typography variant="h6" gutterBottom>
+                        Choose a team
+                    </Typography>
+                    <Typography variant="body1" gutterBottom>
+                        Split the group into two teams.
+                    </Typography>
+                </>
             )}
             <ToggleButtonGroup
                 value={team}
