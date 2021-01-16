@@ -5,7 +5,7 @@ import { makeStyles } from "@material-ui/core/styles";
 const useStyles = makeStyles((theme) => ({
     centerBox: {
         minHeight: "30vh",
-        padding: "8vh 0 30px",
+        padding: "2vh 0 30px",
         position: "relative"
     },
     contentContainer: {

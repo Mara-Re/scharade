@@ -39,7 +39,7 @@ const Home: FunctionComponent<{}> = () => {
 
     return (
         <>
-            <AppBar />
+            <AppBar type="home"/>
             <Container>
                 <CentralBox>
                     <Box className={classes.centerBox}>
