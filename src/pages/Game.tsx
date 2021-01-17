@@ -163,6 +163,7 @@ const Game: FunctionComponent<{}> = () => {
     useEffect(() => {
         getGameStatus();
         getTeam();
+        getGameHost();
     }, []);
 
     const getGameHost = useCallback(async () => {
