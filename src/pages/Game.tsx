@@ -97,7 +97,6 @@ retryConnectOnFailure(RETRY_INTERVAL);
 // TODO handle exceptions / fix bugs / error handling
 // handle case if reloading game and status is end of round reached
 // add error handling to <Home />
-// remove hardcoded timeToExplain from App.js -> retrieve via get request instead
 
 // TODO ideas
 // show list with guessed words and number of discarded words to other players at "time-over" and "end-of-round-reached"
@@ -192,6 +191,7 @@ const Game: FunctionComponent<{}> = () => {
                 onError: onError,
                 error: error,
                 countdown: countdown,
+                setCountdown: setCountdown,
                 team: team,
                 gameUid,
                 setPlayerExplaining: setPlayerExplaining,

@@ -6,6 +6,7 @@ import axios from "axios";
 import { socket } from "../pages/Game";
 import { StatusContext } from "../contexts/StatusContext";
 import { PlayerExplaining } from "../pages/Game";
+import timeToExplain from "../shared/time-to-explain";
 
 const StartExplainingView: FunctionComponent<{}> = () => {
     const {
@@ -14,15 +15,16 @@ const StartExplainingView: FunctionComponent<{}> = () => {
         reloadStatus = () => {},
         setPlayerExplaining = () => {},
         loadingGameStatus,
+        setCountdown = () => {}
     } = useContext(StatusContext);
+
     const onStartExplaining = useCallback(async () => {
         try {
             await axios.post(`/games/${gameUid}/startExplaining`);
 
             reloadStatus();
 
-            // TODO: is this needed for better UX? so timer is shown right away after click?
-            // setCountdown(timeToExplain);
+            setCountdown(timeToExplain);
             setPlayerExplaining(PlayerExplaining.SELF);
             socket.emit("start-explaining");
         } catch (error) {

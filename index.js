@@ -6,8 +6,7 @@ const addTurnScoreToTeamScore = require('./helpers/addTurnScoreToTeam');
 const server = require('http').Server(app);
 const io = require('socket.io')(server);
 const uidSafe = require('uid-safe');
-
-const timeToExplain = process.env.NODE_ENV != 'production' ? 11 : 60;
+const timeToExplain = require('./src/shared/time-to-explain');
 
 //-------------------------MIDDLEWARE-------------------------
 

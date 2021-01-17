@@ -5,6 +5,7 @@ interface StatusContextProps {
     playerExplaining?: PlayerExplaining;
     gameStatus?: GameStatus;
     setPlayerExplaining: (playerExplaining: PlayerExplaining) => void;
+    setCountdown: (countdown: number) => void;
     reloadStatus: () => void;
     reloadTeam: () => void;
     onError: (error: any) => void;
