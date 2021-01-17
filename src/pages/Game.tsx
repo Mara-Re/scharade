@@ -71,17 +71,10 @@ retryConnectOnFailure(RETRY_INTERVAL);
 // check behaviour on mobile when deconnected -> reconnected (during timer running, after, before)
 // -> is gameStatus reloaded?
 
-// TODO onboarding
-// Explain game
-// Explain enter words
-// Explain explanation rounds
-// Explain necessary setup steps: enter 5 words, form 2 teams, note scores for each player,
-// Explain the different rounds - 1. explaining, 2. pantomime, 3. one-word explanation, 4. finger pantomime, 5. make a sound
-
 // TODO rounds
-// 5 rounds: - 1. explaining, 2. pantomime, 3. one-word explanation, 4. finger pantomime, 5. make a sound
+// On "start explaining"/"end of round reached" show current/next round - 1. explaining, 2. pantomime, 3. one-word explanation, 4. finger pantomime, 5. make a sound
 // add round column to games table and add get and post request to set the round
-// game ends when player clicks on end game, show final scores or after 5 rounds
+// after 5th round, players can start additional round(s) or "end game"
 
 // TODO teams alternating order
 // teams explain in alternating order
@@ -111,6 +104,8 @@ const Game: FunctionComponent<{}> = () => {
         PlayerExplaining.NONE
     );
     const [countdown, setCountdown] = useState<number>();
+    const [isGameHost, setIsGameHost] = useState(false);
+
 
     const Component = statusMapping(gameStatus, playerExplaining);
 
@@ -170,6 +165,15 @@ const Game: FunctionComponent<{}> = () => {
         getTeam();
     }, []);
 
+    const getGameHost = useCallback(async () => {
+        try {
+            const { data } = await axios.get("/game-cookies");
+            setIsGameHost(data.isGameHost);
+        } catch (error) {
+            onError(error);
+        }
+    }, []);
+
     const getGameStatus = useCallback(async () => {
         setLoadingGameStatus(true);
         try {
@@ -196,6 +200,8 @@ const Game: FunctionComponent<{}> = () => {
                 gameUid,
                 setPlayerExplaining: setPlayerExplaining,
                 loadingGameStatus: loadingGameStatus,
+                isGameHost,
+                reloadGameHost: getGameHost
             }}
         >
             <GameLayout>

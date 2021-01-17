@@ -1,4 +1,4 @@
-import React, { FunctionComponent, useContext } from "react";
+import React, { FunctionComponent, useContext, useEffect, useState } from "react";
 import AppBarMui from "@material-ui/core/AppBar";
 import { makeStyles } from "@material-ui/core/styles";
 import Typography from "@material-ui/core/Typography";
@@ -8,6 +8,7 @@ import StartGame from "./StartGame";
 import { StatusContext } from "../contexts/StatusContext";
 import { GameStatus } from "../pages/Game";
 import Info from "./Info";
+import axios from "axios";
 
 const useStyles = makeStyles((theme) => ({
     toolbar: {
@@ -23,7 +24,7 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 const AppBar: FunctionComponent<{ type: "home" | "game" }> = ({ type }) => {
-    const { gameStatus, countdown, loadingGameStatus } = useContext(
+    const { gameStatus, countdown, loadingGameStatus, onError, isGameHost } = useContext(
         StatusContext
     );
     const classes = useStyles();
@@ -42,7 +43,7 @@ const AppBar: FunctionComponent<{ type: "home" | "game" }> = ({ type }) => {
                     Zettelchen
                 </Typography>
                 {type === "game" && showTimer && <Timer>{countdown}</Timer>}
-                {type === "game" && gameStatus === GameStatus.SETUP && (
+                {type === "game" && gameStatus === GameStatus.SETUP && isGameHost && (
                     <StartGame>StartGame</StartGame>
                 )}
                 {type === "home" && <Info type="header"/>}

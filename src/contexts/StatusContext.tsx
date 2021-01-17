@@ -10,6 +10,8 @@ interface StatusContextProps {
     reloadTeam: () => void;
     onError: (error: any) => void;
     error: any;
+    isGameHost: boolean,
+    reloadGameHost: () => void;
     countdown?: number;
     team?: Team | null;
     gameUid: string;

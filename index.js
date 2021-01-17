@@ -39,7 +39,8 @@ app.post('/games', async (req, res) => {
     try {
         const gameUid = await uidSafe(10);
         const {rows} = await db.addNewGame(gameUid);
-        res.cookie("gameSetup", true);
+        res.cookie("gameSetup", "true");
+        res.cookie("gameHost", "true");
         await res.json(rows);
     } catch(error) {
         console.log('error in /games post route: ', error);
@@ -222,11 +223,25 @@ app.get('/team-cookie', async (req, res) => {
     }
 });
 
-app.get('/game-link-dialog-cookie', async (req, res) => {
+app.get('/game-cookies', async (req, res) => {
     try {
-        await res.json({showGameLinkDialog: req.cookies.gameSetup === "true" });
+        await res.json({
+            showGameLinkDialog: req.cookies.gameSetup === "true" ,
+            isGameHost: req.cookies.gameHost === "true" ,
+        });
     } catch(error) {
-        console.log('error in /game-link-dialog-cookie get route: ', error);
+        console.log('error in /game-cookies get route: ', error);
+    }
+});
+
+app.post('/set-game-host-cookie', async (req, res) => {
+    try {
+        await res.cookie("gameHost", true);
+        await res.json({
+            isGameHost: true ,
+        });
+    } catch(error) {
+        console.log('error in /set-game-host-cookie post route: ', error);
     }
 });
 
