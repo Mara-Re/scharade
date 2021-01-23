@@ -111,27 +111,19 @@ const Game: FunctionComponent<{}> = () => {
 
     //---------SOCKET EVENT LISTENERS-----------------------
     useEffect(() => {
-        socket.on("game-started", () => {
-            getGameStatus();
-        });
-        socket.on("game-ended", () => {
-            getGameStatus();
-        });
-        socket.on("end-of-round-reached", () => {
-            getGameStatus();
-        });
-        socket.on("timeOver", () => {
-            getGameStatus();
-        });
-        socket.on("new-round-started", () => {
+        socket.on("new-game-status", () => {
             getGameStatus();
         });
     }, []);
 
     useEffect(() => {
-        socket.on("other-player-starts-explaining", () => {
-            getGameStatus();
+        socket.on("other-player-starts-explaining", async () => {
+            await getGameStatus();
             setPlayerExplaining(PlayerExplaining.OTHER);
+        });
+        socket.on("player-starts-explaining-self", async () => {
+            await getGameStatus();
+            setPlayerExplaining(PlayerExplaining.SELF);
         });
     }, []);
 
@@ -199,7 +191,6 @@ const Game: FunctionComponent<{}> = () => {
                 setCountdown: setCountdown,
                 team: team,
                 gameUid,
-                setPlayerExplaining: setPlayerExplaining,
                 loadingGameStatus: loadingGameStatus,
                 isGameHost,
                 reloadGameHost: getGameHost

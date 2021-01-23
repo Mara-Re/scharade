@@ -34,7 +34,7 @@ const StartNewGame: FunctionComponent<{}> = () => {
     return (
         <>
             <Button onClick={() => setStartNewGameDialogOpen(true)}>
-                Start over
+                Start new game
             </Button>
             <Dialog
                 open={startNewGameDialogOpen}

@@ -12,20 +12,13 @@ const StartExplainingView: FunctionComponent<{}> = () => {
     const {
         gameUid,
         onError = () => {},
-        reloadStatus = () => {},
-        setPlayerExplaining = () => {},
         loadingGameStatus,
         setCountdown = () => {}
     } = useContext(StatusContext);
 
     const onStartExplaining = useCallback(async () => {
         try {
-            await axios.post(`/games/${gameUid}/startExplaining`);
-
-            reloadStatus();
-
             setCountdown(timeToExplain);
-            setPlayerExplaining(PlayerExplaining.SELF);
             socket.emit("start-explaining");
         } catch (error) {
             onError(error);

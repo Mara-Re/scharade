@@ -4,7 +4,6 @@ import { GameStatus, PlayerExplaining, Team, Word } from "../pages/Game";
 interface StatusContextProps {
     playerExplaining?: PlayerExplaining;
     gameStatus?: GameStatus;
-    setPlayerExplaining: (playerExplaining: PlayerExplaining) => void;
     setCountdown: (countdown: number) => void;
     reloadStatus: () => void;
     reloadTeam: () => void;
@@ -22,7 +21,6 @@ interface StatusContextProps {
 export const StatusContext = createContext<Partial<StatusContextProps>>({
     reloadStatus: () => {},
     onError: () => {},
-    setPlayerExplaining: () => {},
     gameUid: "",
     wordsList: [],
     loadingGameStatus: false,

@@ -7,7 +7,7 @@ const server = require('http').Server(app);
 const io = require('socket.io')(server);
 const uidSafe = require('uid-safe');
 const timeToExplain = require('./src/shared/time-to-explain');
-
+const cookie = require('cookie');
 //-------------------------MIDDLEWARE-------------------------
 
 app.use(compression());
@@ -68,42 +68,6 @@ app.post('/games/:uid/status', async (req, res) => {
         }
     } catch(error) {
         console.log('error in /games/:uid/status post route: ', error);
-        await res.json({success: false});
-    }
-});
-
-app.post('/games/:uid/startExplaining', async (req, res) => {
-    try {
-        const {rows} = await db.getGameStatus(req.params.uid);
-        if (rows[0].status === "PLAYER_EXPLAINING") {
-            throw new Error;
-        } else {
-            await addTurnScoreToTeamScore(req.params.uid);
-            await db.startExplaining(req.params.uid, req.cookies.team);
-            await db.resetWords(req.params.uid, "pile", "notGuessedThisTurn");
-            await db.resetWords(req.params.uid, "pile", "discardedThisTurn");
-            await db.resetWords(req.params.uid, "guessed", "guessedThisTurn");
-            await res.json({success: true});
-        }
-    } catch(error) {
-        console.log('error in /games/:uid/startExplaining post route: ', error);
-        await res.json({success: false});
-    }
-});
-
-app.post('/games/:uid/startNewRound', async (req, res) => {
-    try {
-        const {rows} = await db.getGameStatus(req.params.uid);
-        if (rows[0].status === "PLAYER_EXPLAINING") {
-            throw new Error;
-        } else {
-            await addTurnScoreToTeamScore(req.params.uid);
-            await db.setGameStatus(req.params.uid, "PLAYER_EXPLAINING");
-            await db.resetWords(req.params.uid, "pile");
-            await res.json({success: true});
-        }
-    } catch(error) {
-        console.log('error in /games/:uid/startNewRound post route: ', error);
         await res.json({success: false});
     }
 });
@@ -297,7 +261,7 @@ io.on('connection', function(socket) {
         countdown--;
         if (countdown < 0) {
             io.in(gameUid).emit('timer', { countdown: undefined });
-            io.in(gameUid).emit('timeOver');
+            io.in(gameUid).emit('new-game-status');
             countdown = timeToExplain;
             const adjustGameStatus = async () => {
                 // ignore onTimerOver when game is currently not ongoing:
@@ -316,7 +280,7 @@ io.on('connection', function(socket) {
 
     socket.on('start-game', () => {
         clearAllTimers();
-        socket.to(gameUid).emit("game-started");
+        socket.to(gameUid).emit("new-game-status");
     });
 
     socket.on('start-new-game', ({gameId}) => {
@@ -326,13 +290,34 @@ io.on('connection', function(socket) {
 
     socket.on('end-game', () => {
         clearAllTimers();
-        socket.to(gameUid).emit("game-ended");
+        socket.to(gameUid).emit("new-game-status");
     });
 
-    socket.on('start-explaining', () => {
-        socket.to(gameUid).emit("other-player-starts-explaining");
-        if (timerId) return;
-        timerId = setCountdownInterval();
+    socket.on('start-explaining', async () => {
+        const cookies = cookie.parse(socket.request.headers.cookie);
+        const teamExplaining = cookies.team;
+
+        try {
+            const {rows} = await db.getGameStatus(gameUid);
+            if (rows[0].status === "PLAYER_EXPLAINING" || !teamExplaining) {
+                throw new Error;
+            } else {
+                await addTurnScoreToTeamScore(gameUid);
+                await db.startExplaining(gameUid, teamExplaining);
+                await db.resetWords(gameUid, "pile", "notGuessedThisTurn");
+                await db.resetWords(gameUid, "pile", "discardedThisTurn");
+                await db.resetWords(gameUid, "guessed", "guessedThisTurn");
+                // to all except emitting player
+                socket.to(gameUid).emit("other-player-starts-explaining");
+                // to emitting player
+                socket.emit("player-starts-explaining-self");
+                if (timerId) return;
+                timerId = setCountdownInterval();
+            }
+        } catch(error) {
+            console.log('error in socket start-explaining: ', error);
+        }
+
     });
 
     socket.on('guessed-word', (data) => {
@@ -345,15 +330,28 @@ io.on('connection', function(socket) {
 
     socket.on('end-of-round', async () => {
         clearAllTimers();
-        socket.to(gameUid).emit("end-of-round-reached");
+        socket.to(gameUid).emit("new-game-status");
     });
 
-    socket.on('start-new-round', (data) => {
+    socket.on('start-new-round', async (data) => {
         countdown = data.countdown || countdown;
-        socket.to(gameUid).emit("new-round-started");
-        if (timerId) return;
-        if (countdown > 0) {
-            timerId = setCountdownInterval();
+        try {
+            const {rows} = await db.getGameStatus(gameUid);
+            if (rows[0].status === "PLAYER_EXPLAINING") {
+                throw new Error;
+            } else {
+                await addTurnScoreToTeamScore(gameUid);
+                await db.setGameStatus(gameUid, "PLAYER_EXPLAINING");
+                await db.resetWords(gameUid, "pile");
+                io.in(gameUid).emit("new-game-status");
+                if (timerId) return;
+                if (countdown > 0) {
+                    timerId = setCountdownInterval();
+                }
+            }
+        } catch(error) {
+            console.log('error in socket on start-new-round: ', error);
         }
+
     });
 });

@@ -16,7 +16,6 @@ const useStyles = makeStyles({
 const EndOfRoundReached: FunctionComponent<{}> = () => {
     const {
         gameUid,
-        reloadStatus = () => {},
         onError = () => {},
         countdown,
     } = useContext(StatusContext);
@@ -25,10 +24,6 @@ const EndOfRoundReached: FunctionComponent<{}> = () => {
 
     const onStartNewRound = useCallback(async () => {
         try {
-            await axios.post(`/games/${gameUid}/startNewRound`, {
-                status: GameStatus.PLAYER_EXPLAINING,
-            });
-            reloadStatus();
             socket.emit("start-new-round", { countdown });
         } catch (error) {
             onError(error);
