@@ -5,7 +5,7 @@ export const rules = [
     <span>Split players into two teams.</span>,
     <span>You agree on a number of words each player should <strong>add to the pile</strong> (in the language you agree on). <strong>4 to 6 words per player</strong> have worked well for us so far :-).</span>,
     <span>When all players have entered their words, you can start the game.</span>,
-    <span>{`Each team gets ${timeToExplain} seconds to`}<strong>guess as many words as possible</strong>, with one player explaining the words to their teammates.</span>,
+    <span>{`Each team gets ${timeToExplain} seconds to `}<strong>guess as many words as possible</strong>, with one player explaining the words to their teammates.</span>,
     <span>Teams take alternating turns. In each team’s turn, <strong>one player explains and the others guess</strong>.</span>,
     <span>When all words have been guessed, a new round is started.</span>,
     <span>The <strong>game is played in several rounds</strong> and each round defines how a word must be explained. In each round <strong>explaining gets harder but the words get more familiar</strong>.</span>,

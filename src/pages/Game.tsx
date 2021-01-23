@@ -70,31 +70,27 @@ const retryConnectOnFailure = (retryInMilliseconds: number) => {
 retryConnectOnFailure(RETRY_INTERVAL);
 //////////////////////////////////////////////////
 
-// TODO
-// check behaviour on mobile when deconnected -> reconnected (during timer running, after, before)
-// -> is gameStatus reloaded?
+// TODO teams alternating order
+// teams explain in alternating order
+// players see which team is explaining next / which team is explaining
 
 // TODO rounds
 // On "start explaining"/"end of round reached" show current/next round - 1. explaining, 2. pantomime, 3. one-word explanation, 4. finger pantomime, 5. make a sound
 // add round column to games table and add get and post request to set the round
 // after 5th round, players can start additional round(s) or "end game"
 
-// TODO teams alternating order
-// teams explain in alternating order
-// players see which team is explaining
-
 // TODO players
 // enable players to enter their names
 // show which players are currently in the game
 // show which player is currently explaining
 // enable players to kick out other players
-// show live with socket, which players are in the game and which have left
 
 // TODO handle exceptions / fix bugs / error handling
 // handle case if reloading game and status is end of round reached
 // add error handling to <Home />
 
 // TODO ideas
+// enable players to change / delete words they have entered during game setup
 // show list with guessed words and number of discarded words to other players at "time-over" and "end-of-round-reached"
 
 

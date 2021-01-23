@@ -7,7 +7,6 @@ const server = require('http').Server(app);
 const io = require('socket.io')(server);
 const uidSafe = require('uid-safe');
 const timeToExplain = require('./src/shared/time-to-explain');
-const cookie = require('cookie');
 //-------------------------MIDDLEWARE-------------------------
 
 app.use(compression());
@@ -293,17 +292,14 @@ io.on('connection', function(socket) {
         socket.to(gameUid).emit("new-game-status");
     });
 
-    socket.on('start-explaining', async () => {
-        const cookies = cookie.parse(socket.request.headers.cookie);
-        const teamExplaining = cookies.team;
-
+    socket.on('start-explaining', async ({ team }) => {
         try {
             const {rows} = await db.getGameStatus(gameUid);
-            if (rows[0].status === "PLAYER_EXPLAINING" || !teamExplaining) {
+            if (rows[0].status === "PLAYER_EXPLAINING" || !team) {
                 throw new Error;
             } else {
                 await addTurnScoreToTeamScore(gameUid);
-                await db.startExplaining(gameUid, teamExplaining);
+                await db.startExplaining(gameUid, team);
                 await db.resetWords(gameUid, "pile", "notGuessedThisTurn");
                 await db.resetWords(gameUid, "pile", "discardedThisTurn");
                 await db.resetWords(gameUid, "guessed", "guessedThisTurn");
