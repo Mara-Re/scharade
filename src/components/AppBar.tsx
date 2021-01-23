@@ -42,7 +42,7 @@ const AppBar: FunctionComponent<{ type: "home" | "game" }> = ({ type }) => {
                 <Typography className={classes.title} variant="h6" noWrap>
                     Zettelchen
                 </Typography>
-                {type === "game" && showTimer && <Timer>{countdown}</Timer>}
+                {type === "game" && showTimer && <Timer timeOver={gameStatus === GameStatus.TIME_OVER}>{countdown}</Timer>}
                 {type === "game" && gameStatus === GameStatus.SETUP && isGameHost && (
                     <StartGame>StartGame</StartGame>
                 )}

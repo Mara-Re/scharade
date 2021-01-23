@@ -10,19 +10,20 @@ const useStyles = makeStyles({
     }
 });
 
-const Timer: FunctionComponent<{}> = (props) => {
+const Timer: FunctionComponent<{timeOver: boolean}> = (props) => {
     const {
         children,
+        timeOver,
     } = props;
 
     const classes = useStyles();
 
     return (
         <Box display="flex" alignSelf="center">
-            {children && <Typography variant="h4">
+            {children && !timeOver && <Typography variant="h4">
                 {children}
             </Typography>}
-            {!children &&
+            {timeOver &&
             <>
             <Typography variant="h6" className={classes.timeOver}>
                 Time over!

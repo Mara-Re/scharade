@@ -1,4 +1,10 @@
-import React, { FunctionComponent, useCallback, useEffect, useMemo, useState } from "react";
+import React, {
+    FunctionComponent,
+    useCallback,
+    useEffect,
+    useMemo,
+    useState,
+} from "react";
 
 import * as io from "socket.io-client";
 import { StatusContext } from "../contexts/StatusContext";
@@ -8,9 +14,6 @@ import axios from "axios";
 import { GameLayout } from "../layouts/GameLayout";
 import ErrorHandling from "../components/ErrorHandling";
 export const socket = io.connect();
-
-const timeToExplain = 60;
-
 
 export enum GameStatus {
     SETUP = "SETUP",
@@ -106,13 +109,19 @@ const Game: FunctionComponent<{}> = () => {
     const [countdown, setCountdown] = useState<number>();
     const [isGameHost, setIsGameHost] = useState(false);
 
-
     const Component = statusMapping(gameStatus, playerExplaining);
 
     //---------SOCKET EVENT LISTENERS-----------------------
     useEffect(() => {
         socket.on("new-game-status", () => {
             getGameStatus();
+        });
+        socket.on("connected", async () => {
+            const currentGameStatus = await getGameStatus();
+            if (currentGameStatus !== GameStatus.PLAYER_EXPLAINING) {
+                setCountdown(undefined);
+                setPlayerExplaining(PlayerExplaining.OTHER);
+            }
         });
     }, []);
 
@@ -167,15 +176,21 @@ const Game: FunctionComponent<{}> = () => {
         }
     }, []);
 
-    const getGameStatus = useCallback(async () => {
+    const getGameStatus = useCallback(async (): Promise<
+        GameStatus | undefined
+    > => {
         setLoadingGameStatus(true);
         try {
             const { data } = await axios.get(`/games/${gameUid}/status`);
-            setGameStatus(data[0].status);
+            const newGameStatus = data[0].status as GameStatus;
+            setGameStatus(newGameStatus);
+            setLoadingGameStatus(false);
+            return newGameStatus;
         } catch (error) {
             onError(error);
+            setLoadingGameStatus(false);
+            return undefined;
         }
-        setLoadingGameStatus(false);
     }, []);
 
     return (
@@ -193,7 +208,7 @@ const Game: FunctionComponent<{}> = () => {
                 gameUid,
                 loadingGameStatus: loadingGameStatus,
                 isGameHost,
-                reloadGameHost: getGameHost
+                reloadGameHost: getGameHost,
             }}
         >
             <GameLayout>
