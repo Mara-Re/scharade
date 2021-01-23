@@ -9,26 +9,18 @@ import { makeStyles } from "@material-ui/core/styles";
 
 const useStyles = makeStyles({
     spacingTop: {
-        marginTop: "30px"
-    }
+        marginTop: "30px",
+    },
 });
 
 const EndOfRoundReached: FunctionComponent<{}> = () => {
-    const {
-        gameUid,
-        onError = () => {},
-        countdown,
-    } = useContext(StatusContext);
+    const { countdown } = useContext(StatusContext);
 
     const classes = useStyles();
 
     const onStartNewRound = useCallback(async () => {
-        try {
-            socket.emit("start-new-round", { countdown });
-        } catch (error) {
-            onError(error);
-        }
-    }, [gameUid, countdown, onError]);
+        socket.emit("start-new-round", { countdown });
+    }, [countdown]);
 
     return (
         <div className={classes.spacingTop}>

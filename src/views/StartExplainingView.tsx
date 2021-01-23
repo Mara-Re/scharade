@@ -9,21 +9,14 @@ import { PlayerExplaining } from "../pages/Game";
 import timeToExplain from "../shared/time-to-explain";
 
 const StartExplainingView: FunctionComponent<{}> = () => {
-    const {
-        gameUid,
-        onError = () => {},
-        loadingGameStatus,
-        setCountdown = () => {}
-    } = useContext(StatusContext);
+    const { loadingGameStatus, setCountdown = () => {} } = useContext(
+        StatusContext
+    );
 
     const onStartExplaining = useCallback(async () => {
-        try {
-            setCountdown(timeToExplain);
-            socket.emit("start-explaining");
-        } catch (error) {
-            onError(error);
-        }
-    }, [gameUid]);
+        setCountdown(timeToExplain);
+        socket.emit("start-explaining");
+    }, []);
 
     if (loadingGameStatus) return null;
 
