@@ -70,10 +70,6 @@ const retryConnectOnFailure = (retryInMilliseconds: number) => {
 retryConnectOnFailure(RETRY_INTERVAL);
 //////////////////////////////////////////////////
 
-// TODO teams alternating order
-// teams explain in alternating order
-// players see which team is explaining next / which team is explaining
-
 // TODO rounds
 // On "start explaining"/"end of round reached" show current/next round - 1. explaining, 2. pantomime, 3. one-word explanation, 4. finger pantomime, 5. make a sound
 // add round column to games table and add get and post request to set the round
@@ -83,7 +79,7 @@ retryConnectOnFailure(RETRY_INTERVAL);
 // enable players to enter their names
 // show which players are currently in the game
 // show which player is currently explaining
-// enable players to kick out other players
+// show end of round reached - start new round action to explaining player only
 
 // TODO handle exceptions / fix bugs / error handling
 // handle case if reloading game and status is end of round reached
@@ -91,7 +87,13 @@ retryConnectOnFailure(RETRY_INTERVAL);
 
 // TODO ideas
 // enable players to change / delete words they have entered during game setup
+// on game setup view: show how many words are already in pile
 // show list with guessed words and number of discarded words to other players at "time-over" and "end-of-round-reached"
+// help: is the game stuck (because a player left or lost their connection)? Reset turn/Game host can reset turn
+
+// TODO automatically determine players turns
+// automatically determine whose player's turn it is
+// enable players to kick out other players
 
 
 const Game: FunctionComponent<{}> = () => {
@@ -115,6 +117,7 @@ const Game: FunctionComponent<{}> = () => {
         });
         socket.on("connected", async () => {
             const currentGameStatus = await getGameStatus();
+            // TODO: check this!! what about end of round reached case?
             if (currentGameStatus !== GameStatus.PLAYER_EXPLAINING) {
                 setCountdown(undefined);
                 setPlayerExplaining(PlayerExplaining.OTHER);
