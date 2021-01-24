@@ -13,6 +13,7 @@ import { getGameUid } from "../helper/getGameUid";
 import axios from "axios";
 import { GameLayout } from "../layouts/GameLayout";
 import ErrorHandling from "../components/ErrorHandling";
+import PlayerJoinGameDialog from "../components/PlayerJoinGameDialog";
 export const socket = io.connect();
 
 export enum GameStatus {
@@ -44,6 +45,12 @@ export type WordStatus =
     | "pile";
 
 export type Team = "A" | "B";
+
+export interface Player {
+    teamAorB: Team;
+    name: string;
+    gameUid: string;
+}
 
 ///// Allow socket reconnects on mobile devices without page reload////
 let isConnected = false;
@@ -95,10 +102,10 @@ retryConnectOnFailure(RETRY_INTERVAL);
 // automatically determine whose player's turn it is
 // enable players to kick out other players
 
-
 const Game: FunctionComponent<{}> = () => {
-    const [team, setTeam] = useState<Team | null>();
+    const [playerMe, setPlayerMe] = useState<Player>();
     const [loadingGameStatus, setLoadingGameStatus] = useState(true);
+    const [loadingPlayerMe, setLoadingPlayerMe] = useState(true);
     const [error, setError] = useState<any>();
     const [gameStatus, setGameStatus] = useState(GameStatus.SETUP);
     const [teamExplaining, setTeamExplaining] = useState<Team>();
@@ -145,13 +152,21 @@ const Game: FunctionComponent<{}> = () => {
     //^^^^^^^^SOCKET EVENT LISTENERS^^^^^^^^^^--------
     const gameUid = useMemo(() => getGameUid(), [getGameUid]);
 
-    const getTeam = useCallback(async () => {
+    const getPlayerMe = useCallback(async () => {
+        setLoadingPlayerMe(true);
         try {
-            const { data } = await axios.get(`/team-cookie`);
-            setTeam(data.team);
+            const { data } = await axios.get(`/games/${gameUid}/player`);
+            console.log("data", data);
+            if (!data) return;
+            setPlayerMe({
+                ...data[0],
+                teamAorB: data[0].team_a_or_b,
+                gameUid: data[0].game_uid,
+            });
         } catch (error) {
             onError(error);
         }
+        setLoadingPlayerMe(false);
     }, []);
 
     const onError = (error: any) => {
@@ -163,7 +178,7 @@ const Game: FunctionComponent<{}> = () => {
 
     useEffect(() => {
         getGameStatus();
-        getTeam();
+        getPlayerMe();
         getGameHost();
     }, []);
 
@@ -198,24 +213,25 @@ const Game: FunctionComponent<{}> = () => {
     return (
         <StatusContext.Provider
             value={{
-                playerExplaining: playerExplaining,
-                gameStatus: gameStatus,
-                teamExplaining: teamExplaining,
-                reloadStatus: getGameStatus,
-                reloadTeam: getTeam,
-                onError: onError,
-                error: error,
-                countdown: countdown,
-                setCountdown: setCountdown,
-                team: team,
                 gameUid,
-                loadingGameStatus: loadingGameStatus,
                 isGameHost,
+                playerExplaining,
+                gameStatus,
+                teamExplaining,
+                playerMe,
+                setCountdown,
+                countdown,
+                onError,
+                error,
+                loadingGameStatus,
+                reloadStatus: getGameStatus,
+                reloadPlayerMe: getPlayerMe,
                 reloadGameHost: getGameHost,
             }}
         >
             <GameLayout>
-                {!loadingGameStatus && <Component />}
+                {!playerMe && !loadingPlayerMe && <PlayerJoinGameDialog />}
+                {playerMe && !loadingGameStatus && <Component />}
                 <ErrorHandling />
             </GameLayout>
         </StatusContext.Provider>

@@ -15,7 +15,7 @@ const useStyles = makeStyles({
 });
 
 const EndOfRoundReached: FunctionComponent<{}> = () => {
-    const { countdown, team, teamExplaining } = useContext(StatusContext);
+    const { countdown, playerMe, teamExplaining } = useContext(StatusContext);
 
     const classes = useStyles();
 
@@ -25,14 +25,14 @@ const EndOfRoundReached: FunctionComponent<{}> = () => {
 
     return (
         <div className={classes.spacingTop}>
-            {teamExplaining && team !== teamExplaining && (
+            {teamExplaining && playerMe?.teamAorB !== teamExplaining && (
                 <ActionMessage>
                     The pile of words is empty. Team{" "}
                     <TeamEmoji team={teamExplaining} /> can start a new
                     round now.
                 </ActionMessage>
             )}
-            {teamExplaining && team === teamExplaining && (
+            {teamExplaining && playerMe?.teamAorB === teamExplaining && (
                 <>
                     <CenterBox>
                         <Typography variant="h2" gutterBottom>

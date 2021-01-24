@@ -156,6 +156,46 @@ app.post('/games/:uid/createTeams', async (req, res) => {
     }
 });
 
+//-------------------------PLAYERS ROUTES-------------------------
+app.get('/games/:uid/player', async (req, res) => {
+    try {
+        const player = JSON.parse(req.cookies.player);
+        if (!player || player.gameUid !== req.params.uid || !player.id) {
+            await res.json();
+        } else {
+            const {rows} = await db.getPlayer(req.params.uid, player.id);
+            await res.json(rows);
+        }
+
+    } catch(error) {
+        console.log('error in /games/:uid/player get route: ', error);
+        await res.json({success: false});
+    }
+});
+
+app.post('/games/:uid/player', async (req, res) => {
+    try {
+        const {rows} = await db.addPlayer(req.body.player);
+        res.cookie(`player`, JSON.stringify({ id: rows[0].id , gameUid: req.params.uid}));
+        res.cookie('playerName', req.body.player.name);
+        await res.json({success: true});
+    } catch(error) {
+        console.log('error in /games/:uid/player post route: ', error);
+        await res.json({success: false});
+    }
+});
+
+app.put('/games/:uid/player', async (req, res) => {
+    try {
+        const player = JSON.parse(req.cookies.player);
+        await db.updatePlayerTeam(req.params.uid, player.id, req.body.team);
+        await res.json({success: true});
+    } catch(error) {
+        console.log('error in /games/:uid/player put route: ', error);
+        await res.json({success: false});
+    }
+});
+
 //-------------------------Cookie ROUTES -------------------------
 
 app.post('/reset-game-setup-cookie', async (req, res) => {
@@ -164,28 +204,6 @@ app.post('/reset-game-setup-cookie', async (req, res) => {
         await res.json({success: true});
     } catch(error) {
         console.log('error in /reset-game-setup-cookie: ', error);
-        await res.json({success: false});
-    }
-});
-
-app.post('/set-team-cookie', async (req, res) => {
-    const randomTeamAorB = Math.floor(Math.random() * 2) + 1 === 1 ? "A" : "B";
-    const team = req.body.team || req.cookies.team || randomTeamAorB;
-    try {
-        res.cookie("team", team);
-        await res.json({success: true});
-    } catch(error) {
-        console.log('error in /set-team-cookie ', error);
-        await res.json({success: false});
-    }
-});
-
-app.get('/team-cookie', async (req, res) => {
-    // TODO: reset team cookie at some point?
-    try {
-        await res.json({team: req.cookies.team || null});
-    } catch(error) {
-        console.log('error in /team-cookie route ', error);
         await res.json({success: false});
     }
 });

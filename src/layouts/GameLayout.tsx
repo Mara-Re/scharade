@@ -10,7 +10,7 @@ import Container from "../components/Container";
 import Info from "../components/Info";
 
 export const GameLayout: FunctionComponent<{}> = ({ children }) => {
-    const { gameStatus, team, loadingGameStatus } = useContext(StatusContext);
+    const { gameStatus, playerMe, loadingGameStatus } = useContext(StatusContext);
     return (
         <>
             <AppBar type="game" />
@@ -29,8 +29,8 @@ export const GameLayout: FunctionComponent<{}> = ({ children }) => {
                                     {gameStatus === GameStatus.END && (
                                         <StartNewGame />
                                     )}
-                                    {team !== undefined && (
-                                        <TeamIndicator team={team} />
+                                    {playerMe?.teamAorB && (
+                                        <TeamIndicator team={playerMe?.teamAorB} />
                                     )}
                                 </>
                             )}
