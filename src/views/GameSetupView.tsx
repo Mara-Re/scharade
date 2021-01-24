@@ -62,7 +62,6 @@ const GameSetupView: FunctionComponent<{}> = () => {
                 open={showGameLinkDialog}
                 setShowGameLinkDialog={setShowGameLinkDialog}
             />
-            <ChooseTeam />
             <EnterWords />
             <Box justifyContent="center" alignItems="center" className={classes.center}>
                 <Typography variant="h6" gutterBottom>Start the game</Typography>

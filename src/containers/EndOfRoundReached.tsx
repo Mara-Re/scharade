@@ -15,7 +15,7 @@ const useStyles = makeStyles({
 });
 
 const EndOfRoundReached: FunctionComponent<{}> = () => {
-    const { countdown, team, teamExplaining } = useContext(StatusContext);
+    const { countdown, playerMe, teamExplaining, playerExplaining } = useContext(StatusContext);
 
     const classes = useStyles();
 
@@ -23,16 +23,18 @@ const EndOfRoundReached: FunctionComponent<{}> = () => {
         socket.emit("start-new-round", { countdown });
     }, [countdown]);
 
+    if (!teamExplaining || !playerExplaining || !playerMe) return null;
+
     return (
         <div className={classes.spacingTop}>
-            {teamExplaining && team !== teamExplaining && (
+            {playerMe.id !== playerExplaining.id && (
                 <ActionMessage>
-                    The pile of words is empty. Team{" "}
+                    The pile of words is empty. {playerExplaining.name}{" "}
                     <TeamEmoji team={teamExplaining} /> can start a new
                     round now.
                 </ActionMessage>
             )}
-            {teamExplaining && team === teamExplaining && (
+            {playerMe.id === playerExplaining.id && (
                 <>
                     <CenterBox>
                         <Typography variant="h2" gutterBottom>

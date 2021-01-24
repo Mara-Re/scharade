@@ -19,19 +19,13 @@ const useStyles = makeStyles({
 });
 
 interface TeamIndicatorProps {
-    team: Team | null;
+    team: Team;
 }
 
 const TeamIndicator: FunctionComponent<TeamIndicatorProps> = (props) => {
     const {team} = props;
 
     const classes = useStyles();
-
-    useEffect(() => {
-        if (team === null) {
-            setChooseTeamModalOpen(true);
-        }
-    }, [team]);
 
     const [chooseTeamModalOpen, setChooseTeamModalOpen] = useState(false);
 
@@ -56,7 +50,7 @@ const TeamIndicator: FunctionComponent<TeamIndicatorProps> = (props) => {
                 </DialogTitle>
                 <DialogContent>
                     <DialogContentText>
-                        <ChooseTeam displayTitle={false}/>
+                        <ChooseTeam />
                     </DialogContentText>
                 </DialogContent>
                 <DialogActions>

@@ -14,22 +14,23 @@ const StartExplainingView: FunctionComponent<{}> = () => {
     const {
         loadingGameStatus,
         setCountdown = () => {},
-        team,
+        playerMe,
         teamExplaining,
     } = useContext(StatusContext);
 
     const nextTeamExplaining = getOppositeTeam(teamExplaining);
 
     const onStartExplaining = useCallback(async () => {
+        if (!playerMe) return;
         setCountdown(timeToExplain);
-        socket.emit("start-explaining");
+        socket.emit("start-explaining", {player : playerMe});
     }, []);
 
     if (loadingGameStatus) return null;
 
     return (
         <CentralBox>
-            {nextTeamExplaining && team !== nextTeamExplaining &&(
+            {nextTeamExplaining && playerMe?.teamAorB !== nextTeamExplaining &&(
                 <CenterBox >
                     <Typography variant="h3">
                         It is <TeamEmoji team={nextTeamExplaining} />
@@ -37,7 +38,7 @@ const StartExplainingView: FunctionComponent<{}> = () => {
                     </Typography>
                 </CenterBox>
             )}
-            {nextTeamExplaining && team === nextTeamExplaining && (
+            {nextTeamExplaining && playerMe?.teamAorB === nextTeamExplaining && (
                 <>
                     <CenterBox>
                         <Typography variant="h2" gutterBottom>

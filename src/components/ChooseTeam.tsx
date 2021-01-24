@@ -8,6 +8,7 @@ import TeamEmoji from "./TeamEmoji";
 import axios from "axios";
 import { StatusContext } from "../contexts/StatusContext";
 import { Team } from "../pages/Game";
+import TeamToggleButton from "./TeamToggleButton";
 
 const useStyles = makeStyles({
     chooseTeamBox: {
@@ -17,25 +18,21 @@ const useStyles = makeStyles({
 });
 
 interface ChooseTeamProps {
-    // TODO: remove team and setTeam from props when not needed anymore
-    team?: Team | null;
-    setTeam?: (team: Team) => void;
-    displayTitle?: boolean;
 }
 
 const ChooseTeam: FunctionComponent<ChooseTeamProps> = (props) => {
-    const { reloadTeam = () => {}, onError = () => {}, team } = useContext(
+    const { reloadPlayerMe = () => {}, onError = () => {}, playerMe, gameUid } = useContext(
         StatusContext
     );
-    const { displayTitle = true } = props;
     const classes = useStyles();
 
+    // TODO: adjust handleTeamChoice -> adjust player instead of setting cookie
     const handleTeamChoice = useCallback(
         async (_: any, newTeamChoice: Team | undefined) => {
             if (!newTeamChoice) return;
             try {
-                await axios.post(`/set-team-cookie`, { team: newTeamChoice });
-                reloadTeam();
+                await axios.put(`/games/${gameUid}/playerMe`, { team: newTeamChoice });
+                reloadPlayerMe();
             } catch (error) {
                 onError(error);
             }
@@ -49,32 +46,7 @@ const ChooseTeam: FunctionComponent<ChooseTeamProps> = (props) => {
             alignItems="center"
             className={classes.chooseTeamBox}
         >
-            {displayTitle && (
-                <>
-                    <Typography variant="h6" gutterBottom>
-                        Choose a team
-                    </Typography>
-                    <Typography variant="body1" gutterBottom>
-                        Split the group into two teams.
-                    </Typography>
-                </>
-            )}
-            <ToggleButtonGroup
-                value={team}
-                exclusive
-                onChange={handleTeamChoice}
-            >
-                <ToggleButton value="A">
-                    <Typography variant={team === "A" ? "h3" : "h6"}>
-                        <TeamEmoji team="A" />
-                    </Typography>
-                </ToggleButton>
-                <ToggleButton value="B">
-                    <Typography variant={team === "B" ? "h3" : "h6"}>
-                        <TeamEmoji team="B" />
-                    </Typography>
-                </ToggleButton>
-            </ToggleButtonGroup>
+            <TeamToggleButton onTeamChoice={handleTeamChoice} team={playerMe?.teamAorB}/>
         </Box>
     );
 };

@@ -1,19 +1,19 @@
 import React, { createContext } from "react";
-import { GameStatus, PlayerExplaining, Team, Word } from "../pages/Game";
+import { GameStatus, Player, Team, Word } from "../pages/Game";
 
 interface StatusContextProps {
-    playerExplaining?: PlayerExplaining;
+    playerExplaining?: Player;
     gameStatus?: GameStatus;
     teamExplaining?: Team;
     setCountdown: (countdown: number) => void;
     reloadStatus: () => void;
-    reloadTeam: () => void;
+    reloadPlayerMe: () => void;
     onError: (error: any) => void;
     error: any;
     isGameHost: boolean,
     reloadGameHost: () => void;
     countdown?: number;
-    team?: Team | null;
+    playerMe?: Player;
     gameUid: string;
     wordsList: Word[];
     loadingGameStatus: boolean;
