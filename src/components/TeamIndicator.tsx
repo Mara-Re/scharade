@@ -50,7 +50,7 @@ const TeamIndicator: FunctionComponent<TeamIndicatorProps> = (props) => {
                 </DialogTitle>
                 <DialogContent>
                     <DialogContentText>
-                        <ChooseTeam displayTitle={false}/>
+                        <ChooseTeam />
                     </DialogContentText>
                 </DialogContent>
                 <DialogActions>
