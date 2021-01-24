@@ -25,12 +25,6 @@ export enum GameStatus {
     END = "END",
 }
 
-export enum PlayerExplaining {
-    SELF = "SELF",
-    OTHER = "OTHER",
-    NONE = "NONE",
-}
-
 export interface Word {
     id: number;
     word: string;
@@ -47,6 +41,7 @@ export type WordStatus =
 export type Team = "A" | "B";
 
 export interface Player {
+    id: number;
     teamAorB: Team;
     name: string;
     gameUid: string;
@@ -83,10 +78,8 @@ retryConnectOnFailure(RETRY_INTERVAL);
 // after 5th round, players can start additional round(s) or "end game"
 
 // TODO players
-// enable players to enter their names
 // show which players are currently in the game
-// show which player is currently explaining
-// show end of round reached - start new round action to explaining player only
+// show how many words each player has entered on gameSetup
 
 // TODO handle exceptions / fix bugs / error handling
 // handle case if reloading game and status is end of round reached
@@ -109,13 +102,13 @@ const Game: FunctionComponent<{}> = () => {
     const [error, setError] = useState<any>();
     const [gameStatus, setGameStatus] = useState(GameStatus.SETUP);
     const [teamExplaining, setTeamExplaining] = useState<Team>();
-    const [playerExplaining, setPlayerExplaining] = useState(
-        PlayerExplaining.NONE
-    );
+    const [playerExplaining, setPlayerExplaining] = useState<Player>();
     const [countdown, setCountdown] = useState<number>();
     const [isGameHost, setIsGameHost] = useState(false);
 
-    const Component = statusMapping(gameStatus, playerExplaining);
+    const isPlayerMeExplaining: boolean | undefined = (playerExplaining && playerMe) && playerExplaining?.id === playerMe?.id;
+
+    const Component = statusMapping(gameStatus, isPlayerMeExplaining);
 
     //---------SOCKET EVENT LISTENERS-----------------------
     useEffect(() => {
@@ -124,22 +117,9 @@ const Game: FunctionComponent<{}> = () => {
         });
         socket.on("connected", async () => {
             const currentGameStatus = await getGameStatus();
-            // TODO: check this!! what about end of round reached case?
-            if (currentGameStatus !== GameStatus.PLAYER_EXPLAINING) {
+            if (currentGameStatus !== GameStatus.END_OF_ROUND_REACHED) {
                 setCountdown(undefined);
-                setPlayerExplaining(PlayerExplaining.OTHER);
             }
-        });
-    }, []);
-
-    useEffect(() => {
-        socket.on("other-player-starts-explaining", async () => {
-            await getGameStatus();
-            setPlayerExplaining(PlayerExplaining.OTHER);
-        });
-        socket.on("player-starts-explaining-self", async () => {
-            await getGameStatus();
-            setPlayerExplaining(PlayerExplaining.SELF);
         });
     }, []);
 
@@ -155,14 +135,14 @@ const Game: FunctionComponent<{}> = () => {
     const getPlayerMe = useCallback(async () => {
         setLoadingPlayerMe(true);
         try {
-            const { data } = await axios.get(`/games/${gameUid}/player`);
-            console.log("data", data);
-            if (!data) return;
-            setPlayerMe({
-                ...data[0],
-                teamAorB: data[0].team_a_or_b,
-                gameUid: data[0].game_uid,
-            });
+            const { data } = await axios.get(`/games/${gameUid}/playerMe`);
+            if (data) {
+                setPlayerMe({
+                    ...data[0],
+                    teamAorB: data[0].team_a_or_b,
+                    gameUid: data[0].game_uid,
+                });
+            }
         } catch (error) {
             onError(error);
         }
@@ -197,6 +177,12 @@ const Game: FunctionComponent<{}> = () => {
         setLoadingGameStatus(true);
         try {
             const { data } = await axios.get(`/games/${gameUid}`);
+            const playerExplainingId = data[0].player_explaining_id;
+            if (playerExplainingId) {
+                const {data: playerData} = await axios.get(`/games/${gameUid}/player/${playerExplainingId}`);
+                const newPlayerExplaining = playerData[0] as Player;
+                setPlayerExplaining(newPlayerExplaining);
+            }
             const newGameStatus = data[0].status as GameStatus;
             const newTeamExplaining = data[0].team_explaining as Team;
             setGameStatus(newGameStatus);

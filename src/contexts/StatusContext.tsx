@@ -1,8 +1,8 @@
 import React, { createContext } from "react";
-import { GameStatus, Player, PlayerExplaining, Team, Word } from "../pages/Game";
+import { GameStatus, Player, Team, Word } from "../pages/Game";
 
 interface StatusContextProps {
-    playerExplaining?: PlayerExplaining;
+    playerExplaining?: Player;
     gameStatus?: GameStatus;
     teamExplaining?: Team;
     setCountdown: (countdown: number) => void;

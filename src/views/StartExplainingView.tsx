@@ -21,8 +21,9 @@ const StartExplainingView: FunctionComponent<{}> = () => {
     const nextTeamExplaining = getOppositeTeam(teamExplaining);
 
     const onStartExplaining = useCallback(async () => {
+        if (!playerMe) return;
         setCountdown(timeToExplain);
-        socket.emit("start-explaining");
+        socket.emit("start-explaining", {player : playerMe});
     }, []);
 
     if (loadingGameStatus) return null;

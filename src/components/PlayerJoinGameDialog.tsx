@@ -21,14 +21,16 @@ import axios from "axios";
 
 const useStyles = makeStyles({
     spacingBottom: {
-        marginBottom: "20px"
+        marginBottom: "20px",
     },
 });
 
 const PlayerJoinGameDialog: FunctionComponent<{}> = (props) => {
-    const { gameUid, reloadPlayerMe = () => {}, onError = () => {} } = useContext(
-        StatusContext
-    );
+    const {
+        gameUid,
+        reloadPlayerMe = () => {},
+        onError = () => {},
+    } = useContext(StatusContext);
 
     const classes = useStyles();
 
@@ -42,7 +44,7 @@ const PlayerJoinGameDialog: FunctionComponent<{}> = (props) => {
                 player: {
                     gameUid,
                     team,
-                    name
+                    name,
                 },
             });
             reloadPlayerMe();
@@ -52,39 +54,49 @@ const PlayerJoinGameDialog: FunctionComponent<{}> = (props) => {
     }, [name, team, gameUid, onError, reloadPlayerMe]);
 
     return (
-        <Dialog
-            open={true}
-        >
+        <Dialog open={true}>
             <DialogTitle>Join Game</DialogTitle>
             <DialogContent>
                 <DialogContentText>
                     <CenterBox>
                         <Box className={classes.spacingBottom}>
-                        <TextField
-                            variant="outlined"
-                            onChange={(event: any) =>
-                                setName(event.target.value)
-                            }
-                            label="Your name"
-                            value={name}
-                        />
+                            <Typography variant="h6" gutterBottom>
+                                Choose a team
+                            </Typography>
+                            <Typography variant="body1" gutterBottom>
+                                Split the group into two teams.
+                            </Typography>
+
+                            <TeamToggleButton
+                                team={team}
+                                onTeamChoice={(
+                                    _: any,
+                                    newTeamChoice: Team | undefined
+                                ) => {
+                                    setTeam(newTeamChoice);
+                                }}
+                            />
                         </Box>
-                        <Box>
-                        <TeamToggleButton
-                            team={team}
-                            onTeamChoice={(
-                                _: any,
-                                newTeamChoice: Team | undefined
-                            ) => {
-                                setTeam(newTeamChoice);
-                            }}
-                        />
+                        <Box >
+                            <TextField
+                                variant="outlined"
+                                onChange={(event: any) =>
+                                    setName(event.target.value)
+                                }
+                                label="Your name"
+                                value={name}
+                            />
                         </Box>
                     </CenterBox>
                 </DialogContentText>
             </DialogContent>
             <DialogActions>
-                <Button onClick={() => onJoinGame()} color="primary" variant="contained" disabled={!team || !name}>
+                <Button
+                    onClick={() => onJoinGame()}
+                    color="primary"
+                    variant="contained"
+                    disabled={!team || !name}
+                >
                     Join Game
                 </Button>
             </DialogActions>

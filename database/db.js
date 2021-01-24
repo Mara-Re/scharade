@@ -68,6 +68,15 @@ module.exports.setGameStatus = function setGameStatus(gameUid, status) {
     );
 };
 
+module.exports.startExplaining = function startExplaining(gameUid, playerId) {
+    return db.query(
+        `UPDATE games
+            SET status = $2, player_explaining_id = $3
+            WHERE uid = $1`,
+        [gameUid, "PLAYER_EXPLAINING", playerId]
+    );
+};
+
 module.exports.getTeamExplaining = function getTeamExplaining(gameUid) {
     return db.query(
         `SELECT team_explaining FROM games

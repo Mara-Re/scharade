@@ -1,9 +1,10 @@
 import React, {
     FunctionComponent,
-    useCallback, useContext,
+    useCallback,
+    useContext,
     useEffect,
     useRef,
-    useState
+    useState,
 } from "react";
 import CentralBox from "../components/CentralBox";
 import ActionMessage from "../components/ActionMessage";
@@ -18,10 +19,7 @@ interface NewWordGuessedOrDiscarded {
 }
 
 const OtherPlayerExplainingView: FunctionComponent<{}> = () => {
-
-    const {
-        teamExplaining,
-    } = useContext(StatusContext);
+    const { teamExplaining, playerExplaining } = useContext(StatusContext);
 
     const [
         newWordGuessedOrDiscarded,
@@ -55,7 +53,6 @@ const OtherPlayerExplainingView: FunctionComponent<{}> = () => {
         socket.on("word-was-discarded", () => {
             onNewWord({ status: "discardedThisTurn" });
         });
-
     }, []);
 
     useEffect(() => {
@@ -68,7 +65,12 @@ const OtherPlayerExplainingView: FunctionComponent<{}> = () => {
     return (
         <CentralBox>
             <ActionMessage spacing={true}>
-                {teamExplaining && <>Someone from <TeamEmoji team={teamExplaining}/> is explaining...</>}
+                {teamExplaining && playerExplaining && (
+                    <>
+                        {playerExplaining.name}{" "}
+                        <TeamEmoji team={teamExplaining} /> is explaining...
+                    </>
+                )}
                 {!teamExplaining && <>Someone else is explaining...</>}
             </ActionMessage>
             {newWordGuessedOrDiscarded && (

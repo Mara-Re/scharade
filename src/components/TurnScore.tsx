@@ -20,8 +20,8 @@ const useStyles = makeStyles({
     },
 });
 
-const TurnScore: FunctionComponent<{ wordsList: Word[] }> = ({ wordsList }) => {
-    const [turnScore, setTurnScore] = useState(0);
+const TurnScore: FunctionComponent<{ wordsList: Word[], loading: boolean }> = ({ wordsList, loading }) => {
+    const [turnScore, setTurnScore] = useState<number>();
 
     const classes = useStyles();
 
@@ -48,7 +48,7 @@ const TurnScore: FunctionComponent<{ wordsList: Word[] }> = ({ wordsList }) => {
                 Your score in this round:
             </Typography>
             <Typography variant="h3" color="primary" className={classes.score}>
-                {turnScore}
+                {turnScore !== undefined && !loading && turnScore}
             </Typography>
         </Box>
     );

@@ -13,7 +13,7 @@ import CheckIcon from '@material-ui/icons/Check';
 
 const useStyles = makeStyles({
     enterWordsBox: {
-        padding: "40px 0",
+        padding: "0 0 40px",
         margin: "auto",
         textAlign: "center",
     },

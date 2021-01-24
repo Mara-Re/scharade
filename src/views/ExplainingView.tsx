@@ -105,7 +105,7 @@ const ExplainingView: FunctionComponent<{}> = () => {
     );
 
     const showTurnScore =
-        (!loadingWordsList && gameStatus === GameStatus.END_OF_ROUND_REACHED) ||
+        (gameStatus === GameStatus.END_OF_ROUND_REACHED) ||
         gameStatus === GameStatus.TIME_OVER;
 
     if (loadingGameStatus) return <></>;
@@ -113,7 +113,7 @@ const ExplainingView: FunctionComponent<{}> = () => {
     return (
         <>
             <CentralBox>
-                {showTurnScore && <TurnScore wordsList={wordsList} />}
+                {showTurnScore && <TurnScore loading={loadingWordsList} wordsList={wordsList} />}
                 {gameStatus === GameStatus.END_OF_ROUND_REACHED && (
                     <EndOfRoundReached />
                 )}

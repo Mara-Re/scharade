@@ -18,14 +18,12 @@ const useStyles = makeStyles({
 });
 
 interface ChooseTeamProps {
-    displayTitle?: boolean;
 }
 
 const ChooseTeam: FunctionComponent<ChooseTeamProps> = (props) => {
     const { reloadPlayerMe = () => {}, onError = () => {}, playerMe, gameUid } = useContext(
         StatusContext
     );
-    const { displayTitle = true } = props;
     const classes = useStyles();
 
     // TODO: adjust handleTeamChoice -> adjust player instead of setting cookie
@@ -33,7 +31,7 @@ const ChooseTeam: FunctionComponent<ChooseTeamProps> = (props) => {
         async (_: any, newTeamChoice: Team | undefined) => {
             if (!newTeamChoice) return;
             try {
-                await axios.put(`/games/${gameUid}/player`, { team: newTeamChoice });
+                await axios.put(`/games/${gameUid}/playerMe`, { team: newTeamChoice });
                 reloadPlayerMe();
             } catch (error) {
                 onError(error);
@@ -48,16 +46,6 @@ const ChooseTeam: FunctionComponent<ChooseTeamProps> = (props) => {
             alignItems="center"
             className={classes.chooseTeamBox}
         >
-            {displayTitle && (
-                <>
-                    <Typography variant="h6" gutterBottom>
-                        Choose a team
-                    </Typography>
-                    <Typography variant="body1" gutterBottom>
-                        Split the group into two teams.
-                    </Typography>
-                </>
-            )}
             <TeamToggleButton onTeamChoice={handleTeamChoice} team={playerMe?.teamAorB}/>
         </Box>
     );
