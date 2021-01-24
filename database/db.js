@@ -1,11 +1,11 @@
 const spicedPg = require('spiced-pg');
 const db = spicedPg(process.env.DATABASE_URL || 'postgres:postgres:postgres@localhost:5555/scharade');
 
-exports.addNewGame = function addNewGame(gameUid) {
+exports.addNewGame = function addNewGame(gameUid, team) {
     return db.query(
-        `INSERT INTO games (uid, status) VALUES ($1, $2) 
+        `INSERT INTO games (uid, status, team_explaining) VALUES ($1, $2, $3) 
         RETURNING *`,
-        [ gameUid, 'SETUP' ]
+        [ gameUid, 'SETUP', team ]
     );
 };
 
@@ -29,12 +29,21 @@ module.exports.getWordsList = function getWordsList(gameUid) {
     );
 };
 
-module.exports.getGameStatus = function getGameStatus(gameUid) {
+module.exports.getGame = function getGame(gameUid) {
     return db.query(
         `SELECT * FROM games
         WHERE uid = $1`
         ,
         [gameUid]
+    );
+};
+
+module.exports.updateTeamExplaining = function updateTeamExplaining(gameUid, team) {
+    return db.query(
+        `UPDATE games
+            SET team_explaining = $2
+            WHERE uid = $1`,
+        [gameUid, team]
     );
 };
 
@@ -53,24 +62,6 @@ module.exports.setGameStatus = function setGameStatus(gameUid, status) {
             SET status = $2
             WHERE uid = $1`,
         [gameUid, status]
-    );
-};
-
-module.exports.startGame = function startGame(gameUid) {
-    return db.query(
-        `UPDATE games
-            SET status = 'START'
-            WHERE uid = $1`,
-        [gameUid]
-    );
-};
-
-module.exports.startExplaining = function startExplaining(gameUid, teamAorB) {
-    return db.query(
-        `UPDATE games
-            SET status = $3, team_explaining = $2
-            WHERE uid = $1`,
-        [gameUid, teamAorB, "PLAYER_EXPLAINING"]
     );
 };
 
@@ -157,14 +148,6 @@ module.exports.addTeams = function addTeams(gameUid) {
     return db.query(
         `INSERT INTO teams (game_uid, team_a_or_b) VALUES ($1, 'A'), ($1, 'B')`,
         [ gameUid ]
-    );
-};
-
-module.exports.getTeams = function getTeamscore(gameUid) {
-    return db.query(
-        `SELECT * FROM teams
-            WHERE game_uid = $1` ,
-        [gameUid]
     );
 };
 

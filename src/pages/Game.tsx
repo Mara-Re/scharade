@@ -99,6 +99,7 @@ const Game: FunctionComponent<{}> = () => {
     const [loadingGameStatus, setLoadingGameStatus] = useState(true);
     const [error, setError] = useState<any>();
     const [gameStatus, setGameStatus] = useState(GameStatus.SETUP);
+    const [teamExplaining, setTeamExplaining] = useState<Team>();
     const [playerExplaining, setPlayerExplaining] = useState(
         PlayerExplaining.NONE
     );
@@ -177,9 +178,11 @@ const Game: FunctionComponent<{}> = () => {
     > => {
         setLoadingGameStatus(true);
         try {
-            const { data } = await axios.get(`/games/${gameUid}/status`);
+            const { data } = await axios.get(`/games/${gameUid}`);
             const newGameStatus = data[0].status as GameStatus;
+            const newTeamExplaining = data[0].team_explaining as Team;
             setGameStatus(newGameStatus);
+            setTeamExplaining(newTeamExplaining);
             setLoadingGameStatus(false);
             return newGameStatus;
         } catch (error) {
@@ -194,6 +197,7 @@ const Game: FunctionComponent<{}> = () => {
             value={{
                 playerExplaining: playerExplaining,
                 gameStatus: gameStatus,
+                teamExplaining: teamExplaining,
                 reloadStatus: getGameStatus,
                 reloadTeam: getTeam,
                 onError: onError,

@@ -24,7 +24,7 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 const AppBar: FunctionComponent<{ type: "home" | "game" }> = ({ type }) => {
-    const { gameStatus, countdown, loadingGameStatus, onError, isGameHost } = useContext(
+    const { gameStatus, countdown, loadingGameStatus, isGameHost } = useContext(
         StatusContext
     );
     const classes = useStyles();

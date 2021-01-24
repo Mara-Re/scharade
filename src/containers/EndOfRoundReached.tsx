@@ -1,11 +1,12 @@
 import React, { FunctionComponent, useCallback, useContext } from "react";
 import ActionMessage from "../components/ActionMessage";
 import ReplayIcon from "@material-ui/icons/Replay";
-import axios from "axios";
 import { socket } from "../pages/Game";
 import { StatusContext } from "../contexts/StatusContext";
-import { GameStatus } from "../pages/Game";
 import { makeStyles } from "@material-ui/core/styles";
+import { Typography } from "@material-ui/core";
+import TeamEmoji from "../components/TeamEmoji";
+import CenterBox from "../components/CenterBox";
 
 const useStyles = makeStyles({
     spacingTop: {
@@ -14,7 +15,7 @@ const useStyles = makeStyles({
 });
 
 const EndOfRoundReached: FunctionComponent<{}> = () => {
-    const { countdown } = useContext(StatusContext);
+    const { countdown, team, teamExplaining } = useContext(StatusContext);
 
     const classes = useStyles();
 
@@ -24,13 +25,29 @@ const EndOfRoundReached: FunctionComponent<{}> = () => {
 
     return (
         <div className={classes.spacingTop}>
-            <ActionMessage
-                onAction={onStartNewRound}
-                actionIcon={<ReplayIcon fontSize="large" />}
-            >
-                The pile of words is empty. Do you want to start a new round
-                now?
-            </ActionMessage>
+            {teamExplaining && team !== teamExplaining && (
+                <ActionMessage>
+                    The pile of words is empty. Team{" "}
+                    <TeamEmoji team={teamExplaining} /> can start a new
+                    round now.
+                </ActionMessage>
+            )}
+            {teamExplaining && team === teamExplaining && (
+                <>
+                    <CenterBox>
+                        <Typography variant="h2" gutterBottom>
+                            <TeamEmoji team={teamExplaining} />
+                        </Typography>
+                    </CenterBox>
+                    <ActionMessage
+                        onAction={onStartNewRound}
+                        actionIcon={<ReplayIcon fontSize="large" />}
+                    >
+                        The pile of words is empty. Do you want to start a new
+                        round now?
+                    </ActionMessage>
+                </>
+            )}
         </div>
     );
 };

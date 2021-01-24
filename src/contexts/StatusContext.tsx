@@ -4,6 +4,7 @@ import { GameStatus, PlayerExplaining, Team, Word } from "../pages/Game";
 interface StatusContextProps {
     playerExplaining?: PlayerExplaining;
     gameStatus?: GameStatus;
+    teamExplaining?: Team;
     setCountdown: (countdown: number) => void;
     reloadStatus: () => void;
     reloadTeam: () => void;

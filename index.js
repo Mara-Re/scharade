@@ -3,10 +3,12 @@ const app = express();
 const compression = require('compression');
 const db = require('./database/db');
 const addTurnScoreToTeamScore = require('./helpers/addTurnScoreToTeam');
+const switchTeams = require('./helpers/switchTeams');
 const server = require('http').Server(app);
 const io = require('socket.io')(server);
 const uidSafe = require('uid-safe');
 const timeToExplain = require('./src/shared/time-to-explain');
+
 //-------------------------MIDDLEWARE-------------------------
 
 app.use(compression());
@@ -37,7 +39,9 @@ app.use(express.json());
 app.post('/games', async (req, res) => {
     try {
         const gameUid = await uidSafe(10);
-        const {rows} = await db.addNewGame(gameUid);
+        const random1Or2 = Math.floor(Math.random() * 2) + 1;
+        const startingTeam = random1Or2 === 1 ? "A" : "B";
+        const {rows} = await db.addNewGame(gameUid, startingTeam);
         res.cookie("gameSetup", "true");
         res.cookie("gameHost", "true");
         await res.json(rows);
@@ -46,9 +50,9 @@ app.post('/games', async (req, res) => {
     }
 });
 
-app.get('/games/:uid/status', async (req, res) => {
+app.get('/games/:uid', async (req, res) => {
     try {
-        const {rows} = await db.getGameStatus(req.params.uid);
+        const {rows} = await db.getGame(req.params.uid);
         await res.json({...rows });
     } catch(error) {
         console.log('error in /games/:uid/status get route: ', error);
@@ -57,7 +61,7 @@ app.get('/games/:uid/status', async (req, res) => {
 
 app.post('/games/:uid/status', async (req, res) => {
     try {
-        const {rows} = await db.getGameStatus(req.params.uid);
+        const {rows} = await db.getGame(req.params.uid);
 
         if (rows[0].status === req.body.status) {
             throw new Error;
@@ -73,7 +77,7 @@ app.post('/games/:uid/status', async (req, res) => {
 
 app.post('/games/:uid/endGame', async (req, res) => {
     try {
-        const {rows} = await db.getGameStatus(req.params.uid);
+        const {rows} = await db.getGame(req.params.uid);
         if (rows[0].status === "END") {
             throw new Error;
         } else {
@@ -264,7 +268,7 @@ io.on('connection', function(socket) {
             countdown = timeToExplain;
             const adjustGameStatus = async () => {
                 // ignore onTimerOver when game is currently not ongoing:
-                const gameStatus = await db.getGameStatus(gameUid);
+                const gameStatus = await db.getGame(gameUid);
                 if (gameStatus === "END" || gameStatus === "START" ) {
                     return gameStatus;
                 }
@@ -292,14 +296,15 @@ io.on('connection', function(socket) {
         socket.to(gameUid).emit("new-game-status");
     });
 
-    socket.on('start-explaining', async ({ team }) => {
+    socket.on('start-explaining', async () => {
         try {
-            const {rows} = await db.getGameStatus(gameUid);
-            if (rows[0].status === "PLAYER_EXPLAINING" || !team) {
+            const {rows} = await db.getGame(gameUid);
+            if (rows[0].status === "PLAYER_EXPLAINING") {
                 throw new Error;
             } else {
                 await addTurnScoreToTeamScore(gameUid);
-                await db.startExplaining(gameUid, team);
+                await switchTeams(gameUid);
+                await db.setGameStatus(gameUid, "PLAYER_EXPLAINING");
                 await db.resetWords(gameUid, "pile", "notGuessedThisTurn");
                 await db.resetWords(gameUid, "pile", "discardedThisTurn");
                 await db.resetWords(gameUid, "guessed", "guessedThisTurn");
@@ -332,7 +337,7 @@ io.on('connection', function(socket) {
     socket.on('start-new-round', async (data) => {
         countdown = data.countdown || countdown;
         try {
-            const {rows} = await db.getGameStatus(gameUid);
+            const {rows} = await db.getGame(gameUid);
             if (rows[0].status === "PLAYER_EXPLAINING") {
                 throw new Error;
             } else {

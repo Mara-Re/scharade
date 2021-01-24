@@ -31,7 +31,7 @@ const TeamEmoji: FunctionComponent<TeamEmojiProps> = ({ team }) => {
     const classes = useStyles();
 
 
-    if (team == "A") return <span className={classes.noOpacity}>🥦</span>;
+    if (team == "A") return <span className={classes.noOpacity}>🍋</span>;
     if (team == "B") return <span className={classes.noOpacity}>🌶</span>;
     return null;
 
