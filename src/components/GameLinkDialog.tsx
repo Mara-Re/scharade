@@ -23,13 +23,12 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 interface GameLinkDialogProps {
-    open: boolean;
     setShowGameLinkDialog: (show: boolean) => void;
 }
 
 const GameLinkDialog: FunctionComponent<GameLinkDialogProps> = (props) => {
     const classes = useStyles();
-    const { open = false, setShowGameLinkDialog } = props;
+    const { setShowGameLinkDialog } = props;
 
     const linkTextFieldRef = useRef();
     const [copySuccess, setCopySuccess] = useState(false);
@@ -60,7 +59,7 @@ const GameLinkDialog: FunctionComponent<GameLinkDialogProps> = (props) => {
     };
 
     return (
-        <Dialog open={open} onClose={onCloseGameLinkDialog}>
+        <Dialog open={true} onClose={onCloseGameLinkDialog}>
             <DialogTitle>
                 Copy game link
                 <IconButton

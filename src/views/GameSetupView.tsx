@@ -31,7 +31,6 @@ const GameSetupView: FunctionComponent<{}> = () => {
         reloadGameHost = () => {},
         isGameHost,
     } = useContext(StatusContext);
-    const [showGameLinkDialog, setShowGameLinkDialog] = useState(false);
 
     const classes = useStyles();
 
@@ -44,24 +43,8 @@ const GameSetupView: FunctionComponent<{}> = () => {
         }
     }, [onError]);
 
-    useEffect(() => {
-        const getShowGameLinkDialogInfo = async () => {
-            try {
-                const { data } = await axios.get("/game-cookies");
-                setShowGameLinkDialog(data.showGameLinkDialog);
-            } catch (error) {
-                onError(error);
-            }
-        };
-        getShowGameLinkDialogInfo();
-    }, [onError]);
-
     return (
         <CentralBox>
-            <GameLinkDialog
-                open={showGameLinkDialog}
-                setShowGameLinkDialog={setShowGameLinkDialog}
-            />
             <EnterWords />
             <Box justifyContent="center" alignItems="center" className={classes.center}>
                 <Typography variant="h6" gutterBottom>Start the game</Typography>

@@ -14,6 +14,7 @@ import axios from "axios";
 import { GameLayout } from "../layouts/GameLayout";
 import ErrorHandling from "../components/ErrorHandling";
 import PlayerJoinGameDialog from "../components/PlayerJoinGameDialog";
+import GameLinkDialog from "../components/GameLinkDialog";
 export const socket = io.connect();
 
 export enum GameStatus {
@@ -105,8 +106,10 @@ const Game: FunctionComponent<{}> = () => {
     const [playerExplaining, setPlayerExplaining] = useState<Player>();
     const [countdown, setCountdown] = useState<number>();
     const [isGameHost, setIsGameHost] = useState(false);
+    const [showGameLinkDialog, setShowGameLinkDialog] = useState<boolean>();
 
-    const isPlayerMeExplaining: boolean | undefined = (playerExplaining && playerMe) && playerExplaining?.id === playerMe?.id;
+    const isPlayerMeExplaining: boolean | undefined =
+        playerExplaining && playerMe && playerExplaining?.id === playerMe?.id;
 
     const Component = statusMapping(gameStatus, isPlayerMeExplaining);
 
@@ -162,6 +165,18 @@ const Game: FunctionComponent<{}> = () => {
         getGameHost();
     }, []);
 
+    useEffect(() => {
+        const getShowGameLinkDialogInfo = async () => {
+            try {
+                const { data } = await axios.get("/game-cookies");
+                setShowGameLinkDialog(data.showGameLinkDialog);
+            } catch (error) {
+                onError(error);
+            }
+        };
+        getShowGameLinkDialogInfo();
+    }, [onError]);
+
     const getGameHost = useCallback(async () => {
         try {
             const { data } = await axios.get("/game-cookies");
@@ -179,7 +194,9 @@ const Game: FunctionComponent<{}> = () => {
             const { data } = await axios.get(`/games/${gameUid}`);
             const playerExplainingId = data[0].player_explaining_id;
             if (playerExplainingId) {
-                const {data: playerData} = await axios.get(`/games/${gameUid}/player/${playerExplainingId}`);
+                const { data: playerData } = await axios.get(
+                    `/games/${gameUid}/player/${playerExplainingId}`
+                );
                 const newPlayerExplaining = playerData[0] as Player;
                 setPlayerExplaining(newPlayerExplaining);
             }
@@ -216,7 +233,14 @@ const Game: FunctionComponent<{}> = () => {
             }}
         >
             <GameLayout>
-                {!playerMe && !loadingPlayerMe && <PlayerJoinGameDialog />}
+                {showGameLinkDialog && (
+                    <GameLinkDialog
+                        setShowGameLinkDialog={setShowGameLinkDialog}
+                    />
+                )}
+                {showGameLinkDialog === false &&
+                    !playerMe &&
+                    !loadingPlayerMe && <PlayerJoinGameDialog />}
                 {playerMe && !loadingGameStatus && <Component />}
                 <ErrorHandling />
             </GameLayout>

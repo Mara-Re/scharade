@@ -53,6 +53,12 @@ const PlayerJoinGameDialog: FunctionComponent<{}> = (props) => {
         }
     }, [name, team, gameUid, onError, reloadPlayerMe]);
 
+    const onEnter = async (event: any) => {
+        if (event.key === "Enter") {
+            await onJoinGame();
+        }
+    };
+
     return (
         <Dialog open={true}>
             <DialogTitle>Join Game</DialogTitle>
@@ -85,6 +91,7 @@ const PlayerJoinGameDialog: FunctionComponent<{}> = (props) => {
                                 }
                                 label="Your name"
                                 value={name}
+                                onKeyDown={onEnter}
                             />
                         </Box>
                     </CenterBox>
