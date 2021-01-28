@@ -21,6 +21,9 @@ const useStyles = makeStyles({
     },
     title: {
         maxWidth: "50px"
+    },
+    clickable: {
+        cursor: "pointer"
     }
 });
 
@@ -46,14 +49,14 @@ const StartGame: FunctionComponent<{}> = (props) => {
 
     return (
         <>
-            <Box display="flex" alignSelf="center">
+            <Box display="flex" alignSelf="center" onClick={() => setStartDialogOpen(true)} className={classes.clickable}>
                 <Box alignSelf="center">
                     <Typography variant="body1" align="right" className={classes.title}>
                         Start Game
                     </Typography>
                 </Box>
                 <Box alignSelf="center">
-                    <IconButton onClick={() => setStartDialogOpen(true)} className={classes.startGameButton}>
+                    <IconButton className={classes.startGameButton}>
                         <PlayArrowIcon fontSize="large"/>
                     </IconButton>
                 </Box>

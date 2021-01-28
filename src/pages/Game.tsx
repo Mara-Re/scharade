@@ -152,12 +152,12 @@ const Game: FunctionComponent<{}> = () => {
         setLoadingPlayerMe(false);
     }, []);
 
-    const onError = (error: any) => {
+    const onError = useCallback((error: any) => {
         setError(error);
         setTimeout(() => {
             setError(undefined);
         }, 2000);
-    };
+    }, []);
 
     useEffect(() => {
         getGameStatus();

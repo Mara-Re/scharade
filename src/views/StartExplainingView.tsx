@@ -24,7 +24,7 @@ const StartExplainingView: FunctionComponent<{}> = () => {
         if (!playerMe) return;
         setCountdown(timeToExplain);
         socket.emit("start-explaining", {player : playerMe});
-    }, []);
+    }, [playerMe, timeToExplain]);
 
     if (loadingGameStatus) return null;
 

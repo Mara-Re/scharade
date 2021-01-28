@@ -61,7 +61,6 @@ const PlayerJoinGameDialog: FunctionComponent<{}> = (props) => {
 
     return (
         <Dialog open={true}>
-            <DialogTitle>Join Game</DialogTitle>
             <DialogContent>
                 <DialogContentText>
                     <CenterBox>

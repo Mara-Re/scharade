@@ -338,7 +338,8 @@ io.on("connection", function (socket) {
             const previousTeamExplaining = rows[0].team_explaining;
             if (
                 rows[0].status === "PLAYER_EXPLAINING" ||
-                previousTeamExplaining === player.teamAorB
+                previousTeamExplaining === player.teamAorB ||
+                timerId
             ) {
                 throw new Error();
             } else {
@@ -375,7 +376,7 @@ io.on("connection", function (socket) {
         countdown = data.countdown || countdown;
         try {
             const { rows } = await db.getGame(gameUid);
-            if (rows[0].status === "PLAYER_EXPLAINING") {
+            if (rows[0].status === "PLAYER_EXPLAINING" || timerId) {
                 throw new Error();
             } else {
                 await addTurnScoreToTeamScore(gameUid);

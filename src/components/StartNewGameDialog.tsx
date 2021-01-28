@@ -22,12 +22,12 @@ const useStyles = makeStyles((theme) => ({
     }
 }));
 
-interface GameLinkDialogProps {
+interface StartNewGameDialogProps {
     newGameId?: string;
     setNewGameId: (newGameId?: string) => void;
 }
 
-const StartNewGameDialog: FunctionComponent<GameLinkDialogProps> = (props) => {
+const StartNewGameDialog: FunctionComponent<StartNewGameDialogProps> = (props) => {
     const classes = useStyles();
     const {newGameId, setNewGameId} = props;
 
