@@ -6,7 +6,8 @@ CREATE TABLE words (
     status VARCHAR(255),
     game_uid VARCHAR(255),
     player_id INT REFERENCES players(id),
-    drawn_at TIMESTAMP
+    drawn_at TIMESTAMP,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
 
