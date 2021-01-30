@@ -6,7 +6,9 @@ const useStyles = makeStyles((theme) => ({
     centerBox: {
         minHeight: "30vh",
         padding: "2vh 0 30px",
-        position: "relative"
+        position: "relative",
+        maxWidth: "600px",
+        margin: "auto"
     },
     contentContainer: {
         padding: "20px",

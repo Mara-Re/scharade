@@ -9,8 +9,12 @@ const useStyles = makeStyles({
         width: "100%",
         padding: "5px 10px",
         backgroundColor: "#eeeeee",
+    },
+    maxWidth: {
+        margin: "auto",
+        maxWidth: "600px",
         justifyContent: "space-between",
-    }
+    },
 });
 
 const Footer: FunctionComponent<{}> = ({children}) => {
@@ -18,9 +22,10 @@ const Footer: FunctionComponent<{}> = ({children}) => {
 
     return (
         <>
-            <Box className={classes.footer} display='flex' alignSelf="center">
-                {children}
-            </Box>
+            <div className={classes.footer} >
+                <Box className={classes.maxWidth} display='flex' alignSelf="center">                {children}
+                </Box>
+            </div>
         </>
     );
 }

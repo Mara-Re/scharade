@@ -14,10 +14,14 @@ const useStyles = makeStyles((theme) => ({
     toolbar: {
         minHeight: 100,
         alignItems: "flex-start",
-        paddingRight: "5px",
+        paddingRight: "20px",
         paddingLeft: "20px",
         paddingTop: theme.spacing(2),
         paddingBottom: theme.spacing(2),
+        maxWidth: "600px",
+        justifyContent: "space-between",
+        width: "100%",
+        margin: "auto",
     },
     title: {
         flexGrow: 1,

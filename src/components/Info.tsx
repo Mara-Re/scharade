@@ -20,6 +20,7 @@ const useStyles = makeStyles((theme) => ({
     },
     header: {
         color: "#fff",
+        marginRight: "-12px"
     },
     list: {
         fontSize: "0.9rem",
@@ -53,8 +54,6 @@ const Info: FunctionComponent<{type: "header" | "footer"}> = ({type}) => {
                     open={showInfo}
                     onClose={() => setShowInfo(false)}
                     fullWidth={true}
-                    maxWidth={false}
-                    // fullScreen={true}
                 >
                     <DialogTitle>
                         Info

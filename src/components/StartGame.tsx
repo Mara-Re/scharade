@@ -17,7 +17,8 @@ import { socket } from "../pages/Game";
 
 const useStyles = makeStyles({
     startGameButton: {
-        color: "#fff"
+        color: "#fff",
+        marginRight: "-15px"
     },
     title: {
         maxWidth: "50px"
