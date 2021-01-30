@@ -112,6 +112,7 @@ app.get("/games/:uid/getRandomWord/", async (req, res) => {
 });
 
 app.get("/games/:uid/words/", async (req, res) => {
+    // get words of this turn (guessedThisTurn, discardedThisTurn, notGuessedThisTurn)
     try {
         const { rows } = await db.getWordsList(req.params.uid);
         await res.json(rows);
@@ -121,8 +122,9 @@ app.get("/games/:uid/words/", async (req, res) => {
 });
 
 app.post("/games/:uid/words", async (req, res) => {
+    const player = req.cookies.player && JSON.parse(req.cookies.player);
     try {
-        const { rows } = await db.addWord(req.body.word);
+        const { rows } = await db.addWord(req.body.word, player.id);
         await res.json(rows);
     } catch (error) {
         console.log("error in /games/:uid/words post route: ", error);
@@ -173,6 +175,17 @@ app.get("/games/:uid/player/:player_id", async (req, res) => {
         await res.json({ success: false });
     }
 });
+
+app.get("/games/:uid/players", async (req, res) => {
+    try {
+        const { rows } = await db.getPlayers(req.params.uid);
+        await res.json(rows);
+    } catch (error) {
+        console.log("error in /games/:uid/players get route: ", error);
+        await res.json({ success: false });
+    }
+});
+
 app.get("/games/:uid/playerMe", async (req, res) => {
     try {
         const player = req.cookies.player && JSON.parse(req.cookies.player);
@@ -330,6 +343,18 @@ io.on("connection", function (socket) {
     socket.on("end-game", () => {
         clearAllTimers();
         socket.to(gameUid).emit("new-game-status");
+    });
+
+    socket.on("new-player-joins", () => {
+        socket.to(gameUid).emit("players-list-changed");
+    });
+
+    socket.on("new-word-submit", () => {
+        socket.to(gameUid).emit("players-list-changed");
+    });
+
+    socket.on("switch-team", () => {
+        socket.to(gameUid).emit("players-list-changed");
     });
 
     socket.on("start-explaining", async ({ player }) => {

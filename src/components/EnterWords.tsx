@@ -8,7 +8,7 @@ import axios from "axios";
 import WordsList from "./WordsList";
 import { getGameUid } from "../helper/getGameUid";
 import { StatusContext } from "../contexts/StatusContext";
-import { Word } from "../pages/Game";
+import { socket, Word } from "../pages/Game";
 import CheckIcon from '@material-ui/icons/Check';
 
 const useStyles = makeStyles({
@@ -35,7 +35,7 @@ const useStyles = makeStyles({
 });
 
 const EnterWords: FunctionComponent<{}> = (props) => {
-    const { onError = () => {} } = useContext(StatusContext);
+    const { onError = () => {},  reloadPlayersList = () => {} } = useContext(StatusContext);
 
     const gameUid = getGameUid();
     const classes = useStyles();
@@ -59,6 +59,8 @@ const EnterWords: FunctionComponent<{}> = (props) => {
                     gameUid,
                 },
             });
+            socket.emit("new-word-submit");
+            reloadPlayersList();
             setWordsSubmitted([...wordsSubmitted, data[0]]);
             setSubmitSuccess(true);
             setWordInput("");

@@ -133,11 +133,11 @@ module.exports.setWordDrawn = function setWordDrawn(id, gameUid, date) {
     );
 };
 
-module.exports.addWord = function addWord(word) {
+module.exports.addWord = function addWord(word, playerId) {
     return db.query(
-        `INSERT INTO words (game_uid, word, status) VALUES ($1, $2, $3) 
+        `INSERT INTO words (game_uid, word, status, player_id) VALUES ($1, $2, $3, $4) 
         RETURNING word, id`,
-        [word.gameUid, word.word, word.status]
+        [word.gameUid, word.word, word.status, playerId]
     );
 };
 
@@ -151,8 +151,29 @@ module.exports.addPlayer = function addPlayer(player) {
 
 module.exports.getPlayer = function getPlayer(gameUid, playerId) {
     return db.query(
-        `SELECT * FROM players
+        `SELECT id, name, team_a_or_b as "teamAorB", game_uid as "gameUid" FROM players
         WHERE game_uid = $1 AND id = $2`,
+        [gameUid, playerId]
+    );
+};
+
+module.exports.getPlayers = function getPlayers(gameUid) {
+    return db.query(
+        `SELECT name, team_a_or_b AS "teamAorB", COUNT(words.id) AS "nrOfWords"
+        FROM players
+        LEFT JOIN words
+        ON words.player_id = players.id
+        WHERE players.game_uid = $1
+        GROUP BY players.id
+        `,
+        [gameUid]
+    );
+};
+
+module.exports.getNrOfWordsForPlayer = function getNrOfWordsForPlayer(gameUid, playerId) {
+    return db.query(
+        `SELECT COUNT(id) FROM words
+        WHERE game_uid = $1 AND player_id = $2`,
         [gameUid, playerId]
     );
 };

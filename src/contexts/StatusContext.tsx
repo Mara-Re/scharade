@@ -8,12 +8,14 @@ interface StatusContextProps {
     setCountdown: (countdown: number) => void;
     reloadStatus: () => void;
     reloadPlayerMe: () => void;
+    reloadPlayersList: () => void;
     onError: (error: any) => void;
     error: any;
     isGameHost: boolean,
     reloadGameHost: () => void;
     countdown?: number;
     playerMe?: Player;
+    playersList?: Player[];
     gameUid: string;
     wordsList: Word[];
     loadingGameStatus: boolean;

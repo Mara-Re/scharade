@@ -14,6 +14,7 @@ import { StatusContext } from "../contexts/StatusContext";
 import { Link, Typography } from "@material-ui/core";
 import { makeStyles } from "@material-ui/core/styles";
 import Box from "@material-ui/core/Box";
+import PlayersList from "../components/PlayersList";
 
 const useStyles = makeStyles((theme) => ({
     gameHost: {
@@ -46,6 +47,7 @@ const GameSetupView: FunctionComponent<{}> = () => {
     return (
         <CentralBox>
             <EnterWords />
+            <PlayersList/>
             <Box justifyContent="center" alignItems="center" className={classes.center}>
                 <Typography variant="h6" gutterBottom>Start the game</Typography>
                 {!isGameHost && (

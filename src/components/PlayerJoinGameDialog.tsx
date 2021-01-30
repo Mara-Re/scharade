@@ -11,7 +11,7 @@ import DialogContent from "@material-ui/core/DialogContent";
 import DialogContentText from "@material-ui/core/DialogContentText";
 import DialogActions from "@material-ui/core/DialogActions";
 import { StatusContext } from "../contexts/StatusContext";
-import { Team } from "../pages/Game";
+import { socket, Team } from "../pages/Game";
 import TeamToggleButton from "./TeamToggleButton";
 import TextField from "@material-ui/core/TextField";
 import { Box, Typography } from "@material-ui/core";
@@ -29,6 +29,7 @@ const PlayerJoinGameDialog: FunctionComponent<{}> = (props) => {
     const {
         gameUid,
         reloadPlayerMe = () => {},
+        reloadPlayersList = () => {},
         onError = () => {},
     } = useContext(StatusContext);
 
@@ -47,7 +48,9 @@ const PlayerJoinGameDialog: FunctionComponent<{}> = (props) => {
                     name,
                 },
             });
+            socket.emit("new-player-joins");
             reloadPlayerMe();
+            reloadPlayersList();
         } catch (error) {
             onError(error);
         }

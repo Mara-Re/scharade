@@ -46,6 +46,7 @@ export interface Player {
     teamAorB: Team;
     name: string;
     gameUid: string;
+    nrOfWords?: number;
 }
 
 ///// Allow socket reconnects on mobile devices without page reload////
@@ -73,24 +74,27 @@ const retryConnectOnFailure = (retryInMilliseconds: number) => {
 retryConnectOnFailure(RETRY_INTERVAL);
 //////////////////////////////////////////////////
 
+// DONE
+// show which players are currently in the game
+// show how many words each player has entered on gameSetup
+
+// TODO players
+// TODO 1 enable players to change / delete words they have entered during game setup
+
+// TODO 2 on game setup view: show how many words are already in pile
+// TODO 3 help: is the game stuck (because a player left or lost their connection)? Reset turn/Game host can reset turn
+
 // TODO rounds
 // On "start explaining"/"end of round reached" show current/next round - 1. explaining, 2. pantomime, 3. one-word explanation, 4. finger pantomime, 5. make a sound
 // add round column to games table and add get and post request to set the round
 // after 5th round, players can start additional round(s) or "end game"
-
-// TODO players
-// show which players are currently in the game
-// show how many words each player has entered on gameSetup
 
 // TODO handle exceptions / fix bugs / error handling
 // handle case if reloading game and status is end of round reached
 // add error handling to <Home />
 
 // TODO ideas
-// enable players to change / delete words they have entered during game setup
-// on game setup view: show how many words are already in pile
 // show list with guessed words and number of discarded words to other players at "time-over" and "end-of-round-reached"
-// help: is the game stuck (because a player left or lost their connection)? Reset turn/Game host can reset turn
 
 // TODO automatically determine players turns
 // automatically determine whose player's turn it is
@@ -98,6 +102,7 @@ retryConnectOnFailure(RETRY_INTERVAL);
 
 const Game: FunctionComponent<{}> = () => {
     const [playerMe, setPlayerMe] = useState<Player>();
+    const [playersList, setPlayersList] = useState<Player[]>();
     const [loadingGameStatus, setLoadingGameStatus] = useState(true);
     const [loadingPlayerMe, setLoadingPlayerMe] = useState(true);
     const [error, setError] = useState<any>();
@@ -118,6 +123,9 @@ const Game: FunctionComponent<{}> = () => {
         socket.on("new-game-status", () => {
             getGameStatus();
         });
+        socket.on("players-list-changed", () => {
+            getPlayersList();
+        });
         socket.on("connected", async () => {
             const currentGameStatus = await getGameStatus();
             if (currentGameStatus !== GameStatus.END_OF_ROUND_REACHED) {
@@ -135,23 +143,6 @@ const Game: FunctionComponent<{}> = () => {
     //^^^^^^^^SOCKET EVENT LISTENERS^^^^^^^^^^--------
     const gameUid = useMemo(() => getGameUid(), [getGameUid]);
 
-    const getPlayerMe = useCallback(async () => {
-        setLoadingPlayerMe(true);
-        try {
-            const { data } = await axios.get(`/games/${gameUid}/playerMe`);
-            if (data) {
-                setPlayerMe({
-                    ...data[0],
-                    teamAorB: data[0].team_a_or_b,
-                    gameUid: data[0].game_uid,
-                });
-            }
-        } catch (error) {
-            onError(error);
-        }
-        setLoadingPlayerMe(false);
-    }, []);
-
     const onError = useCallback((error: any) => {
         setError(error);
         setTimeout(() => {
@@ -159,36 +150,34 @@ const Game: FunctionComponent<{}> = () => {
         }, 2000);
     }, []);
 
-    useEffect(() => {
-        getGameStatus();
-        getPlayerMe();
-        getGameHost();
-    }, []);
-
-    useEffect(() => {
-        const getShowGameLinkDialogInfo = async () => {
-            try {
-                const { data } = await axios.get("/game-cookies");
-                setShowGameLinkDialog(data.showGameLinkDialog);
-            } catch (error) {
-                onError(error);
-            }
-        };
-        getShowGameLinkDialogInfo();
-    }, [onError]);
-
-    const getGameHost = useCallback(async () => {
+    const getPlayerMe = useCallback(async () => {
+        setLoadingPlayerMe(true);
         try {
-            const { data } = await axios.get("/game-cookies");
-            setIsGameHost(data.isGameHost);
+            const { data } = await axios.get(`/games/${gameUid}/playerMe`);
+            if (data) {
+                setPlayerMe(data[0]);
+            }
         } catch (error) {
             onError(error);
         }
-    }, []);
+        setLoadingPlayerMe(false);
+    }, [onError, gameUid]);
+
+    const getPlayersList = useCallback(async () => {
+        try {
+            const { data } = await axios.get(`/games/${gameUid}/players`);
+            console.log("data", data);
+            if (data) {
+                setPlayersList(data);
+            }
+        } catch (error) {
+            onError(error);
+        }
+    }, [onError, gameUid]);
 
     const getGameStatus = useCallback(async (): Promise<
         GameStatus | undefined
-    > => {
+        > => {
         setLoadingGameStatus(true);
         try {
             const { data } = await axios.get(`/games/${gameUid}`);
@@ -211,7 +200,35 @@ const Game: FunctionComponent<{}> = () => {
             setLoadingGameStatus(false);
             return undefined;
         }
-    }, []);
+    }, [onError, gameUid]);
+
+    const getGameHost = useCallback(async () => {
+        try {
+            const { data } = await axios.get("/game-cookies");
+            setIsGameHost(data.isGameHost);
+        } catch (error) {
+            onError(error);
+        }
+    }, [onError]);
+
+    useEffect(() => {
+        getGameStatus();
+        getPlayerMe();
+        getGameHost();
+        getPlayersList();
+    }, [getGameStatus, getPlayerMe, getPlayersList, getGameHost]);
+
+    useEffect(() => {
+        const getShowGameLinkDialogInfo = async () => {
+            try {
+                const { data } = await axios.get("/game-cookies");
+                setShowGameLinkDialog(data.showGameLinkDialog);
+            } catch (error) {
+                onError(error);
+            }
+        };
+        getShowGameLinkDialogInfo();
+    }, [onError]);
 
     return (
         <StatusContext.Provider
@@ -222,6 +239,7 @@ const Game: FunctionComponent<{}> = () => {
                 gameStatus,
                 teamExplaining,
                 playerMe,
+                playersList,
                 setCountdown,
                 countdown,
                 onError,
@@ -230,6 +248,7 @@ const Game: FunctionComponent<{}> = () => {
                 reloadStatus: getGameStatus,
                 reloadPlayerMe: getPlayerMe,
                 reloadGameHost: getGameHost,
+                reloadPlayersList: getPlayersList,
             }}
         >
             <GameLayout>

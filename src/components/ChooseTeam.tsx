@@ -7,7 +7,7 @@ import { makeStyles } from "@material-ui/core/styles";
 import TeamEmoji from "./TeamEmoji";
 import axios from "axios";
 import { StatusContext } from "../contexts/StatusContext";
-import { Team } from "../pages/Game";
+import { socket, Team } from "../pages/Game";
 import TeamToggleButton from "./TeamToggleButton";
 
 const useStyles = makeStyles({
@@ -24,24 +24,25 @@ interface ChooseTeamProps {
 const ChooseTeam: FunctionComponent<ChooseTeamProps> = (props) => {
 
     const { onChoice = () => {} } = props;
-    const { reloadPlayerMe = () => {}, onError = () => {}, playerMe, gameUid } = useContext(
+    const { reloadPlayerMe = () => {}, onError = () => {}, reloadPlayersList = () => {}, playerMe, gameUid } = useContext(
         StatusContext
     );
     const classes = useStyles();
 
-    // TODO: adjust handleTeamChoice -> adjust player instead of setting cookie
     const handleTeamChoice = useCallback(
         async (_: any, newTeamChoice: Team | undefined) => {
             if (!newTeamChoice) return;
             try {
                 await axios.put(`/games/${gameUid}/playerMe`, { team: newTeamChoice });
+                socket.emit("switch-team");
                 reloadPlayerMe();
+                reloadPlayersList();
                 onChoice();
             } catch (error) {
                 onError(error);
             }
         },
-        []
+        [gameUid, reloadPlayersList, reloadPlayerMe, onError, onChoice]
     );
 
     return (
