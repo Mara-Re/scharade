@@ -50,15 +50,10 @@ const TeamIndicator: FunctionComponent<TeamIndicatorProps> = (props) => {
                 </DialogTitle>
                 <DialogContent>
                     <DialogContentText>
-                        <ChooseTeam />
+                        <ChooseTeam onChoice={() => setChooseTeamModalOpen(false)} />
                     </DialogContentText>
                 </DialogContent>
                 <DialogActions>
-                    {team && (
-                        <Button onClick={() => setChooseTeamModalOpen(false)} color="primary">
-                            Done
-                        </Button>
-                    )}
                 </DialogActions>
             </Dialog>
         </>

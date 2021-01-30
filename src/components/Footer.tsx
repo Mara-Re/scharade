@@ -7,7 +7,7 @@ const useStyles = makeStyles({
         position: "fixed",
         bottom: 0,
         width: "100%",
-        padding: "5px 20px",
+        padding: "5px 10px",
         backgroundColor: "#eeeeee",
         justifyContent: "space-between",
     }

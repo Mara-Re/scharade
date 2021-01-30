@@ -18,9 +18,12 @@ const useStyles = makeStyles({
 });
 
 interface ChooseTeamProps {
+    onChoice?: () => void;
 }
 
 const ChooseTeam: FunctionComponent<ChooseTeamProps> = (props) => {
+
+    const { onChoice = () => {} } = props;
     const { reloadPlayerMe = () => {}, onError = () => {}, playerMe, gameUid } = useContext(
         StatusContext
     );
@@ -33,6 +36,7 @@ const ChooseTeam: FunctionComponent<ChooseTeamProps> = (props) => {
             try {
                 await axios.put(`/games/${gameUid}/playerMe`, { team: newTeamChoice });
                 reloadPlayerMe();
+                onChoice();
             } catch (error) {
                 onError(error);
             }
