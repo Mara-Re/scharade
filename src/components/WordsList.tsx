@@ -21,7 +21,7 @@ const useStyles = makeStyles({
     },
     noColor: {},
     wordsListBox: {
-        paddingBottom: "20px",
+        padding: "0 20px 20px",
     }
 });
 
@@ -63,7 +63,6 @@ const WordsList: FunctionComponent<WordsListProps> = (props) => {
                 display="flex"
                 justifyContent="center"
                 alignSelf="center"
-                className={classes.wordsListBox}
             >
                 {words && !!words.length && (
                     <TableContainer>
@@ -94,6 +93,7 @@ const WordsList: FunctionComponent<WordsListProps> = (props) => {
                                         {showWordStatusModifiers && (
                                             <>
                                                 <TableCell
+                                                    align="center"
                                                     className={
                                                         classes[
                                                             getStatusColor(
@@ -110,7 +110,7 @@ const WordsList: FunctionComponent<WordsListProps> = (props) => {
                                                             "-1") ||
                                                         undefined}
                                                 </TableCell>
-                                                <TableCell>
+                                                <TableCell align="right">
                                                     <IconButton
                                                         onClick={() =>
                                                             word.status &&

@@ -49,9 +49,6 @@ const AppBar: FunctionComponent<{ type: "home" | "game" }> = ({ type }) => {
                     Zettelchen
                 </Typography>
                 {type === "game" && showTimer && <Timer timeOver={gameStatus === GameStatus.TIME_OVER}>{countdown}</Timer>}
-                {type === "game" && gameStatus === GameStatus.SETUP && isGameHost && !loadingGameStatus && (
-                    <StartGame>StartGame</StartGame>
-                )}
                 {type === "home" && <Info type="header"/>}
             </Toolbar>
         </AppBarMui>

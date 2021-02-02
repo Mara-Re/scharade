@@ -3,7 +3,8 @@ import timeToExplain from "../shared/time-to-explain";
 
 export const rules = [
     <span>Split players into two teams.</span>,
-    <span>You agree on a number of words each player should <strong>add to the pile</strong> (in the language you agree on). <strong>4 to 6 words per player</strong> have worked well for us so far :-).</span>,
+    <span><strong>Each player adds 5 words</strong> to the game (in the language you agree on).</span>,
+    // <span>You agree on a number of words each player should <strong>add to the pile</strong> (in the language you agree on). <strong>4 to 6 words per player</strong> have worked well for us so far :-).</span>,
     <span>When all players have entered their words, you can start the game.</span>,
     <span>{`Each team gets ${timeToExplain} seconds to `}<strong>guess as many words as possible</strong>, with one player explaining the words to their teammates.</span>,
     <span>Teams take alternating turns. In each team’s turn, <strong>one player explains and the others guess</strong>.</span>,

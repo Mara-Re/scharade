@@ -1,9 +1,10 @@
 import React, { createContext } from "react";
-import { GameStatus, Player, Team, Word } from "../pages/Game";
+import { GameConfig, GameStatus, Player, Team, Word } from "../pages/Game";
 
 interface StatusContextProps {
     playerExplaining?: Player;
     gameStatus?: GameStatus;
+    gameConfig?: GameConfig;
     teamExplaining?: Team;
     setCountdown: (countdown: number) => void;
     reloadStatus: () => void;

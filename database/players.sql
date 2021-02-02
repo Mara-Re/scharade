@@ -5,5 +5,6 @@ CREATE TABLE players (
     game_uid VARCHAR(255),
     name VARCHAR(255),
     team_a_or_b VARCHAR(255),
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    enter_words_completed BOOLEAN DEFAULT false
 );

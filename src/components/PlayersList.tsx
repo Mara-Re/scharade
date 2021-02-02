@@ -10,14 +10,18 @@ import {
 import TeamEmoji from "./TeamEmoji";
 import { makeStyles } from "@material-ui/core/styles";
 import TableHead from "@material-ui/core/TableHead";
+import CheckIcon from "@material-ui/icons/Check";
 
 const useStyles = makeStyles({
     spacing: {
-        margin: "0 0 30px",
+        margin: "0 0 50px",
     },
     columnWidth: {
         width: "33.3%",
     },
+    green: {
+        color: "green"
+    }
 });
 
 const PlayersList: FunctionComponent<{}> = (props) => {
@@ -34,7 +38,8 @@ const PlayersList: FunctionComponent<{}> = (props) => {
                     <TableRow>
                         <TableCell>Players</TableCell>
                         <TableCell align="center">Team</TableCell>
-                        <TableCell align="right">Words</TableCell>
+                        <TableCell align="center">Words</TableCell>
+                        <TableCell align="right"></TableCell>
                     </TableRow>
                 </TableHead>
                 <TableBody>
@@ -50,10 +55,16 @@ const PlayersList: FunctionComponent<{}> = (props) => {
                                 <TeamEmoji team={player.teamAorB} />
                             </TableCell>
                             <TableCell
-                                align="right"
+                                align="center"
                                 className={classes.columnWidth}
                             >
                                 {player.nrOfWords}
+                            </TableCell>
+                            <TableCell
+                                align="right"
+                                className={classes.columnWidth}
+                            >
+                                {player.enterWordsCompleted && <CheckIcon className={classes.green}/>}
                             </TableCell>
                         </TableRow>
                     ))}

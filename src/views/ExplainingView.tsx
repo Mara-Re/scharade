@@ -66,7 +66,7 @@ const ExplainingView: FunctionComponent<{}> = () => {
     const getWordsList = useCallback(async () => {
         setLoadingWordsList(true);
         try {
-            const { data } = await axios.get(`/games/${gameUid}/words`);
+            const { data } = await axios.get(`/games/${gameUid}/words/thisTurn`);
             setWordsList(data);
         } catch (error) {
             onError(error);

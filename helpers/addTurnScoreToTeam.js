@@ -2,7 +2,7 @@ const db = require('../database/db');
 
 const addTurnScoreToTeamScore = async (gameUid) => {
     try {
-        const {rows} = await db.getWordsList(gameUid);
+        const {rows} = await db.getTurnWordsList(gameUid);
         const {rows: rowsTeamExplaining} = await db.getTeamExplaining(gameUid);
         const teamExplaining = rowsTeamExplaining[0].team_explaining;
 

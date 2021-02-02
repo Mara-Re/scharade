@@ -1,21 +1,27 @@
-import React, { FunctionComponent, useContext, useEffect, useState } from "react";
+import React, {
+    FunctionComponent,
+    useCallback,
+    useContext,
+    useEffect,
+    useState,
+} from "react";
 import Box from "@material-ui/core/Box";
 import Typography from "@material-ui/core/Typography";
 import Button from "@material-ui/core/Button";
 import TextField from "@material-ui/core/TextField";
 import { makeStyles } from "@material-ui/core/styles";
 import axios from "axios";
-import WordsList from "./WordsList";
 import { getGameUid } from "../helper/getGameUid";
 import { StatusContext } from "../contexts/StatusContext";
-import { socket, Word } from "../pages/Game";
-import CheckIcon from '@material-ui/icons/Check';
+import { socket } from "../pages/Game";
+import { times, find, compact } from "lodash";
 
 const useStyles = makeStyles({
     enterWordsBox: {
         padding: "0 0 40px",
-        margin: "auto",
-        textAlign: "center",
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center"
     },
     wordInput: {
         padding: "0 0 1rem",
@@ -23,98 +29,121 @@ const useStyles = makeStyles({
     },
     submitButton: {
         margin: "0 0 1rem",
-        position: "relative"
+        position: "relative",
     },
-    submitSuccess: {
-        color: "transparent !important"
-    },
-    success: {
-        color: "white",
-        position: "absolute"
+    title: {
+        marginBottom: "20px"
     }
 });
 
 const EnterWords: FunctionComponent<{}> = (props) => {
-    const { onError = () => {},  reloadPlayersList = () => {} } = useContext(StatusContext);
+    const {
+        onError = () => {},
+        reloadPlayersList = () => {},
+        reloadPlayerMe = () => {},
+        gameConfig,
+        playerMe,
+    } = useContext(StatusContext);
 
     const gameUid = getGameUid();
     const classes = useStyles();
-    const [wordInput, setWordInput] = useState<string>("");
-    const [submitSuccess, setSubmitSuccess] = useState(false);
-    const [wordsSubmitted, setWordsSubmitted] = useState<Word[]>([]);
+    const [words, setWords] = useState<string[]>(
+        times(gameConfig?.nrOfWordsPerPlayer || 0, () => "")
+    );
 
-    const onChange = (event: any) => {
-        setWordInput(event.target.value);
+    const onChange = (event: any, index: number) => {
+        setWords((prevWords) => {
+            let words = [...prevWords];
+            words[index] = event.target.value;
+            return words;
+        });
     };
 
-    const onWordSubmit = async () => {
-        if (!wordInput) {
-            return;
-        }
+    useEffect(() => {
+        const getPlayersWords = async () => {
+            try {
+                const { data } = await axios.get(`/games/${gameUid}/words`);
+                setWords(
+                    times(gameConfig?.nrOfWordsPerPlayer || 0, (index) => {
+                        const wordRow = find(data, { playerWordIndex: index });
+                        return wordRow?.word || "";
+                    })
+                );
+            } catch (error) {
+                onError(error);
+            }
+        };
+        getPlayersWords();
+    }, []);
+
+    const onBlur = useCallback(
+        async (index: number) => {
+            if (!words[index] === undefined) return;
+            try {
+                const { data } = await axios.post(`/games/${gameUid}/words`, {
+                    word: words[index],
+                    playerWordIndex: index,
+                });
+                if (data?.insertedOrDeleted) {
+                    socket.emit("new-word-submit");
+                    reloadPlayersList();
+                }
+            } catch (error) {
+                onError(error);
+            }
+        },
+        [words, gameUid, onError, reloadPlayersList]
+    );
+
+    const onDone = async () => {
         try {
-            const { data } = await axios.post(`/games/${gameUid}/words`, {
-                word: {
-                    word: wordInput,
-                    status: "pile",
-                    gameUid,
-                },
-            });
-            socket.emit("new-word-submit");
+            await axios.put(`/games/${gameUid}/playerMe/enterWordsCompleted`);
+            socket.emit("new-player-status");
+            reloadPlayerMe();
             reloadPlayersList();
-            setWordsSubmitted([...wordsSubmitted, data[0]]);
-            setSubmitSuccess(true);
-            setWordInput("");
         } catch (error) {
             onError(error);
         }
     };
 
-    useEffect(() => {
-        if (submitSuccess) {
-            setTimeout(() => {
-                setSubmitSuccess(false);
-            }, 500);
-        }
-    }, [submitSuccess]);
-
-    const onEnter = async (event: any) => {
-        if (event.key === "Enter") {
-            await onWordSubmit();
-        }
-    };
+    if (playerMe?.enterWordsCompleted) return null;
 
     return (
         <Box
             justifyContent="center"
-            alignItems="center"
             className={classes.enterWordsBox}
         >
-            <Typography variant="h6" gutterBottom>
-                Enter words
+            <Typography variant="h6" gutterBottom className={classes.title}>
+                {`Enter ${gameConfig?.nrOfWordsPerPlayer} words`}
             </Typography>
-            <Typography variant="body1" gutterBottom>
-                Agree on how many words each player should enter (e.g. 5). Enter word by word.
-            </Typography>
-            <TextField
-                variant="outlined"
-                onChange={onChange}
-                className={classes.wordInput}
-                value={wordInput}
-                onKeyDown={onEnter}
-            />
+            <div>
+                {times(gameConfig?.nrOfWordsPerPlayer || 0, (i) => i).map(
+                    (index) => (
+                        <TextField
+                            key={index}
+                            onChange={(event) => {
+                                event.persist();
+                                onChange(event, index);
+                            }}
+                            className={classes.wordInput}
+                            value={words[index]}
+                            label={index + 1}
+                            onBlur={() => onBlur(index)}
+                        />
+                    )
+                )}
+            </div>
             <Button
                 variant="contained"
                 color="primary"
-                onClick={onWordSubmit}
-                disabled={submitSuccess}
-                className={`${classes.submitButton} ${submitSuccess ? classes.submitSuccess : ""}`}
+                onClick={onDone}
+                disabled={
+                    compact(words).length !== gameConfig?.nrOfWordsPerPlayer
+                }
+                className={classes.submitButton}
             >
-                Add word to pile
-                {submitSuccess && <CheckIcon className={classes.success}/>}
+                Ready
             </Button>
-            {!!wordsSubmitted.length && (
-                <WordsList title="Words you added" words={wordsSubmitted} />
-            )}
         </Box>
     );
 };

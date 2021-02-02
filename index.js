@@ -42,7 +42,13 @@ app.post("/games", async (req, res) => {
         const gameUid = await uidSafe(10);
         const random1Or2 = Math.floor(Math.random() * 2) + 1;
         const startingTeam = random1Or2 === 1 ? "A" : "B";
-        const { rows } = await db.addNewGame(gameUid, startingTeam);
+        // TODO: replace hardcoded nrOfWordsPerPlayer
+        const nrOfWordsPerPlayer = 5;
+        const { rows } = await db.addNewGame(
+            gameUid,
+            startingTeam,
+            nrOfWordsPerPlayer
+        );
         res.cookie("gameSetup", "true");
         res.cookie("gameHost", "true");
         await res.json(rows);
@@ -111,10 +117,20 @@ app.get("/games/:uid/getRandomWord/", async (req, res) => {
     }
 });
 
-app.get("/games/:uid/words/", async (req, res) => {
+app.get("/games/:uid/words/thisTurn", async (req, res) => {
     // get words of this turn (guessedThisTurn, discardedThisTurn, notGuessedThisTurn)
     try {
-        const { rows } = await db.getWordsList(req.params.uid);
+        const { rows } = await db.getTurnWordsList(req.params.uid);
+        await res.json(rows);
+    } catch (error) {
+        console.log("error in /games/:uid/words get route: ", error);
+    }
+});
+
+app.get("/games/:uid/words", async (req, res) => {
+    const player = req.cookies.player && JSON.parse(req.cookies.player);
+    try {
+        const { rows } = await db.getPlayerWords(player.id, req.params.uid);
         await res.json(rows);
     } catch (error) {
         console.log("error in /games/:uid/words get route: ", error);
@@ -123,9 +139,35 @@ app.get("/games/:uid/words/", async (req, res) => {
 
 app.post("/games/:uid/words", async (req, res) => {
     const player = req.cookies.player && JSON.parse(req.cookies.player);
+    let insertedOrDeleted = false;
     try {
-        const { rows } = await db.addWord(req.body.word, player.id);
-        await res.json(rows);
+        const { rows } = await db.getPlayerIndexWord(
+            player.id,
+            req.body.playerWordIndex,
+            req.params.uid
+        );
+        // TODO: make sure only the last call is used to delete/update!
+        // if word with player index exists
+        if (rows[0]) {
+            if (!req.body.word) {
+                // delete
+                await db.deleteWord(rows[0].id, req.params.uid);
+                insertedOrDeleted = true;
+            } else {
+                // update
+                await db.updateWord(rows[0].id, req.body.word);
+            }
+        } else if (req.body.word) {
+            //insert
+            await db.addWord(
+                req.body.word,
+                player.id,
+                req.body.playerWordIndex,
+                req.params.uid
+            );
+            insertedOrDeleted = true;
+        }
+        await res.json({ insertedOrDeleted });
     } catch (error) {
         console.log("error in /games/:uid/words post route: ", error);
     }
@@ -168,10 +210,16 @@ app.post("/games/:uid/createTeams", async (req, res) => {
 //-------------------------PLAYERS ROUTES-------------------------
 app.get("/games/:uid/player/:player_id", async (req, res) => {
     try {
-        const { rows } = await db.getPlayer(req.params.uid, req.params.player_id);
+        const { rows } = await db.getPlayer(
+            req.params.uid,
+            req.params.player_id
+        );
         await res.json(rows);
     } catch (error) {
-        console.log("error in /games/:uid/player/:player_id get route: ", error);
+        console.log(
+            "error in /games/:uid/player/:player_id get route: ",
+            error
+        );
         await res.json({ success: false });
     }
 });
@@ -220,6 +268,17 @@ app.put("/games/:uid/playerMe", async (req, res) => {
     try {
         const player = JSON.parse(req.cookies.player);
         await db.updatePlayerTeam(req.params.uid, player.id, req.body.team);
+        await res.json({ success: true });
+    } catch (error) {
+        console.log("error in /games/:uid/playerMe put route: ", error);
+        await res.json({ success: false });
+    }
+});
+
+app.put("/games/:uid/playerMe/enterWordsCompleted", async (req, res) => {
+    try {
+        const player = JSON.parse(req.cookies.player);
+        await db.updatePlayerEnterWordsCompleted(req.params.uid, player.id);
         await res.json({ success: true });
     } catch (error) {
         console.log("error in /games/:uid/playerMe put route: ", error);
@@ -317,9 +376,9 @@ io.on("connection", function (socket) {
                 countdown = timeToExplain;
                 const adjustGameStatus = async () => {
                     // ignore onTimerOver when game is currently not ongoing:
-                    const gameStatus = await db.getGame(gameUid);
-                    if (gameStatus === "END" || gameStatus === "START") {
-                        return gameStatus;
+                    const { rows } = await db.getGame(gameUid);
+                    if (rows[0].status === "END" || rows[0].status === "START") {
+                        return;
                     }
                     await db.setGameStatus(gameUid, "TIME_OVER");
                 };
@@ -350,6 +409,10 @@ io.on("connection", function (socket) {
     });
 
     socket.on("new-word-submit", () => {
+        socket.to(gameUid).emit("players-list-changed");
+    });
+
+    socket.on("new-player-status", () => {
         socket.to(gameUid).emit("players-list-changed");
     });
 

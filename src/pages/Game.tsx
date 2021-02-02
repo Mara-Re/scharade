@@ -47,6 +47,11 @@ export interface Player {
     name: string;
     gameUid: string;
     nrOfWords?: number;
+    enterWordsCompleted: boolean;
+}
+
+export interface GameConfig {
+    nrOfWordsPerPlayer: number;
 }
 
 ///// Allow socket reconnects on mobile devices without page reload////
@@ -77,12 +82,20 @@ retryConnectOnFailure(RETRY_INTERVAL);
 // DONE
 // show which players are currently in the game
 // show how many words each player has entered on gameSetup
+// enable players to change / delete words they have entered during game setup
 
-// TODO players
-// TODO 1 enable players to change / delete words they have entered during game setup
 
-// TODO 2 on game setup view: show how many words are already in pile
-// TODO 3 help: is the game stuck (because a player left or lost their connection)? Reset turn/Game host can reset turn
+// TODO
+// adjust info to preconfigured nr of words
+// enable players / game host to adjust nrOfWords in game config
+// help: is the game stuck (because a player left or lost their connection)? Reset turn/Game host can reset turn
+
+// TODO sounds
+// add sound on time over
+// add sound on start explaining
+// add sound guessed word
+// add sound discarded word
+// add sound player joined
 
 // TODO rounds
 // On "start explaining"/"end of round reached" show current/next round - 1. explaining, 2. pantomime, 3. one-word explanation, 4. finger pantomime, 5. make a sound
@@ -112,6 +125,7 @@ const Game: FunctionComponent<{}> = () => {
     const [countdown, setCountdown] = useState<number>();
     const [isGameHost, setIsGameHost] = useState(false);
     const [showGameLinkDialog, setShowGameLinkDialog] = useState<boolean>();
+    const [gameConfig, setGameConfig] = useState<GameConfig>();
 
     const isPlayerMeExplaining: boolean | undefined =
         playerExplaining && playerMe && playerExplaining?.id === playerMe?.id;
@@ -128,6 +142,8 @@ const Game: FunctionComponent<{}> = () => {
         });
         socket.on("connected", async () => {
             const currentGameStatus = await getGameStatus();
+            getPlayersList();
+            getPlayerMe();
             if (currentGameStatus !== GameStatus.END_OF_ROUND_REACHED) {
                 setCountdown(undefined);
             }
@@ -166,7 +182,6 @@ const Game: FunctionComponent<{}> = () => {
     const getPlayersList = useCallback(async () => {
         try {
             const { data } = await axios.get(`/games/${gameUid}/players`);
-            console.log("data", data);
             if (data) {
                 setPlayersList(data);
             }
@@ -191,6 +206,8 @@ const Game: FunctionComponent<{}> = () => {
             }
             const newGameStatus = data[0].status as GameStatus;
             const newTeamExplaining = data[0].team_explaining as Team;
+            const nrOfWordsPerPlayer = data[0].nr_of_words_per_player as number;
+            setGameConfig({ nrOfWordsPerPlayer });
             setGameStatus(newGameStatus);
             setTeamExplaining(newTeamExplaining);
             setLoadingGameStatus(false);
@@ -245,6 +262,7 @@ const Game: FunctionComponent<{}> = () => {
                 onError,
                 error,
                 loadingGameStatus,
+                gameConfig,
                 reloadStatus: getGameStatus,
                 reloadPlayerMe: getPlayerMe,
                 reloadGameHost: getGameHost,

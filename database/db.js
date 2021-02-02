@@ -4,11 +4,11 @@ const db = spicedPg(
         "postgres:postgres:postgres@localhost:5555/scharade"
 );
 
-exports.addNewGame = function addNewGame(gameUid, team) {
+exports.addNewGame = function addNewGame(gameUid, team, nrOfWordsPerPlayer) {
     return db.query(
-        `INSERT INTO games (uid, status, team_explaining) VALUES ($1, $2, $3) 
+        `INSERT INTO games (uid, status, team_explaining, nr_of_words_per_player) VALUES ($1, $2, $3, $4) 
         RETURNING *`,
-        [gameUid, "SETUP", team]
+        [gameUid, "SETUP", team, nrOfWordsPerPlayer]
     );
 };
 
@@ -22,7 +22,7 @@ module.exports.getRandomWord = function getRandomWord(gameUid) {
     );
 };
 
-module.exports.getWordsList = function getWordsList(gameUid) {
+module.exports.getTurnWordsList = function getTurnWordsList(gameUid) {
     return db.query(
         `SELECT * FROM words
         WHERE (status = 'guessedThisTurn' OR status = 'discardedThisTurn' OR status = 'notGuessedThisTurn') AND game_uid = $1
@@ -133,13 +133,53 @@ module.exports.setWordDrawn = function setWordDrawn(id, gameUid, date) {
     );
 };
 
-module.exports.addWord = function addWord(word, playerId) {
+
+module.exports.getPlayerWords = function getPlayerWords(playerId, gameUid) {
     return db.query(
-        `INSERT INTO words (game_uid, word, status, player_id) VALUES ($1, $2, $3, $4) 
-        RETURNING word, id`,
-        [word.gameUid, word.word, word.status, playerId]
+        `SELECT word, player_word_index AS "playerWordIndex" FROM words 
+        WHERE player_id = $1 AND game_uid = $2
+        ORDER BY player_word_index`,
+        [playerId, gameUid]
     );
 };
+
+
+module.exports.deleteWord = function deleteWord(wordId, gameUid) {
+    return db.query(
+        `DELETE FROM words WHERE id = $1 AND game_uid = $2`,
+        [wordId, gameUid]
+    );
+};
+
+module.exports.getPlayerIndexWord = function getPlayerIndexWord(playerId, playerWordIndex, gameUid) {
+    return db.query(
+        `SELECT id FROM words 
+        WHERE player_id = $1 AND player_word_index = $2 AND game_uid = $3`,
+        [playerId, playerWordIndex, gameUid]
+    );
+};
+
+module.exports.addWord = function addWord(word, playerId, playerWordIndex, gameUid) {
+    return db.query(
+        `INSERT INTO words (game_uid, word, player_id, player_word_index, status) VALUES ($1, $2, $3, $4, $5) 
+        RETURNING word, id`,
+        [gameUid, word, playerId, playerWordIndex, "pile" ]
+    );
+};
+
+
+module.exports.updateWord = function updateWord(wordId, word) {
+    return db.query(
+        `UPDATE words
+            SET word = $2
+            WHERE id = $1`,
+        [wordId, word ]
+    );
+};
+
+
+
+
 
 module.exports.addPlayer = function addPlayer(player) {
     return db.query(
@@ -151,7 +191,7 @@ module.exports.addPlayer = function addPlayer(player) {
 
 module.exports.getPlayer = function getPlayer(gameUid, playerId) {
     return db.query(
-        `SELECT id, name, team_a_or_b as "teamAorB", game_uid as "gameUid" FROM players
+        `SELECT id, name, team_a_or_b as "teamAorB", game_uid as "gameUid", enter_words_completed as "enterWordsCompleted" FROM players
         WHERE game_uid = $1 AND id = $2`,
         [gameUid, playerId]
     );
@@ -159,7 +199,7 @@ module.exports.getPlayer = function getPlayer(gameUid, playerId) {
 
 module.exports.getPlayers = function getPlayers(gameUid) {
     return db.query(
-        `SELECT name, team_a_or_b AS "teamAorB", COUNT(words.id) AS "nrOfWords"
+        `SELECT name, team_a_or_b AS "teamAorB", enter_words_completed as "enterWordsCompleted", COUNT(words.id) AS "nrOfWords"
         FROM players
         LEFT JOIN words
         ON words.player_id = players.id
@@ -184,6 +224,15 @@ module.exports.updatePlayerTeam = function updatePlayerTeam(gameUid, playerId, t
             SET team_a_or_b = $3
             WHERE game_uid = $1 AND id = $2`,
         [gameUid, playerId, teamAorB]
+    );
+};
+
+module.exports.updatePlayerEnterWordsCompleted = function updatePlayerEnterWordsCompleted(gameUid, playerId) {
+    return db.query(
+        `UPDATE players
+            SET enter_words_completed = $3
+            WHERE game_uid = $1 AND id = $2`,
+        [gameUid, playerId, true]
     );
 };
 

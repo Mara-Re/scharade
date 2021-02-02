@@ -6,22 +6,24 @@ const useStyles = makeStyles((theme) => ({
     centerBox: {
         minHeight: "30vh",
         padding: "2vh 0 30px",
-        position: "relative",
-        maxWidth: "600px",
-        margin: "auto"
+        position: "relative"
     },
     contentContainer: {
         padding: "20px",
     },
+    flex : {
+        display: "flex",
+        justifyContent: "center"
+    }
 }));
 
-const CentralBox: FunctionComponent<{}> = ({children}) => {
+const CentralBox: FunctionComponent<{flex?: boolean}> = ({children, flex}) => {
 
     const classes = useStyles();
 
     return(
         <>
-            <Box className={classes.contentContainer}>
+            <Box className={`${classes.contentContainer} ${flex ? classes.flex : ""}`}>
                 <Box
                     alignSelf="center"
                     justifyContent="center"

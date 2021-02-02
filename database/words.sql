@@ -7,7 +7,8 @@ CREATE TABLE words (
     game_uid VARCHAR(255),
     player_id INT REFERENCES players(id),
     drawn_at TIMESTAMP,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    player_word_index INT
 );
 
 
