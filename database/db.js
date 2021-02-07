@@ -68,6 +68,15 @@ module.exports.setGameStatus = function setGameStatus(gameUid, status) {
     );
 };
 
+module.exports.setNrOfWordsPerPlayer = function setNrOfWordsPerPlayer(gameUid, nrOfWordsPerPlayer) {
+    return db.query(
+        `UPDATE games
+            SET nr_of_words_per_player = $2
+            WHERE uid = $1`,
+        [gameUid, nrOfWordsPerPlayer]
+    );
+};
+
 module.exports.startExplaining = function startExplaining(gameUid, playerId) {
     return db.query(
         `UPDATE games
@@ -148,6 +157,14 @@ module.exports.deleteWord = function deleteWord(wordId, gameUid) {
     return db.query(
         `DELETE FROM words WHERE id = $1 AND game_uid = $2`,
         [wordId, gameUid]
+    );
+};
+
+
+module.exports.deleteWordsExceedingNrOfWords = function deleteWordsExceedingNrOfWords(gameUid, nrOfWordsPerPlayer) {
+    return db.query(
+        `DELETE FROM words WHERE player_word_index + 1 > $2 AND game_uid = $1`,
+        [gameUid, nrOfWordsPerPlayer]
     );
 };
 

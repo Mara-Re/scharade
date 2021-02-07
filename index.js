@@ -42,7 +42,6 @@ app.post("/games", async (req, res) => {
         const gameUid = await uidSafe(10);
         const random1Or2 = Math.floor(Math.random() * 2) + 1;
         const startingTeam = random1Or2 === 1 ? "A" : "B";
-        // TODO: replace hardcoded nrOfWordsPerPlayer
         const nrOfWordsPerPlayer = 5;
         const { rows } = await db.addNewGame(
             gameUid,
@@ -78,6 +77,18 @@ app.post("/games/:uid/status", async (req, res) => {
         }
     } catch (error) {
         console.log("error in /games/:uid/status post route: ", error);
+        await res.json({ success: false });
+    }
+});
+
+app.put("/games/:uid/nrOfWordsPerPlayer", async (req, res) => {
+    try {
+        await db.setNrOfWordsPerPlayer(req.params.uid, req.body.nrOfWordsPerPlayer);
+        await db.deleteWordsExceedingNrOfWords(req.params.uid, req.body.nrOfWordsPerPlayer);
+        await res.json({ success: true });
+
+    } catch (error) {
+        console.log("error in /games/:uid/nrOfWordsPerPlayer post route: ", error);
         await res.json({ success: false });
     }
 });
@@ -402,6 +413,10 @@ io.on("connection", function (socket) {
     socket.on("end-game", () => {
         clearAllTimers();
         socket.to(gameUid).emit("new-game-status");
+    });
+
+    socket.on("new-game-config", () => {
+        socket.to(gameUid).emit("new-players-and-game-status");
     });
 
     socket.on("new-player-joins", () => {

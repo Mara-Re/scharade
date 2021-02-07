@@ -36,10 +36,6 @@ const TeamIndicator: FunctionComponent<TeamIndicatorProps> = (props) => {
                     <TeamEmoji team={team}/>
                 </div>
             </BorderedIconButton>
-            <Dialog open={chooseTeamModalOpen}
-                    onClose={() => setChooseTeamModalOpen(false)}
-                    disableBackdropClick={!team}>
-            </Dialog>
             <Dialog
                 open={chooseTeamModalOpen}
                 onClose={() => setChooseTeamModalOpen(false)}

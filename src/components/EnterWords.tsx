@@ -15,6 +15,7 @@ import { getGameUid } from "../helper/getGameUid";
 import { StatusContext } from "../contexts/StatusContext";
 import { socket } from "../pages/Game";
 import { times, find, compact } from "lodash";
+import EditNrOfWordsGameConfig from "./EditNrOfWordsGameConfig";
 
 const useStyles = makeStyles({
     enterWordsBox: {
@@ -114,7 +115,7 @@ const EnterWords: FunctionComponent<{}> = (props) => {
             className={classes.enterWordsBox}
         >
             <Typography variant="h6" gutterBottom className={classes.title}>
-                {`Enter ${gameConfig?.nrOfWordsPerPlayer} words`}
+                {`Enter ${gameConfig?.nrOfWordsPerPlayer} words`} <EditNrOfWordsGameConfig/>
             </Typography>
             <div>
                 {times(gameConfig?.nrOfWordsPerPlayer || 0, (i) => i).map(
@@ -137,9 +138,6 @@ const EnterWords: FunctionComponent<{}> = (props) => {
                 variant="contained"
                 color="primary"
                 onClick={onDone}
-                disabled={
-                    compact(words).length !== gameConfig?.nrOfWordsPerPlayer
-                }
                 className={classes.submitButton}
             >
                 Ready

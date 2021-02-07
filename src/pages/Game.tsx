@@ -79,28 +79,18 @@ const retryConnectOnFailure = (retryInMilliseconds: number) => {
 retryConnectOnFailure(RETRY_INTERVAL);
 //////////////////////////////////////////////////
 
-// DONE
-// show which players are currently in the game
-// show how many words each player has entered on gameSetup
-// enable players to change / delete words they have entered during game setup
-
-
 // TODO
-// adjust info to preconfigured nr of words
-// enable players / game host to adjust nrOfWords in game config
 // help: is the game stuck (because a player left or lost their connection)? Reset turn/Game host can reset turn
-
-// TODO sounds
-// add sound on time over
-// add sound on start explaining
-// add sound guessed word
-// add sound discarded word
-// add sound player joined
 
 // TODO rounds
 // On "start explaining"/"end of round reached" show current/next round - 1. explaining, 2. pantomime, 3. one-word explanation, 4. finger pantomime, 5. make a sound
 // add round column to games table and add get and post request to set the round
 // after 5th round, players can start additional round(s) or "end game"
+
+// TODO sounds
+// add sound on time over
+// add sound on start explaining
+// add sound guessed word / discarded word / player joined
 
 // TODO handle exceptions / fix bugs / error handling
 // handle case if reloading game and status is end of round reached
@@ -138,6 +128,10 @@ const Game: FunctionComponent<{}> = () => {
             getGameStatus();
         });
         socket.on("players-list-changed", () => {
+            getPlayersList();
+        });
+        socket.on("new-players-and-game-status", () => {
+            getGameStatus();
             getPlayersList();
         });
         socket.on("connected", async () => {
