@@ -14,8 +14,8 @@ import axios from "axios";
 import { getGameUid } from "../helper/getGameUid";
 import { StatusContext } from "../contexts/StatusContext";
 import { socket } from "../pages/Game";
-import { times, find, compact } from "lodash";
-import EditNrOfWordsGameConfig from "./EditNrOfWordsGameConfig";
+import { times, find } from "lodash";
+import EditNrOfWordsPerPlayer from "./EditNrOfWordsPerPlayer";
 
 const useStyles = makeStyles({
     enterWordsBox: {
@@ -42,14 +42,14 @@ const EnterWords: FunctionComponent<{}> = (props) => {
         onError = () => {},
         reloadPlayersList = () => {},
         reloadPlayerMe = () => {},
-        gameConfig,
+        nrOfWordsPerPlayer,
         playerMe,
     } = useContext(StatusContext);
 
     const gameUid = getGameUid();
     const classes = useStyles();
     const [words, setWords] = useState<string[]>(
-        times(gameConfig?.nrOfWordsPerPlayer || 0, () => "")
+        times(nrOfWordsPerPlayer || 0, () => "")
     );
 
     const onChange = (event: any, index: number) => {
@@ -65,7 +65,7 @@ const EnterWords: FunctionComponent<{}> = (props) => {
             try {
                 const { data } = await axios.get(`/games/${gameUid}/words`);
                 setWords(
-                    times(gameConfig?.nrOfWordsPerPlayer || 0, (index) => {
+                    times(nrOfWordsPerPlayer || 0, (index) => {
                         const wordRow = find(data, { playerWordIndex: index });
                         return wordRow?.word || "";
                     })
@@ -115,10 +115,10 @@ const EnterWords: FunctionComponent<{}> = (props) => {
             className={classes.enterWordsBox}
         >
             <Typography variant="h6" gutterBottom className={classes.title}>
-                {`Enter ${gameConfig?.nrOfWordsPerPlayer} words`} <EditNrOfWordsGameConfig/>
+                {`Enter ${nrOfWordsPerPlayer} words`} <EditNrOfWordsPerPlayer/>
             </Typography>
             <div>
-                {times(gameConfig?.nrOfWordsPerPlayer || 0, (i) => i).map(
+                {times(nrOfWordsPerPlayer || 0, (i) => i).map(
                     (index) => (
                         <TextField
                             key={index}

@@ -12,6 +12,8 @@ import { socket } from "../pages/Game";
 import WordCard from "../components/WordCard";
 import { StatusContext } from "../contexts/StatusContext";
 import TeamEmoji from "../components/TeamEmoji";
+import CenterBox from "../components/CenterBox";
+import { Typography } from "@material-ui/core";
 
 interface NewWordGuessedOrDiscarded {
     status: "guessedThisTurn" | "discardedThisTurn";
@@ -64,7 +66,9 @@ const OtherPlayerExplainingView: FunctionComponent<{}> = () => {
 
     return (
         <CentralBox>
-            <ActionMessage spacing={true}>
+            <CenterBox>
+                <Typography variant="h6">
+            {/*<ActionMessage spacing={true}>*/}
                 {teamExplaining && playerExplaining && (
                     <>
                         {playerExplaining.name}{" "}
@@ -72,7 +76,9 @@ const OtherPlayerExplainingView: FunctionComponent<{}> = () => {
                     </>
                 )}
                 {!teamExplaining && <>Someone else is explaining...</>}
-            </ActionMessage>
+            {/*</ActionMessage>*/}
+                </Typography>
+            </CenterBox>
             {newWordGuessedOrDiscarded && (
                 <WordCard
                     wordStatus={newWordGuessedOrDiscarded.status}

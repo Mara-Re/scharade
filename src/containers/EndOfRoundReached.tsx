@@ -7,15 +7,25 @@ import { makeStyles } from "@material-ui/core/styles";
 import { Typography } from "@material-ui/core";
 import TeamEmoji from "../components/TeamEmoji";
 import CenterBox from "../components/CenterBox";
+import { roundsShort } from "../components/Rules";
 
 const useStyles = makeStyles({
     spacingTop: {
         marginTop: "30px",
     },
+    increasedGutter: {
+        marginBottom: "1rem",
+    },
 });
 
 const EndOfRoundReached: FunctionComponent<{}> = () => {
-    const { countdown, playerMe, teamExplaining, playerExplaining } = useContext(StatusContext);
+    const {
+        countdown,
+        playerMe,
+        teamExplaining,
+        playerExplaining,
+        currentRound = 0,
+    } = useContext(StatusContext);
 
     const classes = useStyles();
 
@@ -27,29 +37,24 @@ const EndOfRoundReached: FunctionComponent<{}> = () => {
 
     return (
         <div className={classes.spacingTop}>
-            {playerMe.id !== playerExplaining.id && (
-                <ActionMessage>
-                    The pile of words is empty. {playerExplaining.name}{" "}
-                    <TeamEmoji team={teamExplaining} /> can start a new
-                    round now.
-                </ActionMessage>
-            )}
-            {playerMe.id === playerExplaining.id && (
-                <>
-                    <CenterBox>
-                        <Typography variant="h2" gutterBottom>
-                            <TeamEmoji team={teamExplaining} />
-                        </Typography>
-                    </CenterBox>
-                    <ActionMessage
-                        onAction={onStartNewRound}
-                        actionIcon={<ReplayIcon fontSize="large" />}
-                    >
-                        The pile of words is empty. Do you want to start a new
-                        round now?
-                    </ActionMessage>
-                </>
-            )}
+            {/*<CenterBox>*/}
+            {/*    <Typography variant="h2" gutterBottom>*/}
+            {/*        <TeamEmoji team={teamExplaining} />*/}
+            {/*    </Typography>*/}
+            {/*</CenterBox>*/}
+            <ActionMessage
+                onAction={onStartNewRound}
+                actionIcon={<ReplayIcon fontSize="large" />}
+            >
+                <strong>Round {currentRound + 2}: {roundsShort[currentRound + 1]} </strong><br />
+                <small>Do you want to start the new round now?</small>
+            </ActionMessage>
+            {/*<CenterBox>*/}
+            {/*    <Typography variant="h6">*/}
+            {/*        /!*next round*!/*/}
+            {/*        */}
+            {/*    </Typography>*/}
+            {/*</CenterBox>*/}
         </div>
     );
 };

@@ -1,13 +1,15 @@
 import React, {
     FunctionComponent,
-    useCallback,
+    useCallback, useContext,
     useEffect,
-    useState,
+    useState
 } from "react";
 import { Word } from "../pages/Game";
 import Typography from "@material-ui/core/Typography";
 import Box from "@material-ui/core/Box";
 import { makeStyles } from "@material-ui/core/styles";
+import TeamEmoji from "./TeamEmoji";
+import { StatusContext } from "../contexts/StatusContext";
 
 const useStyles = makeStyles({
     actionText: {
@@ -21,6 +23,7 @@ const useStyles = makeStyles({
 });
 
 const TurnScore: FunctionComponent<{ wordsList: Word[], loading: boolean }> = ({ wordsList, loading }) => {
+    const { teamExplaining } = useContext(StatusContext);
     const [turnScore, setTurnScore] = useState<number>();
 
     const classes = useStyles();
@@ -45,7 +48,7 @@ const TurnScore: FunctionComponent<{ wordsList: Word[], loading: boolean }> = ({
     return (
         <Box display="flex" justifyContent="center" alignItems="center">
             <Typography variant="h6" className={classes.actionText}>
-                Your score in this round:
+                {teamExplaining ? <TeamEmoji team={teamExplaining} /> : ""} Your score in this turn:
             </Typography>
             <Typography variant="h3" color="primary" className={classes.score}>
                 {turnScore !== undefined && !loading && turnScore}

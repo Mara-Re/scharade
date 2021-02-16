@@ -16,8 +16,8 @@ import { StatusContext } from "../contexts/StatusContext";
 import IconButton from "@material-ui/core/IconButton";
 import { socket } from "../pages/Game";
 
-const EditNrOfWordsGameConfig: FunctionComponent<{}> = () => {
-    const { onError = () => {}, reloadStatus = () => {}, reloadPlayersList = () => {}, gameUid, isGameHost } = useContext(
+const EditNrOfWordsPerPlayer: FunctionComponent<{}> = () => {
+    const { onError = () => {}, reloadGame = () => {}, reloadPlayersList = () => {}, gameUid, isGameHost } = useContext(
         StatusContext
     );
     const [editDialogOpen, setEditDialogOpen] = useState(false);
@@ -26,9 +26,9 @@ const EditNrOfWordsGameConfig: FunctionComponent<{}> = () => {
         async (nrOfWordsPerPlayer) => {
             try {
                 await axios.put(`/games/${gameUid}/nrOfWordsPerPlayer`, { nrOfWordsPerPlayer });
-                reloadStatus();
+                reloadGame();
                 reloadPlayersList();
-                socket.emit("new-game-config");
+                socket.emit("new-nr-of-words-per-player");
                 setEditDialogOpen(false);
             } catch (error) {
                 onError(error);
@@ -68,4 +68,4 @@ const EditNrOfWordsGameConfig: FunctionComponent<{}> = () => {
     );
 };
 
-export default EditNrOfWordsGameConfig;
+export default EditNrOfWordsPerPlayer;

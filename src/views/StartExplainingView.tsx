@@ -1,4 +1,9 @@
-import React, { FunctionComponent, useCallback, useContext, useEffect } from "react";
+import React, {
+    FunctionComponent,
+    useCallback,
+    useContext,
+    useEffect,
+} from "react";
 import CentralBox from "../components/CentralBox";
 import PlayArrowIcon from "@material-ui/icons/PlayArrow";
 import ActionMessage from "../components/ActionMessage";
@@ -9,6 +14,15 @@ import TeamEmoji from "../components/TeamEmoji";
 import { Typography } from "@material-ui/core";
 import CenterBox from "../components/CenterBox";
 import getOppositeTeam from "../helper/getOppositeTeam";
+import { roundsShort } from "../components/Rules";
+import { makeStyles } from "@material-ui/core/styles";
+
+
+const useStyles = makeStyles({
+    increasedGutter: {
+        marginBottom: "2rem",
+    },
+});
 
 const StartExplainingView: FunctionComponent<{}> = () => {
     const {
@@ -16,31 +30,42 @@ const StartExplainingView: FunctionComponent<{}> = () => {
         setCountdown = () => {},
         playerMe,
         teamExplaining,
+        currentRound = 0,
     } = useContext(StatusContext);
+
+    const classes = useStyles();
 
     const nextTeamExplaining = getOppositeTeam(teamExplaining);
 
     const onStartExplaining = useCallback(async () => {
         if (!playerMe) return;
         setCountdown(timeToExplain);
-        socket.emit("start-explaining", {player : playerMe});
+        socket.emit("start-explaining", { player: playerMe });
     }, [playerMe, timeToExplain]);
 
     if (loadingGameStatus) return null;
 
     return (
         <CentralBox>
-            {nextTeamExplaining && playerMe?.teamAorB !== nextTeamExplaining &&(
-                <CenterBox >
+            {nextTeamExplaining && playerMe?.teamAorB !== nextTeamExplaining && (
+                <CenterBox>
+                    <Typography variant="h6" className={classes.increasedGutter}>
+                        Round {currentRound + 1}:{" "}
+                        {roundsShort[currentRound]}
+                    </Typography>
                     <Typography variant="h3">
                         It is <TeamEmoji team={nextTeamExplaining} />
-                        's turn.
+                        ’s turn.
                     </Typography>
                 </CenterBox>
             )}
             {nextTeamExplaining && playerMe?.teamAorB === nextTeamExplaining && (
                 <>
                     <CenterBox>
+                        <Typography variant="h6" className={classes.increasedGutter}>
+                            Round {currentRound + 1}:{" "}
+                            {roundsShort[currentRound]}
+                        </Typography>
                         <Typography variant="h2" gutterBottom>
                             <TeamEmoji team={nextTeamExplaining} />
                         </Typography>

@@ -61,7 +61,7 @@ app.get("/games/:uid", async (req, res) => {
         const { rows } = await db.getGame(req.params.uid);
         await res.json({ ...rows });
     } catch (error) {
-        console.log("error in /games/:uid/status get route: ", error);
+        console.log("error in /games/:uid/ get route: ", error);
     }
 });
 
@@ -415,7 +415,7 @@ io.on("connection", function (socket) {
         socket.to(gameUid).emit("new-game-status");
     });
 
-    socket.on("new-game-config", () => {
+    socket.on("new-nr-of-words-per-player", () => {
         socket.to(gameUid).emit("new-players-and-game-status");
     });
 
@@ -438,7 +438,9 @@ io.on("connection", function (socket) {
     socket.on("start-explaining", async ({ player }) => {
         try {
             const { rows } = await db.getGame(gameUid);
-            const previousTeamExplaining = rows[0].team_explaining;
+            const previousTeamExplaining = rows[0].teamExplaining;
+            console.log("previousTeamExplaining", previousTeamExplaining);
+            console.log("player.teamAorB", player.teamAorB);
             if (
                 rows[0].status === "PLAYER_EXPLAINING" ||
                 previousTeamExplaining === player.teamAorB ||

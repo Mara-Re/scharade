@@ -1,0 +1,205 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="BranchesTreeState">
+    <expand>
+      <path>
+        <item name="ROOT" type="e8cecc67:BranchNodeDescriptor" />
+        <item name="LOCAL_ROOT" type="e8cecc67:BranchNodeDescriptor" />
+      </path>
+      <path>
+        <item name="ROOT" type="e8cecc67:BranchNodeDescriptor" />
+        <item name="REMOTE_ROOT" type="e8cecc67:BranchNodeDescriptor" />
+      </path>
+      <path>
+        <item name="ROOT" type="e8cecc67:BranchNodeDescriptor" />
+        <item name="REMOTE_ROOT" type="e8cecc67:BranchNodeDescriptor" />
+        <item name="GROUP_NODE:origin" type="e8cecc67:BranchNodeDescriptor" />
+      </path>
+    </expand>
+    <select />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="0a7022e0-727d-4c6c-98e1-536c5fc08264" name="Default Changelist" comment="">
+      <change afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/database/db.js" beforeDir="false" afterPath="$PROJECT_DIR$/database/db.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/database/games.sql" beforeDir="false" afterPath="$PROJECT_DIR$/database/games.sql" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/helpers/switchTeams.js" beforeDir="false" afterPath="$PROJECT_DIR$/helpers/switchTeams.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/index.js" beforeDir="false" afterPath="$PROJECT_DIR$/index.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/CenterBox.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/CenterBox.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/EditNrOfWordsGameConfig.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/EditNrOfWordsPerPlayer.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/EndGame.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/EndGame.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/EnterWords.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/EnterWords.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/PlayerJoinGameDialog.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/PlayerJoinGameDialog.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/Rules.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/Rules.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/StartGame.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/StartGame.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/TurnScore.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/TurnScore.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/containers/EndOfRoundReached.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/containers/EndOfRoundReached.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/contexts/StatusContext.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/contexts/StatusContext.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/pages/Game.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/pages/Game.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/views/EndOfRoundReachedView.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/views/EndOfRoundReachedView.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/views/ExplainingView.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/views/ExplainingView.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/views/OtherPlayerExplainingView.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/views/OtherPlayerExplainingView.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/views/StartExplainingView.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/views/StartExplainingView.tsx" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="ProjectId" id="1iBtBopP9Lg7hwJ1opck3FRdBEJ" />
+  <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent">
+    <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
+    <property name="WebServerToolWindowFactoryState" value="false" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
+    <property name="node.js.detected.package.eslint" value="true" />
+    <property name="node.js.path.for.package.eslint" value="project" />
+    <property name="node.js.selected.package.eslint" value="(autodetect)" />
+    <property name="nodejs_package_manager_path" value="npm" />
+    <property name="prettierjs.PrettierConfiguration.Package" value="$PROJECT_DIR$/node_modules/prettier" />
+    <property name="settings.editor.selected.configurable" value="settings.javascript.prettier" />
+    <property name="ts.external.directory.path" value="$PROJECT_DIR$/node_modules/typescript/lib" />
+    <property name="vue.rearranger.settings.migration" value="true" />
+  </component>
+  <component name="RecentsManager">
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$" />
+      <recent name="$PROJECT_DIR$/src/components" />
+    </key>
+  </component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="0a7022e0-727d-4c6c-98e1-536c5fc08264" name="Default Changelist" comment="" />
+      <created>1601392679382</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1601392679382</updated>
+      <workItem from="1601392680392" duration="77000" />
+      <workItem from="1601392764453" duration="440000" />
+      <workItem from="1601658180555" duration="148000" />
+      <workItem from="1601883970055" duration="621000" />
+      <workItem from="1601888808885" duration="429000" />
+      <workItem from="1601913490348" duration="1164000" />
+      <workItem from="1602751131386" duration="440000" />
+      <workItem from="1602772744075" duration="596000" />
+      <workItem from="1602775505125" duration="4937000" />
+      <workItem from="1603350734433" duration="587000" />
+      <workItem from="1603355794708" duration="594000" />
+      <workItem from="1603379345125" duration="1057000" />
+      <workItem from="1603549888401" duration="1475000" />
+      <workItem from="1603552928248" duration="922000" />
+      <workItem from="1603554107507" duration="13894000" />
+      <workItem from="1603793168536" duration="1197000" />
+      <workItem from="1603794744940" duration="8267000" />
+      <workItem from="1603986436011" duration="542000" />
+      <workItem from="1604053475512" duration="20251000" />
+      <workItem from="1605177002927" duration="27015000" />
+      <workItem from="1606330758048" duration="164000" />
+      <workItem from="1606496574657" duration="12695000" />
+      <workItem from="1607035352247" duration="236000" />
+      <workItem from="1607085662584" duration="24250000" />
+      <workItem from="1607619726816" duration="960000" />
+      <workItem from="1608123812858" duration="594000" />
+      <workItem from="1608282653958" duration="672000" />
+      <workItem from="1608470770895" duration="5052000" />
+      <workItem from="1608480741062" duration="48000" />
+      <workItem from="1608480803406" duration="53000" />
+      <workItem from="1608480909702" duration="10000" />
+      <workItem from="1608480944162" duration="4493000" />
+      <workItem from="1608545058507" duration="388000" />
+      <workItem from="1608548308293" duration="481000" />
+      <workItem from="1608634164719" duration="364000" />
+      <workItem from="1608645156976" duration="512000" />
+      <workItem from="1608653534662" duration="8331000" />
+      <workItem from="1610813229306" duration="12580000" />
+      <workItem from="1611009415180" duration="78189000" />
+    </task>
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State />
+          </value>
+        </entry>
+      </map>
+    </option>
+    <option name="oldMeFiltersMigrated" value="true" />
+  </component>
+  <component name="WindowStateProjectService">
+    <state x="-1358" y="169" key="#com.intellij.fileTypes.FileTypeChooser" timestamp="1612270250386">
+      <screen x="-1920" y="-180" width="1920" height="1080" />
+    </state>
+    <state x="-1358" y="169" key="#com.intellij.fileTypes.FileTypeChooser/0.0.1440.900/-1920.-180.1920.1080@-1920.-180.1920.1080" timestamp="1612270250386" />
+    <state x="458" y="204" key="#com.intellij.refactoring.safeDelete.UnsafeUsagesDialog" timestamp="1612117815899">
+      <screen x="0" y="0" width="1440" height="900" />
+    </state>
+    <state x="458" y="204" key="#com.intellij.refactoring.safeDelete.UnsafeUsagesDialog/0.0.1440.900@0.0.1440.900" timestamp="1612117815899" />
+    <state x="221" y="89" key="SettingsEditor" timestamp="1612118630493">
+      <screen x="0" y="0" width="1440" height="900" />
+    </state>
+    <state x="31" y="-973" key="SettingsEditor/0.0.1440.900/-264.-1080.1920.1080@-264.-1080.1920.1080" timestamp="1607412507854" />
+    <state x="221" y="89" key="SettingsEditor/0.0.1440.900@0.0.1440.900" timestamp="1612118630493" />
+    <state x="339" y="67" key="com.intellij.openapi.editor.actions.MultiplePasteAction$ClipboardContentChooser" timestamp="1612117806406">
+      <screen x="0" y="0" width="1440" height="900" />
+    </state>
+    <state x="339" y="67" key="com.intellij.openapi.editor.actions.MultiplePasteAction$ClipboardContentChooser/0.0.1440.900@0.0.1440.900" timestamp="1612117806406" />
+    <state x="518" y="371" key="com.intellij.openapi.vcs.update.UpdateOrStatusOptionsDialogupdate-v2" timestamp="1606666825043">
+      <screen x="0" y="0" width="1440" height="900" />
+    </state>
+    <state x="518" y="371" key="com.intellij.openapi.vcs.update.UpdateOrStatusOptionsDialogupdate-v2/0.0.1440.900@0.0.1440.900" timestamp="1606666825043" />
+    <state x="486" y="111" width="878" height="789" key="find.popup" timestamp="1612702150816">
+      <screen x="0" y="0" width="1440" height="900" />
+    </state>
+    <state x="-1171" y="-75" width="1171" height="927" key="find.popup/0.0.1440.900/-1920.-180.1920.1080@-1920.-180.1920.1080" timestamp="1612528217056" />
+    <state x="485" y="-996" width="1171" height="947" key="find.popup/0.0.1440.900/-264.-1080.1920.1080@-264.-1080.1920.1080" timestamp="1607327561946" />
+    <state x="512" y="65" width="878" height="789" key="find.popup/0.0.1440.900/-264.-1080.1920.1080@0.0.1440.900" timestamp="1607324491192" />
+    <state x="486" y="111" width="878" height="789" key="find.popup/0.0.1440.900@0.0.1440.900" timestamp="1612702150816" />
+    <state x="486" y="121" width="878" height="700" key="find.popup/0.23.1440.798@0.23.1440.798" timestamp="1611821617554" />
+    <state x="385" y="210" key="run.anything.popup" timestamp="1608480217546">
+      <screen x="0" y="0" width="1440" height="900" />
+    </state>
+    <state x="385" y="210" key="run.anything.popup/0.0.1440.900@0.0.1440.900" timestamp="1608480217546" />
+    <state x="739" y="159" width="670" height="676" key="search.everywhere.popup" timestamp="1612701877912">
+      <screen x="0" y="0" width="1440" height="900" />
+    </state>
+    <state x="-1407" y="55" width="894" height="812" key="search.everywhere.popup/0.0.1440.900/-1920.-180.1920.1080@-1920.-180.1920.1080" timestamp="1612530460409" />
+    <state x="249" y="-845" width="894" height="812" key="search.everywhere.popup/0.0.1440.900/-264.-1080.1920.1080@-264.-1080.1920.1080" timestamp="1607413574875" />
+    <state x="739" y="159" width="670" height="676" key="search.everywhere.popup/0.0.1440.900@0.0.1440.900" timestamp="1612701877912" />
+    <state x="739" y="164" width="670" height="600" key="search.everywhere.popup/0.23.1440.798/-1920.-180.1920.1080@0.23.1440.798" timestamp="1611751077757" />
+    <state x="739" y="164" width="670" height="600" key="search.everywhere.popup/0.23.1440.798@0.23.1440.798" timestamp="1611821522884" />
+  </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint enabled="true" type="javascript">
+          <url>file://$PROJECT_DIR$/helpers/addTurnScoreToTeam.js</url>
+          <line>18</line>
+          <option name="timeStamp" value="2" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="javascript">
+          <url>file://$PROJECT_DIR$/src/components/PlayerJoinGameDialog.tsx</url>
+          <line>34</line>
+          <properties lambdaOrdinal="-1" />
+          <option name="timeStamp" value="4" />
+        </line-breakpoint>
+      </breakpoints>
+    </breakpoint-manager>
+  </component>
+</project>

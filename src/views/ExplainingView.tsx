@@ -14,14 +14,17 @@ import EndOfRoundReached from "../containers/EndOfRoundReached";
 import TurnScore from "../components/TurnScore";
 import WordsList from "../components/WordsList";
 import { GameStatus, Word, WordStatus } from "../pages/Game";
+import { Typography } from "@material-ui/core";
+import CenterBox from "../components/CenterBox";
 
 const ExplainingView: FunctionComponent<{}> = () => {
     const {
         gameUid,
         onError = () => {},
-        reloadStatus = () => {},
+        reloadGame = () => {},
         gameStatus,
         loadingGameStatus,
+        currentRound = 0,
     } = useContext(StatusContext);
 
     const [wordToExplain, setWordToExplain] = useState<Word>();
@@ -56,17 +59,19 @@ const ExplainingView: FunctionComponent<{}> = () => {
             await axios.post(`/games/${gameUid}/status`, {
                 status: GameStatus.END_OF_ROUND_REACHED,
             });
-            await reloadStatus();
+            await reloadGame();
             socket.emit("end-of-round");
         } catch (error) {
             onError(error);
         }
-    }, [gameUid]);
+    }, [gameUid, reloadGame]);
 
     const getWordsList = useCallback(async () => {
         setLoadingWordsList(true);
         try {
-            const { data } = await axios.get(`/games/${gameUid}/words/thisTurn`);
+            const { data } = await axios.get(
+                `/games/${gameUid}/words/thisTurn`
+            );
             setWordsList(data);
         } catch (error) {
             onError(error);
@@ -105,7 +110,7 @@ const ExplainingView: FunctionComponent<{}> = () => {
     );
 
     const showTurnScore =
-        (gameStatus === GameStatus.END_OF_ROUND_REACHED) ||
+        gameStatus === GameStatus.END_OF_ROUND_REACHED ||
         gameStatus === GameStatus.TIME_OVER;
 
     if (loadingGameStatus) return <></>;
@@ -113,10 +118,23 @@ const ExplainingView: FunctionComponent<{}> = () => {
     return (
         <>
             <CentralBox>
-                {showTurnScore && <TurnScore loading={loadingWordsList} wordsList={wordsList} />}
+                {gameStatus === GameStatus.END_OF_ROUND_REACHED && (
+                    <CenterBox marginBottom={true}>
+                        <Typography variant="h6" gutterBottom={true}>
+                            You've reached the end of <strong>round {currentRound + 1}</strong>!
+                        </Typography>
+                    </CenterBox>
+                )}
+                {showTurnScore && (
+                    <TurnScore
+                        loading={loadingWordsList}
+                        wordsList={wordsList}
+                    />
+                )}
                 {gameStatus === GameStatus.END_OF_ROUND_REACHED && (
                     <EndOfRoundReached />
                 )}
+
                 {gameStatus === GameStatus.PLAYER_EXPLAINING && wordToExplain && (
                     <WordCard
                         onWordGuessed={() =>
