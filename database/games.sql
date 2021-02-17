@@ -9,6 +9,3 @@ CREATE TABLE games (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     nr_of_words_per_player INT
 );
-
-
-INSERT INTO games (status, uid) VALUES ('setup', 'testuid');
