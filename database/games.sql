@@ -10,6 +10,3 @@ CREATE TABLE games (
     nr_of_words_per_player INT,
     current_round INT DEFAULT 0
 );
-
-
-INSERT INTO games (status, uid) VALUES ('setup', 'testuid');

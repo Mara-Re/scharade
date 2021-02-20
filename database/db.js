@@ -1,6 +1,7 @@
 const spicedPg = require("spiced-pg");
 const db = spicedPg(
     process.env.DATABASE_URL ||
+    // postgres:<username>:<password>@localhost:<port>/<dbname>
         "postgres:postgres:postgres@localhost:5555/scharade"
 );
 

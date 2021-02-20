@@ -10,9 +10,3 @@ CREATE TABLE words (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     player_word_index INT
 );
-
-
-INSERT INTO words (word, status, game_id) VALUES ('Wurmkiste', 'pile', '1');
-INSERT INTO words (word, status, game_id) VALUES ('Schlafmütze', 'pile', '1');
-INSERT INTO words (word, status, game_id) VALUES ('Hunger', 'guessed', '1');
-INSERT INTO words (word, status, game_id) VALUES ('Leben', 'pile', '1');

@@ -5,13 +5,13 @@ The game Zettelchen is hosted on https://www.zettelchen.herokuapp.com/. Find an 
 ## Development setup
 
 ### Prerequisites
-- node.js (v12.18.4)
-- PostgreSQL 13
+- node.js (I use v12.18.4)
+- PostgreSQL (I use 13)
 
 ### Setup database 
 Create PostgreSQL tables using code from the `.sql` files in  `./database/` 
 
-Run PostgreSQL on port 432xxxx.
+Run PostgreSQL on port 5555 (to change to the default port 5432 or any other port, replace the port in the db url in`./database/db.js` accordingly).
 
 ### Install modules
 `npm install`
@@ -21,5 +21,8 @@ Run PostgreSQL on port 432xxxx.
 
 `node index.js`
 
+## Contributions
+
+PRs welcome :)
 
  
