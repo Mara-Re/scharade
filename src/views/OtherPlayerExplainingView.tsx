@@ -70,6 +70,10 @@ const OtherPlayerExplainingView: FunctionComponent<{}> = () => {
         timeOutRef.current = setTimeout(() => {
             setNewWordGuessedOrDiscarded(undefined);
         }, 3000);
+
+        return () => {
+            clearTimeout(timeOutRef.current);
+        }
     }, [newWordGuessedOrDiscarded]);
 
     return (
