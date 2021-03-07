@@ -11,7 +11,11 @@ The game Zettelchen is hosted on https://www.zettelchen.herokuapp.com/. Find an 
 ### Setup database 
 Create PostgreSQL tables using code from the `.sql` files in  `./database/` 
 
-Run PostgreSQL on port 5555 (to change to the default port 5432 or any other port, replace the port in the db url in`./database/db.js` accordingly).
+Configure the postgres wrapper spiced-pg in `./database/db.js` to match your postgres settings:
+
+`spicedPg(postgres:<username>:<password>@localhost:<port>/<dbname>);` 
+
+
 
 ### Install modules
 `npm install`
