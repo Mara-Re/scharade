@@ -12,14 +12,14 @@ import TeamEmoji from "./TeamEmoji";
 import { StatusContext } from "../contexts/StatusContext";
 
 const useStyles = makeStyles({
-    actionText: {
-        maxWidth: "60vw",
-    },
     score: {
         marginLeft: 40,
         // @ts-ignore
         fontWeight: "400",
     },
+    spacingTop: {
+        marginTop: "20px"
+    }
 });
 
 const TurnScore: FunctionComponent<{ wordsList: Word[], loading: boolean }> = ({ wordsList, loading }) => {
@@ -46,8 +46,8 @@ const TurnScore: FunctionComponent<{ wordsList: Word[], loading: boolean }> = ({
         [wordsList]
     );
     return (
-        <Box display="flex" justifyContent="center" alignItems="center">
-            <Typography variant="h6" className={classes.actionText}>
+        <Box display="flex" justifyContent="center" alignItems="center" className={classes.spacingTop}>
+            <Typography variant="h6">
                 {teamExplaining ? <TeamEmoji team={teamExplaining} /> : ""} Your score in this turn:
             </Typography>
             <Typography variant="h3" color="primary" className={classes.score}>

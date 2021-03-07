@@ -1,21 +1,17 @@
-import React, { FunctionComponent, useCallback, useContext } from "react";
-import ActionMessage from "../components/ActionMessage";
-import ReplayIcon from "@material-ui/icons/Replay";
+import React, {
+    FunctionComponent,
+    useCallback,
+    useContext,
+} from "react";
 import { socket } from "../pages/Game";
 import { StatusContext } from "../contexts/StatusContext";
 import { makeStyles } from "@material-ui/core/styles";
-import { Typography } from "@material-ui/core";
-import TeamEmoji from "../components/TeamEmoji";
-import CenterBox from "../components/CenterBox";
-import { roundsShort } from "../components/Rules";
+import RoundIndicator from "../components/RoundIndicator";
 
 const useStyles = makeStyles({
-    spacingTop: {
-        marginTop: "30px",
-    },
-    increasedGutter: {
-        marginBottom: "1rem",
-    },
+    spacingBottom: {
+        marginBottom: "70px"
+    }
 });
 
 const EndOfRoundReached: FunctionComponent<{}> = () => {
@@ -36,25 +32,12 @@ const EndOfRoundReached: FunctionComponent<{}> = () => {
     if (!teamExplaining || !playerExplaining || !playerMe) return null;
 
     return (
-        <div className={classes.spacingTop}>
-            {/*<CenterBox>*/}
-            {/*    <Typography variant="h2" gutterBottom>*/}
-            {/*        <TeamEmoji team={teamExplaining} />*/}
-            {/*    </Typography>*/}
-            {/*</CenterBox>*/}
-            <ActionMessage
-                onAction={onStartNewRound}
-                actionIcon={<ReplayIcon fontSize="large" />}
-            >
-                <strong>Round {currentRound + 2}: {roundsShort[currentRound + 1]} </strong><br />
-                <small>Do you want to start the new round now?</small>
-            </ActionMessage>
-            {/*<CenterBox>*/}
-            {/*    <Typography variant="h6">*/}
-            {/*        /!*next round*!/*/}
-            {/*        */}
-            {/*    </Typography>*/}
-            {/*</CenterBox>*/}
+        <div className={classes.spacingBottom}>
+                <RoundIndicator
+                    round={currentRound + 1}
+                    indicateNextRound={true}
+                    onStartNewRound={onStartNewRound}
+                />
         </div>
     );
 };

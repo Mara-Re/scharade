@@ -120,8 +120,6 @@ const Game: FunctionComponent<{}> = () => {
 
     const [game, setGame] = useState<Game>();
 
-    console.log("game", game);
-
     const isPlayerMeExplaining: boolean | undefined =
         game?.playerExplainingId !== undefined &&
         playerMe &&

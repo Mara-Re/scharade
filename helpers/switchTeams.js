@@ -6,8 +6,6 @@ const switchTeams = async (gameUid) => {
         const prevTeamAorB = rows[0].teamExplaining;
 
         const newTeamExplaining = prevTeamAorB === "A" ? "B" : "A";
-        console.log('prevTeamAorB: ', prevTeamAorB);
-        console.log('newTeamExplaining: ', newTeamExplaining);
 
         await db.updateTeamExplaining(gameUid, newTeamExplaining);
     } catch(error) {

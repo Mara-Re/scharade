@@ -32,14 +32,6 @@ module.exports.getTurnWordsList = function getTurnWordsList(gameUid) {
     );
 };
 
-module.exports.getGame = function getGame(gameUid) {
-    return db.query(
-        `SELECT * FROM games
-        WHERE uid = $1`,
-        [gameUid]
-    );
-};
-
 module.exports.updateTeamExplaining = function updateTeamExplaining(
     gameUid,
     team
@@ -59,6 +51,15 @@ module.exports.getGame = function getGame(gameUid) {
         [gameUid]
     );
 };
+
+module.exports.updateCurrentRound = function updateCurrentRound(gameUid, round) {
+    return db.query(
+        `UPDATE games
+        SET current_round = $2
+        WHERE uid = $1`,
+        [gameUid, round]
+    );
+}
 
 module.exports.setGameStatus = function setGameStatus(gameUid, status) {
     return db.query(

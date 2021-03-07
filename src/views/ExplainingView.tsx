@@ -24,7 +24,6 @@ const ExplainingView: FunctionComponent<{}> = () => {
         reloadGame = () => {},
         gameStatus,
         loadingGameStatus,
-        currentRound = 0,
     } = useContext(StatusContext);
 
     const [wordToExplain, setWordToExplain] = useState<Word>();
@@ -119,11 +118,7 @@ const ExplainingView: FunctionComponent<{}> = () => {
         <>
             <CentralBox>
                 {gameStatus === GameStatus.END_OF_ROUND_REACHED && (
-                    <CenterBox marginBottom={true}>
-                        <Typography variant="h6" gutterBottom={true}>
-                            You've reached the end of <strong>round {currentRound + 1}</strong>!
-                        </Typography>
-                    </CenterBox>
+                    <EndOfRoundReached />
                 )}
                 {showTurnScore && (
                     <TurnScore
@@ -131,10 +126,6 @@ const ExplainingView: FunctionComponent<{}> = () => {
                         wordsList={wordsList}
                     />
                 )}
-                {gameStatus === GameStatus.END_OF_ROUND_REACHED && (
-                    <EndOfRoundReached />
-                )}
-
                 {gameStatus === GameStatus.PLAYER_EXPLAINING && wordToExplain && (
                     <WordCard
                         onWordGuessed={() =>

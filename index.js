@@ -439,8 +439,6 @@ io.on("connection", function (socket) {
         try {
             const { rows } = await db.getGame(gameUid);
             const previousTeamExplaining = rows[0].teamExplaining;
-            console.log("previousTeamExplaining", previousTeamExplaining);
-            console.log("player.teamAorB", player.teamAorB);
             if (
                 rows[0].status === "PLAYER_EXPLAINING" ||
                 previousTeamExplaining === player.teamAorB ||
@@ -485,6 +483,7 @@ io.on("connection", function (socket) {
                 throw new Error();
             } else {
                 await addTurnScoreToTeamScore(gameUid);
+                await db.updateCurrentRound(gameUid, rows[0].currentRound + 1);
                 await db.setGameStatus(gameUid, "PLAYER_EXPLAINING");
                 await db.resetWords(gameUid, "pile");
                 io.in(gameUid).emit("new-game-status");

@@ -6,7 +6,8 @@ import { makeStyles } from "@material-ui/core/styles";
 
 const useStyles = makeStyles({
     timeOver: {
-        maxWidth: "50px"
+        maxWidth: "50px",
+        lineHeight: "1.3"
     }
 });
 

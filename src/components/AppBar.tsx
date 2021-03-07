@@ -1,14 +1,12 @@
-import React, { FunctionComponent, useContext, useEffect, useState } from "react";
+import React, { FunctionComponent, useContext } from "react";
 import AppBarMui from "@material-ui/core/AppBar";
 import { makeStyles } from "@material-ui/core/styles";
 import Typography from "@material-ui/core/Typography";
 import Toolbar from "@material-ui/core/Toolbar";
 import Timer from "./Timer";
-import StartGame from "./StartGame";
 import { StatusContext } from "../contexts/StatusContext";
 import { GameStatus } from "../pages/Game";
 import Info from "./Info";
-import axios from "axios";
 
 const useStyles = makeStyles((theme) => ({
     toolbar: {
@@ -26,11 +24,11 @@ const useStyles = makeStyles((theme) => ({
     title: {
         flexGrow: 1,
         alignSelf: "center",
-    }
+    },
 }));
 
 const AppBar: FunctionComponent<{ type: "home" | "game" }> = ({ type }) => {
-    const { gameStatus, countdown, loadingGameStatus, isGameHost } = useContext(
+    const { gameStatus, countdown , loadingGameStatus } = useContext(
         StatusContext
     );
     const classes = useStyles();
@@ -48,8 +46,12 @@ const AppBar: FunctionComponent<{ type: "home" | "game" }> = ({ type }) => {
                 <Typography className={classes.title} variant="h6" noWrap>
                     Zettelchen
                 </Typography>
-                {type === "game" && showTimer && <Timer timeOver={gameStatus === GameStatus.TIME_OVER}>{countdown}</Timer>}
-                {type === "home" && <Info type="header"/>}
+                {type === "game" && showTimer && (
+                    <Timer timeOver={gameStatus === GameStatus.TIME_OVER}>
+                        {countdown}
+                    </Timer>
+                )}
+                {type === "home" && <Info type="header" />}
             </Toolbar>
         </AppBarMui>
     );
