@@ -33,7 +33,7 @@ const useStyles = makeStyles({
 const StartGame: FunctionComponent<{}> = (props) => {
     const classes = useStyles();
 
-    const { gameUid, reloadStatus = () => {}, onError = () => {} } = useContext(
+    const { gameUid, reloadGame = () => {}, onError = () => {} } = useContext(
         StatusContext
     );
 
@@ -47,12 +47,12 @@ const StartGame: FunctionComponent<{}> = (props) => {
             await axios.post(`/games/${gameUid}/createTeams`);
 
             socket.emit("start-game");
-            reloadStatus();
+            reloadGame();
             setStartDialogOpen(false);
         } catch (error) {
             onError(error);
         }
-    }, [gameUid, reloadStatus, onError]);
+    }, [gameUid, reloadGame, onError]);
 
     return (
         <>

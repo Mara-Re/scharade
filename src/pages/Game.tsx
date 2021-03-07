@@ -50,10 +50,6 @@ export interface Player {
     enterWordsCompleted: boolean;
 }
 
-export interface GameConfig {
-    nrOfWordsPerPlayer: number;
-}
-
 ///// Allow socket reconnects on mobile devices without page reload////
 let isConnected = false;
 let socketTimeoutId: number;
@@ -103,39 +99,52 @@ retryConnectOnFailure(RETRY_INTERVAL);
 // automatically determine whose player's turn it is
 // enable players to kick out other players
 
+interface Game {
+    status: GameStatus;
+    teamExplaining: Team;
+    playerExplainingId: number;
+    nrOfWordsPerPlayer: number;
+    currentRound: number;
+}
+
 const Game: FunctionComponent<{}> = () => {
     const [playerMe, setPlayerMe] = useState<Player>();
     const [playersList, setPlayersList] = useState<Player[]>();
     const [loadingGameStatus, setLoadingGameStatus] = useState(true);
     const [loadingPlayerMe, setLoadingPlayerMe] = useState(true);
     const [error, setError] = useState<any>();
-    const [gameStatus, setGameStatus] = useState(GameStatus.SETUP);
-    const [teamExplaining, setTeamExplaining] = useState<Team>();
     const [playerExplaining, setPlayerExplaining] = useState<Player>();
     const [countdown, setCountdown] = useState<number>();
     const [isGameHost, setIsGameHost] = useState(false);
     const [showGameLinkDialog, setShowGameLinkDialog] = useState<boolean>();
-    const [gameConfig, setGameConfig] = useState<GameConfig>();
+
+    const [game, setGame] = useState<Game>();
 
     const isPlayerMeExplaining: boolean | undefined =
-        playerExplaining && playerMe && playerExplaining?.id === playerMe?.id;
+        game?.playerExplainingId !== undefined &&
+        playerMe &&
+        game?.playerExplainingId === playerMe?.id;
 
-    const Component = statusMapping(gameStatus, isPlayerMeExplaining);
+    const Component: FunctionComponent<{}> = game?.status ? (
+        statusMapping(game.status, isPlayerMeExplaining)
+    ) : (
+        () => <></>
+    );
 
     //---------SOCKET EVENT LISTENERS-----------------------
     useEffect(() => {
         socket.on("new-game-status", () => {
-            getGameStatus();
+            getGame();
         });
         socket.on("players-list-changed", () => {
             getPlayersList();
         });
         socket.on("new-players-and-game-status", () => {
-            getGameStatus();
+            getGame();
             getPlayersList();
         });
         socket.on("connected", async () => {
-            const currentGameStatus = await getGameStatus();
+            const currentGameStatus = await getGame();
             getPlayersList();
             getPlayerMe();
             if (currentGameStatus !== GameStatus.END_OF_ROUND_REACHED) {
@@ -184,13 +193,14 @@ const Game: FunctionComponent<{}> = () => {
         }
     }, [onError, gameUid]);
 
-    const getGameStatus = useCallback(async (): Promise<
+    const getGame = useCallback(async (): Promise<
         GameStatus | undefined
-        > => {
+    > => {
         setLoadingGameStatus(true);
         try {
             const { data } = await axios.get(`/games/${gameUid}`);
-            const playerExplainingId = data[0].player_explaining_id;
+            const game = data[0] as Game | undefined;
+            const playerExplainingId = game?.playerExplainingId;
             if (playerExplainingId) {
                 const { data: playerData } = await axios.get(
                     `/games/${gameUid}/player/${playerExplainingId}`
@@ -198,14 +208,9 @@ const Game: FunctionComponent<{}> = () => {
                 const newPlayerExplaining = playerData[0] as Player;
                 setPlayerExplaining(newPlayerExplaining);
             }
-            const newGameStatus = data[0].status as GameStatus;
-            const newTeamExplaining = data[0].team_explaining as Team;
-            const nrOfWordsPerPlayer = data[0].nr_of_words_per_player as number;
-            setGameConfig({ nrOfWordsPerPlayer });
-            setGameStatus(newGameStatus);
-            setTeamExplaining(newTeamExplaining);
+            setGame(game as Game)
             setLoadingGameStatus(false);
-            return newGameStatus;
+            return game?.status;
         } catch (error) {
             onError(error);
             setLoadingGameStatus(false);
@@ -223,11 +228,11 @@ const Game: FunctionComponent<{}> = () => {
     }, [onError]);
 
     useEffect(() => {
-        getGameStatus();
+        getGame();
         getPlayerMe();
         getGameHost();
         getPlayersList();
-    }, [getGameStatus, getPlayerMe, getPlayersList, getGameHost]);
+    }, [getGame, getPlayerMe, getPlayersList, getGameHost]);
 
     useEffect(() => {
         const getShowGameLinkDialogInfo = async () => {
@@ -247,8 +252,10 @@ const Game: FunctionComponent<{}> = () => {
                 gameUid,
                 isGameHost,
                 playerExplaining,
-                gameStatus,
-                teamExplaining,
+                gameStatus: game?.status,
+                teamExplaining: game?.teamExplaining,
+                currentRound: game?.currentRound,
+                nrOfWordsPerPlayer: game?.nrOfWordsPerPlayer,
                 playerMe,
                 playersList,
                 setCountdown,
@@ -256,8 +263,7 @@ const Game: FunctionComponent<{}> = () => {
                 onError,
                 error,
                 loadingGameStatus,
-                gameConfig,
-                reloadStatus: getGameStatus,
+                reloadGame: getGame,
                 reloadPlayerMe: getPlayerMe,
                 reloadGameHost: getGameHost,
                 reloadPlayersList: getPlayersList,

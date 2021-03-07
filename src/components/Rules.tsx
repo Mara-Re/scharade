@@ -19,4 +19,9 @@ export const rounds = [
     <span><strong>Sound</strong> (solely use sounds – make sure your teammates do not see you)</span>,
 ]
 
+export const roundsShort = ["Describe", "One word", "Pantomime", "Finger pantomime", "Sound"];
+
+export const roundsEmoji = ["💬", "💥️", "🕺", "✌️", "🎙"];
+
+
 

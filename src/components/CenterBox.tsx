@@ -6,16 +6,20 @@ const useStyles = makeStyles({
         margin: "auto",
         textAlign: "center",
     },
+    marginBottom: {
+        marginBottom: "2rem"
+    }
 });
 
-const CenterBox: FunctionComponent<{ className?: string }> = ({
+const CenterBox: FunctionComponent<{ className?: string, marginBottom?: boolean }> = ({
     children,
     className,
+    marginBottom
 }) => {
     const classes = useStyles();
 
     return (
-        <div className={`${classes.centerBox} ${className}`}>{children}</div>
+        <div className={`${classes.centerBox} ${classes.marginBottom} ${className}`}>{children}</div>
     );
 };
 

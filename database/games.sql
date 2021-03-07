@@ -7,5 +7,6 @@ CREATE TABLE games (
     team_explaining VARCHAR(255),
     player_explaining_id INT REFERENCES players(id),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    nr_of_words_per_player INT
+    nr_of_words_per_player INT,
+    current_round INT DEFAULT 0
 );

@@ -32,14 +32,6 @@ module.exports.getTurnWordsList = function getTurnWordsList(gameUid) {
     );
 };
 
-module.exports.getGame = function getGame(gameUid) {
-    return db.query(
-        `SELECT * FROM games
-        WHERE uid = $1`,
-        [gameUid]
-    );
-};
-
 module.exports.updateTeamExplaining = function updateTeamExplaining(
     gameUid,
     team
@@ -54,11 +46,20 @@ module.exports.updateTeamExplaining = function updateTeamExplaining(
 
 module.exports.getGame = function getGame(gameUid) {
     return db.query(
-        `SELECT * FROM games
+        `SELECT status, team_explaining AS "teamExplaining", player_explaining_id AS "playerExplainingId", nr_of_words_per_player AS "nrOfWordsPerPlayer", current_round AS "currentRound" FROM games
         WHERE uid = $1`,
         [gameUid]
     );
 };
+
+module.exports.updateCurrentRound = function updateCurrentRound(gameUid, round) {
+    return db.query(
+        `UPDATE games
+        SET current_round = $2
+        WHERE uid = $1`,
+        [gameUid, round]
+    );
+}
 
 module.exports.setGameStatus = function setGameStatus(gameUid, status) {
     return db.query(
@@ -209,7 +210,7 @@ module.exports.addPlayer = function addPlayer(player) {
 
 module.exports.getPlayer = function getPlayer(gameUid, playerId) {
     return db.query(
-        `SELECT id, name, team_a_or_b as "teamAorB", game_uid as "gameUid", enter_words_completed as "enterWordsCompleted" FROM players
+        `SELECT id, name, team_a_or_b AS "teamAorB", game_uid AS "gameUid", enter_words_completed AS "enterWordsCompleted" FROM players
         WHERE game_uid = $1 AND id = $2`,
         [gameUid, playerId]
     );
@@ -217,7 +218,7 @@ module.exports.getPlayer = function getPlayer(gameUid, playerId) {
 
 module.exports.getPlayers = function getPlayers(gameUid) {
     return db.query(
-        `SELECT name, team_a_or_b AS "teamAorB", enter_words_completed as "enterWordsCompleted", COUNT(words.id) AS "nrOfWords"
+        `SELECT name, team_a_or_b AS "teamAorB", enter_words_completed AS "enterWordsCompleted", COUNT(words.id) AS "nrOfWords"
         FROM players
         LEFT JOIN words
         ON words.player_id = players.id

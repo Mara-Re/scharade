@@ -1,13 +1,14 @@
 import React, { createContext } from "react";
-import { GameConfig, GameStatus, Player, Team, Word } from "../pages/Game";
+import { GameStatus, Player, Team, Word } from "../pages/Game";
 
 interface StatusContextProps {
     playerExplaining?: Player;
     gameStatus?: GameStatus;
-    gameConfig?: GameConfig;
+    nrOfWordsPerPlayer?: number;
     teamExplaining?: Team;
+    currentRound?: number;
     setCountdown: (countdown: number) => void;
-    reloadStatus: () => void;
+    reloadGame: () => void;
     reloadPlayerMe: () => void;
     reloadPlayersList: () => void;
     onError: (error: any) => void;
@@ -23,7 +24,7 @@ interface StatusContextProps {
 }
 
 export const StatusContext = createContext<Partial<StatusContextProps>>({
-    reloadStatus: () => {},
+    reloadGame: () => {},
     onError: () => {},
     gameUid: "",
     wordsList: [],

@@ -15,7 +15,7 @@ import { StatusContext } from "../contexts/StatusContext";
 import { socket } from "../pages/Game";
 
 const EndGame: FunctionComponent<{}> = () => {
-    const { gameUid, reloadStatus = () => {}, onError = () => {} } = useContext(
+    const { gameUid, reloadGame = () => {}, onError = () => {} } = useContext(
         StatusContext
     );
 
@@ -25,12 +25,12 @@ const EndGame: FunctionComponent<{}> = () => {
         try {
             await axios.post(`/games/${gameUid}/endGame`);
             socket.emit("end-game");
-            reloadStatus();
+            reloadGame();
             setEndGameDialogOpen(false);
         } catch (error) {
             onError(error);
         }
-    }, [reloadStatus, gameUid, onError]);
+    }, [reloadGame, gameUid, onError]);
 
     return (
         <>

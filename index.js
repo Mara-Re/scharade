@@ -61,7 +61,7 @@ app.get("/games/:uid", async (req, res) => {
         const { rows } = await db.getGame(req.params.uid);
         await res.json({ ...rows });
     } catch (error) {
-        console.log("error in /games/:uid/status get route: ", error);
+        console.log("error in /games/:uid/ get route: ", error);
     }
 });
 
@@ -378,12 +378,11 @@ io.on("connection", function (socket) {
     };
 
     const setCountdownInterval = () =>
-        setInterval(function () {
+        setInterval( async () => {
             io.in(gameUid).emit("timer", { countdown, timerId });
             countdown--;
             if (countdown < 0) {
                 io.in(gameUid).emit("timer", { countdown: undefined });
-                io.in(gameUid).emit("new-game-status");
                 countdown = timeToExplain;
                 const adjustGameStatus = async () => {
                     // ignore onTimerOver when game is currently not ongoing:
@@ -393,7 +392,8 @@ io.on("connection", function (socket) {
                     }
                     await db.setGameStatus(gameUid, "TIME_OVER");
                 };
-                adjustGameStatus();
+                await adjustGameStatus();
+                io.in(gameUid).emit("new-game-status");
                 clearInterval(timerId);
                 timerId = undefined;
                 return;
@@ -415,7 +415,7 @@ io.on("connection", function (socket) {
         socket.to(gameUid).emit("new-game-status");
     });
 
-    socket.on("new-game-config", () => {
+    socket.on("new-nr-of-words-per-player", () => {
         socket.to(gameUid).emit("new-players-and-game-status");
     });
 
@@ -438,7 +438,7 @@ io.on("connection", function (socket) {
     socket.on("start-explaining", async ({ player }) => {
         try {
             const { rows } = await db.getGame(gameUid);
-            const previousTeamExplaining = rows[0].team_explaining;
+            const previousTeamExplaining = rows[0].teamExplaining;
             if (
                 rows[0].status === "PLAYER_EXPLAINING" ||
                 previousTeamExplaining === player.teamAorB ||
@@ -483,6 +483,7 @@ io.on("connection", function (socket) {
                 throw new Error();
             } else {
                 await addTurnScoreToTeamScore(gameUid);
+                await db.updateCurrentRound(gameUid, rows[0].currentRound + 1);
                 await db.setGameStatus(gameUid, "PLAYER_EXPLAINING");
                 await db.resetWords(gameUid, "pile");
                 io.in(gameUid).emit("new-game-status");
