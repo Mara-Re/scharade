@@ -378,12 +378,11 @@ io.on("connection", function (socket) {
     };
 
     const setCountdownInterval = () =>
-        setInterval(function () {
+        setInterval( async () => {
             io.in(gameUid).emit("timer", { countdown, timerId });
             countdown--;
             if (countdown < 0) {
                 io.in(gameUid).emit("timer", { countdown: undefined });
-                io.in(gameUid).emit("new-game-status");
                 countdown = timeToExplain;
                 const adjustGameStatus = async () => {
                     // ignore onTimerOver when game is currently not ongoing:
@@ -393,7 +392,8 @@ io.on("connection", function (socket) {
                     }
                     await db.setGameStatus(gameUid, "TIME_OVER");
                 };
-                adjustGameStatus();
+                await adjustGameStatus();
+                io.in(gameUid).emit("new-game-status");
                 clearInterval(timerId);
                 timerId = undefined;
                 return;
